@@ -1,0 +1,492 @@
+.sidebar {
+  height: 100vh;
+  background: #1a1a1a;
+  color: white;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar.expanded {
+  width: 240px;
+}
+
+.sidebar.expanded ~ .content-wrapper {
+  margin-left: 240px;
+  transition: margin-left 0.3s ease;
+}
+
+.sidebar.collapsed {
+  width: 72px;
+}
+
+.sidebar.collapsed ~ .content-wrapper {
+  margin-left: 92px; /* 72px sidebar width + 20px gap */
+  transition: margin-left 0.3s ease;
+}
+
+.sidebar-header {
+  position: relative;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.brand-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #333;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.brand-text {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 1rem 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  justify-content: space-between;
+  padding: 0.75rem 1.25rem;
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.nav-item.active {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.item-icon {
+  font-size: 1.25rem;
+  min-width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.item-label {
+  transition: all 0.2s ease;
+  flex: 1;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.dropdown-icon {
+  font-size: 1.25rem;
+  transition: transform 0.2s ease;
+  opacity: 0.7;
+}
+
+.dropdown-icon.rotated {
+  transform: rotate(180deg);
+}
+
+.sidebar-footer {
+  padding: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: auto;
+}
+
+.logout-button {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  width: 100%;
+}
+
+.logout-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.toggle-button {
+  position: absolute;
+  right: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+  z-index: 10;
+}
+
+.toggle-button:hover {
+  background: #333;
+}
+
+.toggle-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.collapsed-item {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0.75rem 0.5rem;
+}
+
+.collapsed-label {
+  font-size: 0.7rem;
+  margin-top: 0.5rem;
+  white-space: normal;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.expanded-item {
+  padding: 0.75rem 1rem;
+  line-height: 1.2;
+  transition: background-color 0.2s;
+}
+
+.submenu {
+  display: flex;
+  flex-direction: column;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.submenu-item {
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  width: 100%;
+}
+
+.submenu-item:hover {
+  border-left: 3px solid rgba(255, 255, 255, 1);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.submenu-item.active {
+  border-left: 3px solid rgba(255, 255, 255, 1);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Nested submenu styles - applies to all nested dropdowns */
+.nested-submenu {
+  display: flex;
+  flex-direction: column;
+  background: rgba(0, 0, 0, 0.2);
+  margin-left: 2.5rem; /* Indentation for nested items */
+}
+
+.nested-submenu-item {
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.nested-submenu-item:hover {
+  border-left: 2px solid rgba(255, 255, 255, 1);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.nested-submenu-item.active {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Dropdown icon */
+.dropdown-icon {
+  margin-left: auto;
+  transition: transform 0.2s ease;
+}
+
+.dropdown-icon.rotated {
+  transform: rotate(180deg); /* Rotate down when expanded */
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+  .nested-submenu {
+    margin-left: 2rem;
+  }
+}
+
+/* iPhone SE, iPhone XR (smaller phones) */
+@media screen and (max-width: 375px) {
+  .sidebar.expanded {
+    width: 200px;
+  }
+  
+  .sidebar.collapsed {
+    width: 60px;
+  }
+  
+  .sidebar.collapsed ~ .content-wrapper {
+    margin-left: 60px;
+  }
+  
+  .sidebar.expanded ~ .content-wrapper {
+    margin-left: 200px;
+  }
+}
+
+/* iPhone 12 Pro, iPhone 14 Pro Max (larger phones) */
+@media screen and (min-width: 376px) and (max-width: 428px) {
+  .sidebar.expanded {
+    width: 220px;
+  }
+  
+  .sidebar.expanded ~ .content-wrapper {
+    margin-left: 220px;
+  }
+}
+
+/* Tablets - iPad Mini, iPad Air */
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+  .sidebar.expanded {
+    width: 260px;
+  }
+  
+  .sidebar.expanded ~ .content-wrapper {
+    margin-left: 260px;
+  }
+}
+
+/* iPad Pro, Surface Pro 7 */
+@media screen and (min-width: 1024px) and (max-width: 1366px) {
+  .sidebar.expanded {
+    width: 280px;
+  }
+  
+  .sidebar.expanded ~ .content-wrapper {
+    margin-left: 280px;
+  }
+}
+
+/* Foldables - Galaxy Z Fold, Surface Duo (unfolded) */
+@media screen and (min-width: 717px) and (max-width: 767px) {
+  .sidebar.expanded {
+    width: 230px;
+  }
+  
+  .sidebar.expanded ~ .content-wrapper {
+    margin-left: 230px;
+  }
+}
+
+/* MacBook Air (1440 x 900) */
+@media screen and (min-width: 1440px) {
+  .sidebar.expanded {
+    width: 300px;
+  }
+  
+  .sidebar.expanded ~ .content-wrapper {
+    margin-left: 300px;
+  }
+}
+
+/* MacBook Pro 14" (2021) and similar */
+@media screen and (min-width: 1512px) {
+  .sidebar.expanded {
+    width: 320px;
+  }
+  
+  .sidebar.expanded ~ .content-wrapper {
+    margin-left: 320px;
+  }
+}
+
+/* MacBook Pro 16" and larger displays */
+@media screen and (min-width: 1728px) {
+  .sidebar.expanded {
+    width: 340px;
+  }
+  
+  .sidebar.expanded ~ .content-wrapper {
+    margin-left: 340px;
+  }
+}
+
+/* Half screen support for all devices */
+@media screen and (max-width: 50vw) {
+  .sidebar.expanded {
+    width: 180px;
+  }
+  
+  .sidebar.collapsed {
+    width: 50px;
+  }
+  
+  .sidebar.collapsed ~ .content-wrapper {
+    margin-left: 50px;
+  }
+  
+  .sidebar.expanded ~ .content-wrapper {
+    margin-left: 180px;
+  }
+  
+  .brand-text {
+    font-size: 0.9rem;
+  }
+  
+  .item-label {
+    font-size: 0.85rem;
+  }
+  
+  .submenu-item {
+    padding: 0.75rem !important;
+  }
+}
+
+/* Ensure minimum usable size */
+@media screen and (max-width: 320px) {
+  .sidebar.expanded {
+    width: 160px;
+  }
+  
+  .sidebar.collapsed {
+    width: 45px;
+  }
+  
+  .sidebar.collapsed ~ .content-wrapper {
+    margin-left: 45px;
+  }
+  
+  .sidebar.expanded ~ .content-wrapper {
+    margin-left: 160px;
+  }
+  
+  .brand-icon {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .item-icon {
+    font-size: 1rem;
+  }
+}
+
+/* Adjust font sizes for very small screens */
+@media screen and (max-width: 280px) {
+  .brand-text {
+    font-size: 0.8rem;
+  }
+  
+  .item-label {
+    font-size: 0.8rem;
+  }
+  
+  .collapsed-label {
+    font-size: 0.6rem;
+  }
+}
+
+/* Add these styles for smaller screens */
+@media screen and (max-width: 768px) {
+  .sidebar.collapsed {
+    transform: translateX(-100%);
+    width: 0;
+  }
+  
+  .sidebar.collapsed ~ .content-wrapper {
+    margin-left: 0;
+  }
+  
+  .sidebar.collapsed .brand-icon {
+    display: none;
+  }
+  
+  .toggle-button {
+    background: #1a1a1a;
+    /* right: -32px; */
+    top: 12px;
+    transform: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+  }
+  
+  .sidebar.expanded {
+    transform: translateX(0);
+    width: 100%;
+    max-width: 300px;
+  }
+  
+  .submenu {
+    flex-direction: column;
+  }
+}
+
+/* Update the horizontal submenu styles to be vertical */
+.horizontal-submenu {
+  display: flex;
+  flex-direction: column; /* Change to vertical layout */
+  background: rgba(0, 0, 0, 0.15);
+  margin-left: 2.5rem; /* Align with parent menu item's content */
+}
+
+.horizontal-submenu-item {
+  padding: 0.75rem 1rem;
+  white-space: nowrap;
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.horizontal-submenu-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.horizontal-submenu-item.active {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Update dropdown icon rotation */
+.dropdown-icon.rotated {
+  transform: rotate(180deg); /* Rotate downward when open */
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+  .horizontal-submenu {
+    margin-left: 2rem;
+  }
+}

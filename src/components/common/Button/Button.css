@@ -1,0 +1,20 @@
+.button {
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.button:focus {
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  .button.outline {
+    border-color: #60A5FA;
+    color: #60A5FA;
+  }
+  
+  .button.outline:hover {
+    background-color: #60A5FA;
+  }
+}

@@ -1,0 +1,71 @@
+.dashboard-footer {
+  background: white;
+  border-radius: 12px;
+  margin: 1.5rem;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.footer-content {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.ratio-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ratio-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0;
+}
+
+.ratio-numbers {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.active-number {
+  color: #4299e1;  /* Blue color matching our theme */
+}
+
+.ratio-separator {
+  color: #4299e1;
+}
+
+.total-number {
+  color: #4299e1;
+}
+
+.ratio-description {
+  font-size: 1rem;
+  color: #718096;
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .dashboard-footer {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+
+  .ratio-title {
+    font-size: 1.25rem;
+  }
+
+  .ratio-numbers {
+    font-size: 2rem;
+  }
+
+  .ratio-description {
+    font-size: 0.875rem;
+  }
+} 

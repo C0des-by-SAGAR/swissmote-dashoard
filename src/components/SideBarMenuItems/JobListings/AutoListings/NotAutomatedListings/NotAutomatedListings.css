@@ -1,0 +1,133 @@
+.not-automated-listings-container {
+  width: 100%;
+  max-width: 100%;
+  padding: 1rem;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+/* Reuse most styles from ActiveListings.css but with specific class names */
+.not-automated-listings-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px; /* Adjusted for fewer columns */
+}
+
+.not-automated-listings-table th,
+.not-automated-listings-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.not-automated-listings-table th {
+  background-color: #f8fafc;
+  font-weight: 600;
+  color: #475569;
+}
+
+.not-automated-listings-table tr:hover {
+  background-color: #f1f5f9;
+}
+
+/* Specific styles for the Automate button */
+.automate-button {
+  background-color: #fef9c3;
+  color: #854d0e;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.automate-button:hover {
+  background-color: #fef08a;
+  transform: translateY(-1px);
+}
+
+/* Add alternating column colors */
+.not-automated-listings-table tr td:nth-child(odd),
+.not-automated-listings-table tr th:nth-child(odd) {
+  background-color: #fafafa;
+}
+
+.not-automated-listings-table tr td:nth-child(even),
+.not-automated-listings-table tr th:nth-child(even) {
+  background-color: #ffffff;
+}
+
+/* Responsive styles for all devices */
+
+/* iPhone SE */
+@media screen and (max-width: 375px) {
+  .not-automated-listings-container {
+    width: 100%;
+    padding: 0.5rem;
+  }
+}
+
+/* iPhone XR */
+@media screen and (max-width: 414px) {
+  .not-automated-listings-container {
+    width: 100%;
+    padding: 0.5rem;
+  }
+}
+
+/* iPhone 12 Pro */
+@media screen and (max-width: 390px) {
+  .not-automated-listings-container {
+    width: 100%;
+    padding: 0.5rem;
+  }
+}
+
+/* iPhone 14 Pro Max */
+@media screen and (max-width: 430px) {
+  .not-automated-listings-container {
+    width: 100%;
+    padding: 0.5rem;
+  }
+}
+
+/* Pixel 7 */
+@media screen and (max-width: 412px) {
+  .not-automated-listings-container {
+    width: 100%;
+    padding: 0.5rem;
+  }
+}
+
+/* Samsung Galaxy S8+ */
+@media screen and (max-width: 360px) {
+  .not-automated-listings-container {
+    width: 100%;
+    padding: 0.5rem;
+  }
+}
+
+/* Samsung Galaxy S20 Ultra */
+@media screen and (max-width: 412px) {
+  .not-automated-listings-container {
+    width: 100%;
+    padding: 0.5rem;
+  }
+}
+
+/* iPad Mini */
+@media screen and (max-width: 768px) {
+  .not-automated-listings-container {
+    width: 80%;
+    padding: 0.75rem;
+  }
+}
+
+/* iPad Air */
+.not-automated-listings-table tr td:nth-child(even),
+.not-automated-listings-table tr th:nth-child(even) {
+  background-color: #ffffff;
+}

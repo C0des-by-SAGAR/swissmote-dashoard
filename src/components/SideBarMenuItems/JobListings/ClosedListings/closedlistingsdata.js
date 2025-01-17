@@ -1,0 +1,40 @@
+export const ClosedListingsData = [
+  {
+    id: 1,
+    organisation: "Systemic Altruism",
+    listingNo: "2683722",
+    process: "Assignment",
+    designation: "job",
+    date: "15 January 2025",
+    createdBy: "S. Sri Vyshalini",
+    createdPlatform: "telegram",
+    automatedBy: "S. Sri Vyshalini",
+    automatedPlatform: "telegram",
+    expiryDate: "15 February 2025",
+    conversionRate: 0.0,
+    internshalaLink: "#",
+    leaderLink: "#",
+    candidateLink: "#",
+    assignmentLinks: "#",
+    assignmentType: "Loom Recording"
+  },
+  {
+    id: 2,
+    organisation: "Systemic Altruism",
+    listingNo: "2683723",
+    process: "Assignment",
+    designation: "job",
+    date: "13 January 2025",
+    createdBy: "S. Sri Vyshalini",
+    createdPlatform: "telegram",
+    automatedBy: "S. Sri Vyshalini",
+    automatedPlatform: "telegram",
+    expiryDate: "15 February 2025",
+    conversionRate: 0.0,
+    internshalaLink: "#",
+    leaderLink: "#",
+    candidateLink: "#",
+    assignmentLinks: "#",
+    assignmentType: "Google Drive"
+  }
+];

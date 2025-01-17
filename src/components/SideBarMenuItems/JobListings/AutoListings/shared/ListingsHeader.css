@@ -1,0 +1,118 @@
+/* Base styles for input and select elements */
+.search-input,
+.sort-select,
+.employment-type-select,
+.account-select {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  height: 38px;
+  background-color: white;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* Select specific styles */
+.sort-select,
+.employment-type-select,
+.account-select {
+  padding-right: 2.5rem;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 1em;
+}
+
+/* Hover state */
+.search-input:hover,
+.sort-select:hover,
+.employment-type-select:hover,
+.account-select:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 4px rgba(148, 163, 184, 0.12);
+}
+
+/* Focus state - removing blue outline */
+.search-input:focus,
+.sort-select:focus,
+.employment-type-select:focus,
+.account-select:focus {
+  outline: none !important;
+  border-color: #94a3b8;
+  box-shadow: 0 3px 6px rgba(148, 163, 184, 0.15);
+  transform: translateY(-1px);
+}
+
+/* Active state */
+.search-input:active,
+.sort-select:active,
+.employment-type-select:active,
+.account-select:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(148, 163, 184, 0.1);
+}
+
+/* Remove default focus styles */
+.search-input:focus-visible,
+.sort-select:focus-visible,
+.employment-type-select:focus-visible,
+.account-select:focus-visible {
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Fetch button styles */
+.fetch-button {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.5rem 1.5rem;
+  height: 38px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 120px;
+}
+
+/* Fetch button hover */
+.fetch-button:hover {
+  background-color: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+}
+
+/* Fetch button focus */
+.fetch-button:focus {
+  outline: none !important;
+  background-color: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+}
+
+/* Fetch button active */
+.fetch-button:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* Remove all default focus rings */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+*:focus {
+  outline: none !important;
+}
+
+/* Optional: Add a more subtle focus indicator for accessibility */
+*:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(203, 213, 225, 0.4) !important;
+}
+

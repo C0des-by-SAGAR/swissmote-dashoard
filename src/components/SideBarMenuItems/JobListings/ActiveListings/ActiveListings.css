@@ -1,0 +1,300 @@
+.active-listings-container {
+  width: 100%;
+  max-width: 100%;
+  padding: 1rem;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.listings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.listings-title {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #475569;
+}
+
+.search-container {
+    width: 100%;
+    height: 3rem;
+    border-radius: 0.5rem;
+    border: 1px solid #e2e8f0;
+    padding: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.search-container:focus-within {
+    transform: scale(1.01);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border-color: #94a3b8;
+}
+
+.search-input {
+    width: 100%;
+    height: 100%;
+    border: none;
+    outline: none !important; /* Remove blue outline */
+    padding: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.sort-select {
+    width: 10rem;
+    height: 3rem;
+    border-radius: 0.5rem;
+    border: 1px solid #e2e8f0;
+    padding: 0 0.5rem;
+    outline: none !important; /* Remove blue outline */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: white;
+    color: #475569;
+}
+
+.sort-select:hover {
+    border-color: #94a3b8;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.sort-select:focus {
+    border-color: #94a3b8;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transform: scale(1.01);
+}
+
+.header-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    gap: 1rem;
+}
+
+.table-scroll-container {
+  width: 100%;
+  overflow-x: scroll;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  margin-bottom: 1rem;
+}
+
+.active-listings-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1200px; /* Ensures horizontal scroll on smaller screens */
+}
+
+.active-listings-table th,
+.active-listings-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+/* Add alternating column colors */
+.active-listings-table tr td:nth-child(odd),
+.active-listings-table tr th:nth-child(odd) {
+  background-color: #fafafa;
+}
+
+.active-listings-table tr td:nth-child(even),
+.active-listings-table tr th:nth-child(even) {
+  background-color: #ffffff;
+}
+
+.active-listings-table th {
+  background-color: #f8fafc;
+  font-weight: 600;
+  color: #475569;
+}
+
+.active-listings-table tr:hover {
+  background-color: #f1f5f9;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+.pagination-button {
+  padding: 0.5rem 1rem;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pagination-button:hover:not(:disabled) {
+  background-color: #e2e8f0;
+}
+
+.pagination-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-info {
+  color: #475569;
+  font-size: 0.875rem;
+}
+
+/* Add these styles for the links */
+.link {
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.blue {
+  color: #1a73e8;
+}
+
+.hover-dark-blue:hover {
+  color: #1557b0;
+}
+
+/* Responsive styles for different screen sizes */
+/* Large Screens (Macbook Pro, Desktop) */
+@media screen and (min-width: 1920px) {
+  .active-listings-container {
+    width: 82.5%;
+  }
+}
+
+/* Medium-Large Screens (Laptops, Small Desktops) */
+@media screen and (max-width: 1919px) and (min-width: 1440px) {
+  .active-listings-container {
+    width: 82.5%;
+  }
+}
+
+/* Medium Screens (Small Laptops, iPad Pro) */
+@media screen and (max-width: 1439px) and (min-width: 1024px) {
+  .active-listings-container {
+    width: 80%;
+  }
+  
+  .listings-title {
+    font-size: 1.75rem;
+  }
+}
+
+/* Small-Medium Screens (iPad Air, iPad Mini) */
+@media screen and (max-width: 1023px) and (min-width: 768px) {
+  .active-listings-container {
+    width: 95%;
+  }
+  
+  .listings-title {
+    font-size: 1.5rem;
+  }
+  
+  .header-controls {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .search-input {
+    width: 100%;
+    min-width: 200px;
+  }
+}
+
+/* Mobile Screens (iPhone, Pixel, Galaxy) */
+@media screen and (max-width: 767px) {
+  .active-listings-container {
+    width: 100%;
+    padding: 0.5rem;
+  }
+  
+  .listings-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .listings-title {
+    font-size: 1.25rem;
+  }
+  
+  .header-controls {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+  }
+  
+  .search-container,
+  .search-input {
+    width: 100%;
+  }
+  
+  .sort-container,
+  .sort-select {
+    width: 100%;
+  }
+}
+
+/* Half Screen Support */
+@media screen and (max-width: 960px) {
+  .active-listings-container {
+    width: 100%;
+  }
+  
+  .header-controls {
+    gap: 0.5rem;
+  }
+  
+  .search-input {
+    min-width: 150px;
+  }
+}
+
+/* Adjust table for smaller screens */
+@media screen and (max-width: 1024px) {
+  .active-listings-table th,
+  .active-listings-table td {
+    padding: 8px 12px;
+    font-size: 0.875rem;
+  }
+}
+
+/* Handle extremely small screens */
+@media screen and (max-width: 320px) {
+  .active-listings-container {
+    padding: 0.25rem;
+  }
+  
+  .listings-title {
+    font-size: 1.125rem;
+  }
+  
+  .pagination {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+/* Support for foldable devices */
+@media screen and (max-width: 884px) and (min-width: 653px) {
+  .active-listings-container {
+    width: 100%;
+  }
+}
+
+/* Dark mode support for better visibility on different screens */
+@media (prefers-color-scheme: dark) {
+  .table-scroll-container {
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  }
+}
