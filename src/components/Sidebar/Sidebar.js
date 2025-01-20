@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { FiLogOut, FiBriefcase, FiFileText, FiHelpCircle, FiChevronLeft, FiChevronRight, FiChevronDown } from 'react-icons/fi';
+import { FiLogOut, FiBriefcase, FiFileText, FiChevronLeft, FiChevronRight, FiChevronDown } from 'react-icons/fi';
 import { MdWork, MdSchool, MdVolunteerActivism, MdAutorenew, MdCheckCircle, MdCancel } from 'react-icons/md';
 import './Sidebar.css';
 import { useNavigate } from 'react-router-dom';
+import { FiMessageCircle } from 'react-icons/fi';
 
 const Sidebar = ({ isExpanded, onToggle }) => {
   const navigate = useNavigate();
@@ -84,12 +85,14 @@ const Sidebar = ({ isExpanded, onToggle }) => {
     {
       id: 'assignments',
       label: 'Assignments',
-      icon: <FiFileText />
+      icon: <FiFileText />,
+      path: '/assignments'
     },
     {
       id: 'questions',
       label: 'Questions',
-      icon: <FiHelpCircle />
+      icon: <FiMessageCircle />,
+      path: '/questions'
     }
   ];
 
@@ -109,8 +112,11 @@ const Sidebar = ({ isExpanded, onToggle }) => {
     setIsJobListingsOpen(!isJobListingsOpen);
   };
 
-  const handleItemClick = (itemId) => {
+  const handleItemClick = (itemId, path) => {
     setActiveItem(itemId);
+    if (path) {
+      navigate(path);
+    }
     onToggle(); // Always collapse sidebar after selection
   };
 
@@ -256,7 +262,7 @@ const Sidebar = ({ isExpanded, onToggle }) => {
           <div 
             key={item.id}
             className={`nav-item ${activeItem === item.id ? 'active' : ''} ${!isExpanded ? 'collapsed-item' : 'expanded-item'}`}
-            onClick={() => handleItemClick(item.id)}
+            onClick={() => handleItemClick(item.id, item.path)}
           >
             <span className="item-icon">{item.icon}</span>
             <span className={`item-label ${!isExpanded ? 'collapsed-label' : ''}`}>

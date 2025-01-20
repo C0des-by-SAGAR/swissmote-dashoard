@@ -9,6 +9,8 @@ import {
 } from 'react-icons/fi';
 import { BiBuilding } from 'react-icons/bi';
 import './PostUnpaidInternship.css';
+import { unpaidInternshipsService } from '../../../../api/services/unpaidInternships';
+import { toast } from 'react-toastify';
 
 const PostUnpaidInternship = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -30,10 +32,35 @@ const PostUnpaidInternship = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (currentStep === 3) {
-      console.log('Form submitted:', formData);
+      try {
+        const response = await unpaidInternshipsService.postUnpaidInternship({
+          username: formData.username || 'default_user',
+          internshipTitle: formData.internshipTitle,
+          skills: formData.requiredSkills,
+          jobTypeFull: formData.employment === 'Full-Time',
+          positions: formData.positions,
+          duration: formData.duration,
+          postOnLinkedin: false
+        });
+
+        toast.success('Unpaid internship posted successfully!');
+        // Reset form
+        setFormData({
+          internshipTitle: '',
+          requiredSkills: '',
+          positions: '',
+          duration: '',
+          workType: 'Virtual',
+          employment: 'Part-Time',
+          organization: 'Systemic Altruism'
+        });
+        setCurrentStep(1);
+      } catch (error) {
+        toast.error(error.response?.data?.message || 'Error posting unpaid internship');
+      }
     } else {
       setCurrentStep(prev => prev + 1);
     }

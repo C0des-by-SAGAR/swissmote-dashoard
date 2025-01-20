@@ -1,0 +1,343 @@
+/* Card and Container Styles */
+.assignment-card {
+  transition: all 0.2s ease-in-out;
+  border: 1px solid #e0e0e0;
+}
+
+.assignment-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.active-listings-container {
+  border: 1px solid #e0e0e0;
+  height: calc(100vh - 220px);
+  min-width: 250px;
+  width: 100%;
+}
+
+.fixed-header {
+  background: white;
+  z-index: 1;
+  width: 100%;
+}
+
+.scrollable-content {
+  overflow-y: auto;
+  height: calc(100% - 60px);
+  padding: 0.5rem;
+}
+
+.scrollable-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollable-content::-webkit-scrollbar-thumb {
+  background-color: #cbd5e0;
+  border-radius: 3px;
+}
+
+.scrollable-content::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
+}
+
+/* Status Indicators */
+.status-indicator {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 20px;
+  height: 20px;
+}
+
+.status-evaluated {
+  color: #48bb78;
+}
+
+.status-pending {
+  color: #ed8936;
+}
+
+.status-future {
+  color: #4299e1;
+}
+
+/* Attachment Link Styles */
+.attachment-link {
+  transition: color 0.2s ease;
+  word-break: break-all;
+}
+
+.attachment-link:hover {
+  color: #4299e1;
+}
+
+/* Action Buttons */
+.action-button {
+  transition: all 0.2s ease;
+  cursor: pointer;
+  opacity: 1;
+}
+
+.action-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.bg-blue {
+  background-color: #007bff;
+}
+
+.white {
+  color: #ffffff;
+}
+
+.action-button:hover {
+  transform: translateY(-1px);
+}
+
+/* Custom Dropdown Styles */
+.custom-dropdown {
+  min-width: 180px;
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: ellipsis;
+  padding-right: 24px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 16px;
+}
+
+.custom-dropdown option {
+  padding: 8px;
+  white-space: nowrap;
+}
+
+/* Legend Styles */
+.status-legend {
+  background-color: rgba(255, 255, 255, 0.95);
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive Grid Layout */
+@media screen and (min-width: 64em) {
+  .assignments-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+}
+
+/* Animation for Status Changes */
+@keyframes statusPop {
+  0% { transform: scale(0.95); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.status-change {
+  animation: statusPop 0.3s ease-in-out;
+}
+
+.listing-card {
+  transition: all 0.2s ease-in-out;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.5rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.listing-card:hover {
+  transform: translateX(2px);
+  border-color: #90cdf4;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure text doesn't overflow in cards */
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Bullet point separator */
+.mh2 {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+/* Project details text colors */
+.moon-gray {
+  color: #999999;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+}
+
+.action-btn {
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+}
+
+.light-blue-btn {
+  background-color: #f0f7ff;
+}
+
+.light-blue-btn:hover {
+  background-color: #e6f0ff;
+}
+
+.light-green-btn {
+  background-color: #f0fff4;
+}
+
+.light-green-btn:hover {
+  background-color: #e6ffed;
+}
+
+.light-purple-btn {
+  background-color: #f5f0ff;
+}
+
+.light-purple-btn:hover {
+  background-color: #ebe6ff;
+}
+
+.blue {
+  color: #1a73e8;
+}
+
+.green {
+  color: #34a853;
+}
+
+.purple {
+  color: #7c4dff;
+}
+
+.assignments-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 1.5rem;
+  padding: 1rem;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.reply-modal {
+  background: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 600px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.reply-textarea {
+  width: 100%;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 16px;
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 120px;
+  transition: border-color 0.2s ease;
+}
+
+.reply-textarea:focus {
+  outline: none;
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.1);
+}
+
+.cancel-btn {
+  padding: 8px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background: white;
+  color: #666;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancel-btn:hover {
+  background: #f5f5f5;
+  border-color: #d0d0d0;
+}
+
+.send-btn {
+  padding: 8px 24px;
+  border: none;
+  border-radius: 4px;
+  background: #1a73e8;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.send-btn:hover {
+  background: #1557b0;
+}
+
+.send-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.close-button {
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+
+.close-button:hover {
+  background-color: #f5f5f5;
+}

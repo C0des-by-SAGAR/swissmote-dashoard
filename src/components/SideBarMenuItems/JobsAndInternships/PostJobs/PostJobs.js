@@ -9,6 +9,8 @@ import {
 } from 'react-icons/fi';
 import { BiBuilding, BiRupee } from 'react-icons/bi';
 import './PostJobs.css';
+import { jobsService } from '../../../../api/services/jobs';
+import { toast } from 'react-toastify';
 
 const organizationMap = {
   'org1': 'Persist Ventures',
@@ -37,10 +39,41 @@ const PostJobs = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (currentStep === 3) {
-      console.log('Form submitted:', formData);
+      try {
+        const response = await jobsService.postJob({
+          username: formData.username || 'default_user',
+          jobTitle: formData.jobTitle,
+          minExperience: formData.minExperience,
+          skills: formData.requiredSkills,
+          python: formData.requiredSkills?.includes('Python'),
+          django: formData.requiredSkills?.includes('Django'),
+          jobTypeFull: formData.employment === 'Full-Time',
+          minPosition: formData.positions,
+          maxPosition: formData.positions,
+          minSalary: formData.minSalary,
+          account: formData.organization === 'Persist Ventures' ? 'pv' : 'sa',
+          postOnLinkedin: true
+        });
+
+        toast.success('Job posted successfully!');
+        setFormData({
+          jobTitle: '',
+          requiredSkills: '',
+          positions: '',
+          minExperience: '',
+          minSalary: '',
+          maxSalary: '',
+          workType: 'Virtual',
+          employment: 'Full-Time',
+          organization: ''
+        });
+        setCurrentStep(1);
+      } catch (error) {
+        toast.error(error.response?.data?.message || 'Error posting job');
+      }
     } else {
       setCurrentStep(prev => prev + 1);
     }

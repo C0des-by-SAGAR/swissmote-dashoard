@@ -1,9 +1,84 @@
 /* Container styles */
 .automated-container {
-  width: 100%;
-  background-color: white;
+  padding: 32px;
+  background-color: #F3F4F6;
+  min-height: 100vh;
+}
+
+.header-section {
+  background: linear-gradient(to right, rgba(55, 65, 81, 0.9), rgba(17, 24, 39, 0.9));
+  padding: 32px;
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  color: white;
+  margin-bottom: 24px;
+}
+
+.title-section {
+  margin-bottom: 24px;
+}
+
+.main-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #D1D5DB;
+  margin: 0;
+}
+
+.filters-section {
+  display: flex;
+  gap: 24px;
+  align-items: flex-end;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter-group label {
+  font-size: 14px;
+  color: #D1D5DB;
+}
+
+.search-input,
+.select-input {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #4B5563;
+  background-color: #374151;
+  color: white;
+  font-size: 14px;
+  min-width: 200px;
+}
+
+.search-input {
+  min-width: 300px;
+}
+
+.search-input::placeholder {
+  color: #9CA3AF;
+}
+
+.select-input {
+  appearance: none;
+  padding-right: 32px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239CA3AF'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 16px;
+}
+
+.search-input:focus,
+.select-input:focus {
+  outline: none;
+  border-color: #60A5FA;
 }
 
 /* Responsive widths for different screen sizes */
@@ -153,8 +228,7 @@
 
 /* Rest of the original CSS remains unchanged */
 .automated-header-wrapper {
-  padding: 0;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
 }
 
 /* Override ListingsHeader styles to fit container */
@@ -292,5 +366,114 @@
   .automated-pagination-info {
     width: 100%;
     text-align: center;
+  }
+}
+
+.automated-listings-container {
+  padding: 24px;
+  min-height: 100vh;
+  background: #1a1a1a;
+}
+
+.listings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.no-results {
+  text-align: center;
+  padding: 48px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  margin-top: 24px;
+}
+
+.no-results p {
+  color: #94a3b8;
+  font-size: 16px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+.pagination-button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #e2e8f0;
+  background-color: white;
+  color: #4a5568;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pagination-button:hover:not(:disabled) {
+  background-color: #f7fafc;
+  border-color: #cbd5e0;
+}
+
+.pagination-button:disabled {
+  background-color: #f1f5f9;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.pagination-info {
+  color: #4a5568;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  background-color: #f8fafc;
+  border-radius: 0.375rem;
+  border: 1px solid #e2e8f0;
+}
+
+/* Responsive Styles */
+@media (max-width: 640px) {
+  .automated-container {
+    padding: 1rem;
+  }
+
+  .listings-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 1024px) {
+  .listings-grid {
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  }
+}
+
+@media (min-width: 1536px) {
+  .listings-grid {
+    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .automated-container {
+    background-color: #111827;
+  }
+
+  .pagination-button {
+    background-color: #2d3748;
+    border-color: #4a5568;
+    color: #e2e8f0;
+  }
+
+  .pagination-info {
+    background-color: #2d3748;
+    border-color: #4a5568;
+    color: #e2e8f0;
   }
 }

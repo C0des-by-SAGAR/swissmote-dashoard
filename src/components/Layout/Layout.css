@@ -8,21 +8,21 @@
   flex: 1;
   padding: 20px;
   transition: margin-left 0.3s ease;
-  margin-left: 72px; /* Width of collapsed sidebar */
+  margin-left: 240px; /* Default to expanded sidebar width */
 }
 
 .main-content.content-expanded {
-  margin-left: 240px; /* Width of expanded sidebar */
+  margin-left: 240px; /* Ensure this matches the expanded sidebar width */
 }
 
 .main-content.content-collapsed {
-  margin-left: 72px;
+  margin-left: 72px; /* Ensure this matches the collapsed sidebar width */
 }
 
 /* Responsive adjustments */
 @media screen and (max-width: 768px) {
   .main-content {
-    margin-left: 60px;
+    margin-left: 0; /* Adjust for smaller screens */
   }
   
   .main-content.content-expanded {

@@ -8,6 +8,8 @@ import {
 } from 'react-icons/fi';
 import { BiBuilding, BiRupee } from 'react-icons/bi';
 import './PostInternship.css';
+import { internshipsService } from '../../../../api/services/internships';
+import { toast } from 'react-toastify';
 
 const organizationMap = {
   'org1': 'Persist Ventures',
@@ -35,10 +37,37 @@ const PostInternship = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (currentStep === 3) {
-      console.log('Form submitted:', formData);
+      try {
+        const response = await internshipsService.postInternship({
+          username: formData.username || 'default_user',
+          internshipTitle: formData.internshipTitle,
+          skills: formData.requiredSkills,
+          jobTypeFull: formData.employment === 'Full-Time',
+          positions: formData.positions,
+          stipend: formData.stipend,
+          account: formData.organization === 'Persist Ventures' ? 'pv' : 'sa',
+          postOnLinkedin: false
+        });
+
+        toast.success('Internship posted successfully!');
+        // Reset form
+        setFormData({
+          internshipTitle: '',
+          requiredSkills: '',
+          positions: '',
+          duration: '',
+          stipend: '',
+          workType: 'Virtual',
+          employment: 'Part-Time',
+          organization: ''
+        });
+        setCurrentStep(1);
+      } catch (error) {
+        toast.error(error.response?.data?.message || 'Error posting internship');
+      }
     } else {
       setCurrentStep(prev => prev + 1);
     }

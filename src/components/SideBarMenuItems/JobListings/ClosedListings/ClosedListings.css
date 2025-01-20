@@ -76,3 +76,136 @@
 .pagination-info {
   color: var(--text-secondary);
 }
+
+.closed-listings-container {
+  width: 100%;
+  max-width: 100%;
+  padding: 1.5rem;
+  background-color: white;
+  min-height: 100vh;
+}
+
+.listings-header {
+  margin-bottom: 2rem;
+}
+
+.listings-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 1rem;
+}
+
+.header-controls {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.search-container {
+  flex: 1;
+  min-width: 250px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.sort-select {
+  padding: 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  min-width: 200px;
+  background-color: white;
+  cursor: pointer;
+}
+
+.listings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.no-results {
+  text-align: center;
+  padding: 3rem;
+  color: #64748b;
+  font-size: 1.125rem;
+}
+
+/* Responsive Styles */
+@media (max-width: 640px) {
+  .closed-listings-container {
+    padding: 1rem;
+  }
+
+  .listings-title {
+    font-size: 1.5rem;
+  }
+
+  .header-controls {
+    flex-direction: column;
+  }
+
+  .search-container,
+  .sort-select {
+    width: 100%;
+  }
+
+  .listings-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 1024px) {
+  .listings-grid {
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  }
+}
+
+@media (min-width: 1536px) {
+  .listings-grid {
+    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .closed-listings-container {
+    background-color: #1a202c;
+  }
+
+  .listings-title {
+    color: #f7fafc;
+  }
+
+  .search-input,
+  .sort-select {
+    background-color: #2d3748;
+    border-color: #4a5568;
+    color: #e2e8f0;
+  }
+
+  .search-input:focus {
+    border-color: #3b82f6;
+  }
+}
+
+/* Status badge for closed listings */
+.status-badge.closed {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
