@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { authService } from '../../api/services/authService';
 import FormInput from './FormInput';
 import { toast } from 'react-toastify';
+import { validateLoginForm } from '../../utils/validation';
 
 const SignInForm = ({ onToggleAuth }) => {
   const { signIn } = useAuth();
@@ -10,25 +10,31 @@ const SignInForm = ({ onToggleAuth }) => {
     username: '',
     password: ''
   });
+  const [formErrors, setFormErrors] = useState({});
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate form
+    const errors = validateLoginForm(formData);
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+
     setIsLoading(true);
-    setError('');
+    setFormErrors({});
     
     try {
-      const response = await authService.login(formData);
-      // Store the access token
-      localStorage.setItem('access_token', response.access_token);
-      // Update auth context
-      await signIn(response);
+      await signIn(formData);
       toast.success('Successfully signed in!');
     } catch (error) {
       console.error('Login error:', error);
-      setError(error.message || 'Failed to sign in');
+      setFormErrors({ 
+        general: error.message || 'Failed to sign in. Please check your credentials.' 
+      });
       toast.error('Failed to sign in');
     } finally {
       setIsLoading(false);
@@ -36,17 +42,19 @@ const SignInForm = ({ onToggleAuth }) => {
   };
 
   const handleChange = (e) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.id]: e.target.value
-    }));
+    const { id, value } = e.target;
+    setFormData(prev => ({ ...prev, [id]: value }));
+    // Clear error when user starts typing
+    if (formErrors[id]) {
+      setFormErrors(prev => ({ ...prev, [id]: '' }));
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="w-100">
-      {error && (
+      {formErrors.general && (
         <div className="error-message mb3">
-          {error}
+          {formErrors.general}
         </div>
       )}
 
@@ -56,6 +64,7 @@ const SignInForm = ({ onToggleAuth }) => {
         id="username"
         value={formData.username}
         onChange={handleChange}
+        error={formErrors.username}
         required
         autoComplete="username"
         placeholder="Enter your username"
@@ -67,6 +76,7 @@ const SignInForm = ({ onToggleAuth }) => {
         id="password"
         value={formData.password}
         onChange={handleChange}
+        error={formErrors.password}
         required
         showPasswordToggle
         isPasswordVisible={isPasswordVisible}
@@ -78,12 +88,12 @@ const SignInForm = ({ onToggleAuth }) => {
       <button
         type="submit"
         disabled={isLoading}
-        className="btn-primary"
+        className="btn-primary w-100"
       >
         {isLoading ? 'Signing in...' : 'Sign In'}
       </button>
 
-      <div className="auth-toggle">
+      <div className="auth-toggle mt3 tc">
         Don't have an account?{' '}
         <button
           type="button"

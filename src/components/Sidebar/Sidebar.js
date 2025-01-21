@@ -295,6 +295,8 @@ const Sidebar = ({ isExpanded, onToggle }) => {
 
       {/* Footer/Logout */}
       <div className="sidebar-footer">
+        {/* Commented out Feedback menu */}
+        {/*
         <div 
           className={`logout-button ${!isExpanded ? 'collapsed-item' : ''}`}
           onClick={() => {
@@ -307,6 +309,7 @@ const Sidebar = ({ isExpanded, onToggle }) => {
             Feed back
           </span>
         </div>
+        */}
         <div 
           className={`logout-button ${!isExpanded ? 'collapsed-item' : ''}`}
           onClick={() => {

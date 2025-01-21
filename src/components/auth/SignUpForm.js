@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import FormInput from './FormInput';
+import { toast } from 'react-toastify';
+import { validateSignupForm } from '../../utils/validation';
 
 const SignUpForm = ({ onToggleAuth }) => {
   const { signUp } = useAuth();
@@ -10,54 +12,51 @@ const SignUpForm = ({ onToggleAuth }) => {
     email: '',
     password: ''
   });
+  const [formErrors, setFormErrors] = useState({});
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate form
+    const errors = validateSignupForm(formData);
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+
     setIsLoading(true);
-    setError('');
+    setFormErrors({});
 
     try {
-      const response = await fetch('/api/auth/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-        credentials: 'include' // Include cookies if needed
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({
-          message: 'An error occurred during sign up'
-        }));
-        throw new Error(errorData.message || 'Failed to sign up');
-      }
-
-      const data = await response.json();
-      await signUp(data);
+      await signUp(formData);
+      toast.success('Account created successfully!');
     } catch (error) {
       console.error('Signup error:', error);
-      setError(error.message || 'Failed to sign up. Please try again.');
+      setFormErrors({ 
+        general: error.message || 'Failed to create account. Please try again.' 
+      });
+      toast.error('Failed to create account');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleChange = (e) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.id]: e.target.value
-    }));
+    const { id, value } = e.target;
+    setFormData(prev => ({ ...prev, [id]: value }));
+    // Clear error when user starts typing
+    if (formErrors[id]) {
+      setFormErrors(prev => ({ ...prev, [id]: '' }));
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="w-100">
-      {error && (
-        <div className="error-message">
-          {error}
+      {formErrors.general && (
+        <div className="error-message mb3">
+          {formErrors.general}
         </div>
       )}
 
@@ -67,8 +66,10 @@ const SignUpForm = ({ onToggleAuth }) => {
         id="fullName"
         value={formData.fullName}
         onChange={handleChange}
+        error={formErrors.fullName}
         required
         autoComplete="name"
+        placeholder="Enter your full name"
       />
 
       <FormInput
@@ -77,10 +78,12 @@ const SignUpForm = ({ onToggleAuth }) => {
         id="username"
         value={formData.username}
         onChange={handleChange}
+        error={formErrors.username}
         required
         autoComplete="username"
+        placeholder="Choose a username"
         pattern="^[a-zA-Z0-9_-]{3,16}$"
-        title="Username must be 3-16 characters long and can contain letters, numbers, underscores and hyphens"
+        title="Username must be 3-16 characters and can contain letters, numbers, underscores and hyphens"
       />
 
       <FormInput
@@ -89,8 +92,10 @@ const SignUpForm = ({ onToggleAuth }) => {
         id="email"
         value={formData.email}
         onChange={handleChange}
+        error={formErrors.email}
         required
         autoComplete="email"
+        placeholder="Enter your email"
       />
 
       <FormInput
@@ -99,22 +104,25 @@ const SignUpForm = ({ onToggleAuth }) => {
         id="password"
         value={formData.password}
         onChange={handleChange}
+        error={formErrors.password}
         required
         showPasswordToggle
         isPasswordVisible={isPasswordVisible}
         onTogglePassword={() => setIsPasswordVisible(!isPasswordVisible)}
         autoComplete="new-password"
+        placeholder="Create a password"
+        minLength={6}
       />
 
       <button
         type="submit"
         disabled={isLoading}
-        className="btn-primary"
+        className="btn-primary w-100"
       >
         {isLoading ? 'Creating Account...' : 'Sign Up'}
       </button>
 
-      <div className="auth-toggle">
+      <div className="auth-toggle mt3 tc">
         Already have an account?{' '}
         <button
           type="button"
