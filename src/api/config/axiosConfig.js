@@ -12,9 +12,11 @@ const getAuthHeaders = () => {
 export const axiosInstance = axios.create({
   baseURL: API_URL,
   timeout: 15000,
+  withCredentials: true, // Enable sending cookies
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
+    'Access-Control-Allow-Origin': 'https://swissmote-dashoard.vercel.app',
     ...getAuthHeaders()
   }
 });
@@ -31,6 +33,9 @@ axiosInstance.interceptors.request.use(
       });
     }
 
+    // Add CORS headers
+    config.headers['Origin'] = 'https://swissmote-dashoard.vercel.app';
+    
     const token = localStorage.getItem('access_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;

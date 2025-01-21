@@ -87,7 +87,7 @@ const SignUpForm = ({ onToggleAuth }) => {
         required
         autoComplete="username"
         placeholder="Choose a username"
-        pattern="^[a-zA-Z0-9_-]{3,16}$"
+        pattern="[a-zA-Z0-9_-]{3,16}"
         title="Username must be 3-16 characters and can contain letters, numbers, underscores and hyphens"
       />
 
