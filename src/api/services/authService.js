@@ -14,14 +14,34 @@ export const authService = {
    */
   login: async (credentials) => {
     try {
-      const response = await axiosInstance.post('/auth/login', credentials);
-      return response.data;
+      // Create form data as the API expects application/x-www-form-urlencoded
+      const formData = new URLSearchParams();
+      formData.append('username', credentials.username);
+      formData.append('password', credentials.password);
+      formData.append('grant_type', 'password');
+      // Optional fields if needed
+      // formData.append('scope', '');
+      // formData.append('client_id', '');
+      // formData.append('client_secret', '');
+
+      const response = await axiosInstance.post('/token', formData, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        }
+      });
+
+      // The API returns access_token and token_type
+      return {
+        access_token: response.data.access_token,
+        token_type: response.data.token_type,
+        user: {
+          username: credentials.username
+        }
+      };
     } catch (error) {
-      if (!navigator.onLine) {
-        throw new Error('No internet connection. Please check your network.');
-      }
-      if (!error.response) {
-        throw new Error('No response from server. Please check your connection.');
+      // Handle 401 Unauthorized specifically
+      if (error.response?.status === 401) {
+        throw new Error('Incorrect username or password');
       }
       throw handleApiError(error);
     }
@@ -38,15 +58,17 @@ export const authService = {
    */
   register: async (userData) => {
     try {
-      const response = await axiosInstance.post('/auth/register', userData);
-      return response.data;
+      const response = await axiosInstance.post('/auth/register', {
+        username: userData.username,
+        email: userData.email,
+        password: userData.password,
+        full_name: userData.fullName
+      });
+      return {
+        access_token: response.data.access_token,
+        user: response.data.user
+      };
     } catch (error) {
-      if (!navigator.onLine) {
-        throw new Error('No internet connection. Please check your network.');
-      }
-      if (!error.response) {
-        throw new Error('No response from server. Please check your connection.');
-      }
       throw handleApiError(error);
     }
   },
@@ -60,12 +82,6 @@ export const authService = {
       const response = await axiosInstance.get('/auth/me');
       return response.data;
     } catch (error) {
-      if (!navigator.onLine) {
-        throw new Error('No internet connection. Please check your network.');
-      }
-      if (!error.response) {
-        throw new Error('No response from server. Please check your connection.');
-      }
       throw handleApiError(error);
     }
   }

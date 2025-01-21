@@ -11,24 +11,26 @@ const getAuthHeaders = () => {
 
 export const axiosInstance = axios.create({
   baseURL: API_URL,
+  timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
+    'Accept': 'application/json',
     ...getAuthHeaders()
-  },
-  timeout: 10000 // 10 seconds timeout
+  }
 });
 
 // Request interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
-    // Log outgoing requests in development
+    // Log request in development
     if (process.env.NODE_ENV === 'development') {
       console.log('API Request:', {
         url: config.url,
         method: config.method,
-        data: config.data
+        baseURL: config.baseURL
       });
     }
+
     const token = localStorage.getItem('access_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -36,31 +38,21 @@ axiosInstance.interceptors.request.use(
     return config;
   },
   (error) => {
-    console.error('Request Error:', error);
     return Promise.reject(error);
   }
 );
 
 // Response interceptor
 axiosInstance.interceptors.response.use(
-  (response) => {
-    // Log successful responses in development
+  (response) => response,
+  (error) => {
     if (process.env.NODE_ENV === 'development') {
-      console.log('API Response:', {
-        url: response.config.url,
-        status: response.status,
-        data: response.data
+      console.error('API Error:', {
+        url: error.config?.url,
+        status: error.response?.status,
+        data: error.response?.data
       });
     }
-    return response;
-  },
-  (error) => {
-    if (!error.response) {
-      // Network error
-      console.error('Network Error:', error);
-      return Promise.reject(new Error('No response from server. Please check your connection.'));
-    }
-    console.error('Response Error:', error);
     return Promise.reject(error);
   }
 ); 
