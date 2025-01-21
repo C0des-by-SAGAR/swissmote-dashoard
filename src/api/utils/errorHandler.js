@@ -4,8 +4,16 @@ export const handleApiError = (error) => {
     message: error.message,
     status: error.response?.status,
     data: error.response?.data,
-    config: error.config // This will show the request details
+    config: error.config
   });
+
+  // Check for offline status first
+  if (!navigator.onLine) {
+    return {
+      error: true,
+      message: 'No internet connection. Please check your network.'
+    };
+  }
 
   if (error.response) {
     // Server responded with error status
@@ -13,26 +21,44 @@ export const handleApiError = (error) => {
     const message = error.response.data?.message || 'An error occurred';
     
     switch (status) {
-      case 401:
+      case 400:
         return {
           error: true,
-          message: 'Unauthorized access'
+          message: 'Invalid request. Please check your input.',
+          details: error.response.data?.details
+        };
+      case 401:
+        // Clear token if unauthorized
+        localStorage.removeItem('access_token');
+        return {
+          error: true,
+          message: 'Invalid credentials. Please sign in again.'
         };
       case 403:
         return {
           error: true,
-          message: 'Access forbidden'
+          message: 'Access denied. Please check your permissions.'
         };
       case 404:
         return {
           error: true,
-          message: 'Resource not found'
+          message: 'Resource not found. Please try again later.'
         };
       case 422:
         return {
           error: true,
           message: 'Validation Error',
-          details: error.response.data?.detail || []
+          details: error.response.data?.details || []
+        };
+      case 429:
+        return {
+          error: true,
+          message: 'Too many attempts. Please try again later.'
+        };
+      case 500:
+        return {
+          error: true,
+          message: 'Server error. Please try again later.'
         };
       default:
         return {
@@ -50,9 +76,9 @@ export const handleApiError = (error) => {
     };
   }
 
-  // Something else happened while setting up the request
+  // Something happened in setting up the request
   return {
     error: true,
-    message: 'Failed to make request'
+    message: error.message || 'An unexpected error occurred. Please try again.'
   };
 }; 

@@ -30,6 +30,11 @@ const SignUpForm = ({ onToggleAuth }) => {
     setFormErrors({});
 
     try {
+      // Check internet connection
+      if (!navigator.onLine) {
+        throw new Error('No internet connection. Please check your network.');
+      }
+
       await signUp(formData);
       toast.success('Account created successfully!');
     } catch (error) {
@@ -37,7 +42,7 @@ const SignUpForm = ({ onToggleAuth }) => {
       setFormErrors({ 
         general: error.message || 'Failed to create account. Please try again.' 
       });
-      toast.error('Failed to create account');
+      toast.error(error.message || 'Failed to create account');
     } finally {
       setIsLoading(false);
     }

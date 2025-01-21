@@ -17,6 +17,12 @@ export const authService = {
       const response = await axiosInstance.post('/auth/login', credentials);
       return response.data;
     } catch (error) {
+      if (!navigator.onLine) {
+        throw new Error('No internet connection. Please check your network.');
+      }
+      if (!error.response) {
+        throw new Error('No response from server. Please check your connection.');
+      }
       throw handleApiError(error);
     }
   },
@@ -35,6 +41,12 @@ export const authService = {
       const response = await axiosInstance.post('/auth/register', userData);
       return response.data;
     } catch (error) {
+      if (!navigator.onLine) {
+        throw new Error('No internet connection. Please check your network.');
+      }
+      if (!error.response) {
+        throw new Error('No response from server. Please check your connection.');
+      }
       throw handleApiError(error);
     }
   },
@@ -48,6 +60,12 @@ export const authService = {
       const response = await axiosInstance.get('/auth/me');
       return response.data;
     } catch (error) {
+      if (!navigator.onLine) {
+        throw new Error('No internet connection. Please check your network.');
+      }
+      if (!error.response) {
+        throw new Error('No response from server. Please check your connection.');
+      }
       throw handleApiError(error);
     }
   }

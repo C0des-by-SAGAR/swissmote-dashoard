@@ -28,14 +28,23 @@ const SignInForm = ({ onToggleAuth }) => {
     setFormErrors({});
     
     try {
+      // Check internet connection
+      if (!navigator.onLine) {
+        throw new Error('No internet connection. Please check your network.');
+      }
+
       await signIn(formData);
       toast.success('Successfully signed in!');
     } catch (error) {
       console.error('Login error:', error);
+      const errorMessage = error.response?.data?.message || 
+                          error.message || 
+                          'Failed to sign in. Please check your credentials.';
+      
       setFormErrors({ 
-        general: error.message || 'Failed to sign in. Please check your credentials.' 
+        general: errorMessage
       });
-      toast.error('Failed to sign in');
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -53,7 +62,7 @@ const SignInForm = ({ onToggleAuth }) => {
   return (
     <form onSubmit={handleSubmit} className="w-100">
       {formErrors.general && (
-        <div className="error-message mb3">
+        <div className="error-message mb3 pa3 br2 bg-light-red dark-red">
           {formErrors.general}
         </div>
       )}
@@ -68,6 +77,7 @@ const SignInForm = ({ onToggleAuth }) => {
         required
         autoComplete="username"
         placeholder="Enter your username"
+        disabled={isLoading}
       />
 
       <FormInput
@@ -83,14 +93,22 @@ const SignInForm = ({ onToggleAuth }) => {
         onTogglePassword={() => setIsPasswordVisible(!isPasswordVisible)}
         autoComplete="current-password"
         placeholder="Enter your password"
+        disabled={isLoading}
       />
 
       <button
         type="submit"
         disabled={isLoading}
-        className="btn-primary w-100"
+        className={`btn-primary w-100 ${isLoading ? 'o-50' : ''}`}
       >
-        {isLoading ? 'Signing in...' : 'Sign In'}
+        {isLoading ? (
+          <span className="flex items-center justify-center">
+            <span className="loading-spinner mr2"></span>
+            Signing in...
+          </span>
+        ) : (
+          'Sign In'
+        )}
       </button>
 
       <div className="auth-toggle mt3 tc">
@@ -99,6 +117,7 @@ const SignInForm = ({ onToggleAuth }) => {
           type="button"
           onClick={onToggleAuth}
           className="toggle-link"
+          disabled={isLoading}
         >
           Sign Up
         </button>

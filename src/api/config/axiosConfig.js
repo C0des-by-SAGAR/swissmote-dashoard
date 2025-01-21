@@ -1,5 +1,8 @@
 import axios from 'axios';
 
+// Use environment variable for API URL
+const API_URL = process.env.REACT_APP_API_URL || 'https://api.swissmote.com';
+
 // Add this if authentication is required
 const getAuthHeaders = () => {
   const token = localStorage.getItem('auth_token'); // or however you store your auth token
@@ -7,7 +10,7 @@ const getAuthHeaders = () => {
 };
 
 export const axiosInstance = axios.create({
-  baseURL: 'https://api.swissmote.com',
+  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
     ...getAuthHeaders()
@@ -25,6 +28,10 @@ axiosInstance.interceptors.request.use(
         method: config.method,
         data: config.data
       });
+    }
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -48,6 +55,11 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   (error) => {
+    if (!error.response) {
+      // Network error
+      console.error('Network Error:', error);
+      return Promise.reject(new Error('No response from server. Please check your connection.'));
+    }
     console.error('Response Error:', error);
     return Promise.reject(error);
   }
