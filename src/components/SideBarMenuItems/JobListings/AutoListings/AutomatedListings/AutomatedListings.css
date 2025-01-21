@@ -477,3 +477,211 @@
     color: #e2e8f0;
   }
 }
+
+.listing-card {
+  min-width: 300px;
+  max-width: 100%;
+  overflow: hidden;
+  background-color: #1e2837;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.listing-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.listing-content {
+  background-color: white;
+}
+
+.info-group,
+.stat-group,
+.creator-group {
+  min-width: 150px;
+}
+
+.message-text {
+  max-width: 100%;
+  word-break: break-word;
+  line-height: 1.6;
+}
+
+.actions-row {
+  margin-top: auto;
+}
+
+@media screen and (max-width: 480px) {
+  .info-group,
+  .stat-group,
+  .creator-group {
+    width: 100%;
+    padding-right: 0;
+  }
+  
+  .secondary-actions {
+    width: 100%;
+    justify-content: flex-start;
+    margin-top: 0.5rem;
+  }
+}
+
+.edit-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.send-invite-btn:hover {
+  opacity: 0.9;
+}
+
+.status-badge {
+  font-weight: 500;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.bg-green {
+  background-color: #10B981;
+}
+
+.bg-gold {
+  background-color: #F59E0B;
+}
+
+/* Button hover states */
+.hover-bg-dark-blue:hover {
+  background-color: #1d4ed8;
+}
+
+.hover-bg-moon-gray:hover {
+  background-color: #e2e8f0;
+}
+
+.hover-bg-mid-gray:hover {
+  background-color: #4a5568;
+}
+
+/* Smooth transitions */
+button, 
+a.link {
+  transition: all 0.2s ease;
+}
+
+textarea {
+  transition: border-color 0.2s ease;
+}
+
+textarea:focus {
+  border-color: #3b82f6;
+  outline: none;
+}
+
+.label {
+  letter-spacing: 0.05em;
+}
+
+.value {
+  line-height: 1.5;
+}
+
+.modal-overlay {
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.modal-content {
+  max-height: 90vh;
+}
+
+.mh-100 {
+  max-height: 90vh;
+}
+
+.z-999 {
+  z-index: 999;
+}
+
+.message-container {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.message-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.message-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.message-container::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.message-container::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.message-container p {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* For Firefox */
+.message-container {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+/* Smooth scrolling */
+.overflow-auto {
+  scroll-behavior: smooth;
+}
+
+.message-scroll-container {
+  max-height: 200px;
+  overflow-y: auto;
+  position: relative;
+}
+
+.message-text {
+  font-family: inherit;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+  background: transparent;
+  border: none;
+  width: 100%;
+  overflow: visible;
+}
+
+/* Scrollbar Styles */
+.message-scroll-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.message-scroll-container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
+
+.message-scroll-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.message-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Firefox scrollbar */
+.message-scroll-container {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure text doesn't get cut off */
+.message-scroll-container pre {
+  margin: 0;
+  padding: 0;
+}

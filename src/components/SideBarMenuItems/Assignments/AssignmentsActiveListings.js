@@ -1,11 +1,10 @@
 import React from 'react';
-import { activeListings } from './mockData';
 import './Assignments.css';
 
 const ActiveListingsCard = ({ listing, isSelected, onSelect }) => (
   <div 
     className={`listing-card pa3 mb2 pointer ${isSelected ? 'bg-light-blue' : 'bg-white'}`}
-    onClick={() => onSelect(listing.id)}
+    onClick={() => onSelect(listing)}
   >
     <div className="flex justify-between items-center w-100">
       <div className="flex-auto pr2">
@@ -20,19 +19,26 @@ const ActiveListingsCard = ({ listing, isSelected, onSelect }) => (
   </div>
 );
 
-const ActiveListings = ({ selectedListing, onListingSelect }) => {
+const ActiveListings = ({ selectedListing, onListingSelect, listings }) => {
+  const handleListingClick = (listing) => {
+    onListingSelect(listing.id, {
+      companyName: listing.name,
+      role: listing.role
+    });
+  };
+
   return (
-    <div className="active-listings-container bg-white br3 shadow-1">
+    <div className="active-listings-container">
       <div className="fixed-header bb b--light-gray">
-        <h2 className="f4 fw6 pa3 mb0">Active Listings</h2>
+        <h2 className="f4 fw6 pa3 mb0 white">Active Listings</h2>
       </div>
       <div className="scrollable-content">
-        {activeListings.map((listing) => (
+        {listings && listings.map((listing) => (
           <ActiveListingsCard
             key={listing.id}
             listing={listing}
             isSelected={selectedListing === listing.id}
-            onSelect={onListingSelect}
+            onSelect={handleListingClick}
           />
         ))}
       </div>

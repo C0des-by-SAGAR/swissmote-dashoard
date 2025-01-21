@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { authService } from '../../api/services/authService';
 import FormInput from './FormInput';
+import { toast } from 'react-toastify';
 
 const SignInForm = ({ onToggleAuth }) => {
   const { signIn } = useAuth();
   const [formData, setFormData] = useState({
-    email: '',
+    username: '',
     password: ''
   });
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -15,12 +17,19 @@ const SignInForm = ({ onToggleAuth }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError('');
     
     try {
-      // Directly call signIn with credentials
-      await signIn(formData);
+      const response = await authService.login(formData);
+      // Store the access token
+      localStorage.setItem('access_token', response.access_token);
+      // Update auth context
+      await signIn(response);
+      toast.success('Successfully signed in!');
     } catch (error) {
-      setError('An error occurred during sign in');
+      console.error('Login error:', error);
+      setError(error.message || 'Failed to sign in');
+      toast.error('Failed to sign in');
     } finally {
       setIsLoading(false);
     }
@@ -42,14 +51,14 @@ const SignInForm = ({ onToggleAuth }) => {
       )}
 
       <FormInput
-        label="Email Address"
-        type="email"
-        id="email"
-        value={formData.email}
+        label="Username"
+        type="text"
+        id="username"
+        value={formData.username}
         onChange={handleChange}
         required
-        autoComplete="email"
-        placeholder="Enter your email"
+        autoComplete="username"
+        placeholder="Enter your username"
       />
 
       <FormInput

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { FiCheck, FiClock, FiCalendar } from 'react-icons/fi';
-import { MdDownload } from 'react-icons/md';
+import { FiCheck, FiClock } from 'react-icons/fi';
 import './Assignments.css';
 import ActiveListings from './AssignmentsActiveListings';
-import { assignmentsService } from '../../../api/services/assignments';
 import AssignmentCard from './AssignmentCard';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
+import { assignmentService } from '../../../api/services/assignmentService';
+import { addAssignmentService } from '../../../api/services/addAssignmentService';
+import { activeListingService } from '../../../api/services/activeListingService';
 
 const StatusLegend = () => (
   <div className="status-legend pa4 mb4 bg-white br3 shadow-1">
@@ -19,52 +20,92 @@ const StatusLegend = () => (
         <FiClock className="mr2 orange" size={18} />
         <span className="f6 dark-gray">Pending</span>
       </div>
-      <div className="flex items-center mb2">
-        <FiCalendar className="mr2 blue" size={18} />
-        <span className="f6 dark-gray">Future</span>
-      </div>
     </div>
   </div>
 );
 
 const Assignments = () => {
   const [selectedListing, setSelectedListing] = useState(null);
+  const [selectedListingDetails, setSelectedListingDetails] = useState(null);
   const [assignments, setAssignments] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 10;
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState('All Assignments');
+  const [assignmentData, setAssignmentData] = useState({
+    listing: '',
+    link: ''
+  });
+  const [activeListings, setActiveListings] = useState([]);
 
-  useEffect(() => {
-    if (selectedListing) {
-      fetchAssignments();
-    }
-  }, [selectedListing, refreshKey]);
-
-  const fetchAssignments = async () => {
+  const fetchAssignments = async (page = 1) => {
     try {
       setIsLoading(true);
-      const response = await assignmentsService.getAssignments({
-        listingId: selectedListing,
-        source: 'pv', // or 'sa' based on your needs
-        newData: 1,
-        offsetDate: 0
+      const offset = (page - 1) * rowsPerPage;
+      
+      const response = await assignmentService.getAssignments({
+        row_data: rowsPerPage,
+        offset_data: offset
       });
-      setAssignments(response || []);
+
+      if (response) {
+        setAssignments(response);
+        setCurrentPage(page);
+      }
     } catch (error) {
-      toast.error('Error fetching assignments');
-      console.error('Error:', error);
+      toast.error('Failed to fetch assignments');
+      console.error('Error fetching assignments:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleListingSelect = (listingId) => {
-    setSelectedListing(listingId);
+  const fetchActiveListings = async () => {
+    try {
+      const listings = await activeListingService.getActiveListings();
+      setActiveListings(listings);
+    } catch (error) {
+      toast.error('Failed to fetch active listings');
+      console.error('Error:', error);
+    }
   };
 
-  const handleRefresh = () => {
-    setRefreshKey(prev => prev + 1);
+  useEffect(() => {
+    fetchActiveListings();
+    fetchAssignments();
+  }, []);
+
+  const handleListingSelect = (listingId, listingDetails) => {
+    setSelectedListing(listingId);
+    setSelectedListingDetails(listingDetails);
+  };
+
+  const handlePageChange = (newPage) => {
+    fetchAssignments(newPage);
+  };
+
+  const handleStatusChange = (assignmentId, newStatus) => {
+    setAssignments(prevAssignments => 
+      prevAssignments.map(assignment => 
+        assignment.id === assignmentId 
+          ? { ...assignment, status: newStatus }
+          : assignment
+      )
+    );
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await addAssignmentService.addAssignment(assignmentData);
+      toast.success('Assignment added successfully');
+      setAssignmentData({ listing: '', link: '' });
+      fetchAssignments(); // Refresh the list
+    } catch (error) {
+      toast.error('Failed to add assignment');
+      console.error('Error:', error);
+    }
   };
 
   return (
@@ -86,7 +127,6 @@ const Assignments = () => {
               <option>All Assignments</option>
               <option>Evaluated</option>
               <option>Pending</option>
-              <option>Future</option>
             </select>
             
             <input
@@ -96,19 +136,14 @@ const Assignments = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            
-            <button 
-              className="f6 link dim br2 ph3 pv2 dib white bg-blue bn pointer"
-              onClick={handleRefresh}
-            >
-              Refresh
-            </button>
           </div>
         </div>
 
-        {selectedListing && (
+        {selectedListing && selectedListingDetails && (
           <div className="flex items-center gray mt2">
-            <span className="f4 fw5 dark-gray">{selectedListing}</span>
+            <span className="f4 fw5 dark-gray">{selectedListingDetails.companyName}</span>
+            <span className="mh2 f6">•</span>
+            <span className="f5 moon-gray">{selectedListingDetails.role}</span>
             <span className="mh2 f6">•</span>
             <span className="f5 moon-gray">#{selectedListing}</span>
           </div>
@@ -120,6 +155,7 @@ const Assignments = () => {
           <ActiveListings
             selectedListing={selectedListing}
             onListingSelect={handleListingSelect}
+            listings={activeListings}
           />
         </div>
 
@@ -129,12 +165,12 @@ const Assignments = () => {
           {isLoading ? (
             <div className="loading-spinner">Loading assignments...</div>
           ) : (
-            <div className="assignments-grid" key={refreshKey}>
+            <div className="assignments-grid">
               {assignments.map(assignment => (
                 <AssignmentCard 
                   key={assignment.id}
                   assignment={assignment}
-                  onStatusChange={handleRefresh}
+                  onStatusChange={handleStatusChange}
                 />
               ))}
             </div>
@@ -143,16 +179,24 @@ const Assignments = () => {
           {assignments.length === 0 && !isLoading && (
             <div className="empty-state pa4 tc">
               <p className="f4 gray mb3">No assignments found</p>
-              {selectedListing && (
-                <button 
-                  className="refresh-button"
-                  onClick={handleRefresh}
-                >
-                  Refresh
-                </button>
-              )}
             </div>
           )}
+
+          <div className="pagination-controls">
+            <button 
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </button>
+            <span>Page {currentPage}</span>
+            <button 
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={assignments.length < rowsPerPage}
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
     </div>

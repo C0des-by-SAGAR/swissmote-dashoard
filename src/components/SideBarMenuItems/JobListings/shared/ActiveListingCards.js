@@ -1,76 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { listingsService } from '../../../../api/services/listings';
-import { toast } from 'react-toastify';
-import Announcement from '../../../shared/Announcement';
-import ListingMessageEditor from './ListingMessageEditor';
+import React from 'react';
 import './ListingCard.css';
 
-const ActiveListingCards = ({ data, onListingClosed }) => {
-  const [isClosing, setIsClosing] = useState(false);
-  const [showAnnouncement, setShowAnnouncement] = useState(false);
-  const [showMessageEditor, setShowMessageEditor] = useState(false);
-  const [listingStatus, setListingStatus] = useState(null);
-  const [isCheckingStatus, setIsCheckingStatus] = useState(false);
-
-  useEffect(() => {
-    checkListingStatus();
-  }, [data.listingNumber]);
-
-  const checkListingStatus = async () => {
-    try {
-      setIsCheckingStatus(true);
-      const response = await listingsService.getListingStatus({
-        listingId: data.listingNumber,
-        account: data.organisation === 'Persist Ventures' ? 'pv' : 'sa',
-        employmentType: data.employmentType?.toLowerCase() === 'internship' ? 'internship' : 'job'
-      });
-      setListingStatus(response);
-    } catch (error) {
-      console.error('Error checking listing status:', error);
-    } finally {
-      setIsCheckingStatus(false);
-    }
-  };
-
-  const handleCloseListing = async () => {
-    try {
-      setIsClosing(true);
-      await listingsService.closeListing(data.listingNumber);
-      toast.success('Listing closed successfully');
-      if (onListingClosed) {
-        onListingClosed(data.listingNumber);
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Error closing listing');
-    } finally {
-      setIsClosing(false);
-    }
-  };
-
-  const getStatusBadgeClass = () => {
-    if (isCheckingStatus) return 'status-checking';
-    switch (listingStatus) {
-      case 'active': return 'status-active';
-      case 'closed': return 'status-closed';
-      case 'expired': return 'status-expired';
-      default: return 'status-unknown';
-    }
-  };
-
+const ActiveListingCards = ({ data }) => {
   return (
     <div className="job-listing-card">
       <div className="job-listing-header">
-        <span className="job-listing-number">#{data.listingNumber}</span>
-        <span className={`job-status-badge ${getStatusBadgeClass()}`}>
-          {isCheckingStatus ? 'Checking...' : listingStatus || 'Unknown'}
-        </span>
-        <button 
-          className="refresh-status-button"
-          onClick={checkListingStatus}
-          disabled={isCheckingStatus}
-        >
-          ↻
-        </button>
+        <span className="job-listing-number">#{data.listingNo}</span>
       </div>
 
       <div className="job-listing-content">
@@ -129,22 +64,13 @@ const ActiveListingCards = ({ data, onListingClosed }) => {
         <div className="job-listing-actions">
           <button 
             className="job-action-button primary"
-            onClick={() => setShowAnnouncement(!showAnnouncement)}
           >
-            {showAnnouncement ? 'Hide Announcement' : 'Make Announcement'}
-          </button>
-          <button 
-            className="job-action-button secondary"
-            onClick={() => setShowMessageEditor(!showMessageEditor)}
-          >
-            {showMessageEditor ? 'Hide Messages' : 'Edit Messages'}
+            Make Announcement
           </button>
           <button 
             className="job-action-button danger"
-            onClick={handleCloseListing}
-            disabled={isClosing || listingStatus === 'closed' || listingStatus === 'expired'}
           >
-            {isClosing ? 'Closing...' : 'Close Listing'}
+            Close Listing
           </button>
           <div className="job-links-group">
             <a href={data.links?.internshala} className="job-link">Internshala Link</a>
@@ -153,30 +79,6 @@ const ActiveListingCards = ({ data, onListingClosed }) => {
             <a href={data.links?.assignment} className="job-link">Assignment Links</a>
           </div>
         </div>
-
-        {showAnnouncement && (
-          <div className="announcement-section mt3">
-            <Announcement 
-              listingId={data.listingNumber}
-              onAnnouncementSent={() => {
-                toast.success('Announcement sent successfully');
-                setShowAnnouncement(false);
-              }}
-            />
-          </div>
-        )}
-
-        {showMessageEditor && (
-          <div className="message-editor-section mt3">
-            <ListingMessageEditor 
-              listingId={data.listingNumber}
-              onMessageUpdate={() => {
-                toast.success('Messages updated successfully');
-                setShowMessageEditor(false);
-              }}
-            />
-          </div>
-        )}
       </div>
     </div>
   );

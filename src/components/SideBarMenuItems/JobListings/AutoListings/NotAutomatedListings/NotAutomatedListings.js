@@ -1,17 +1,20 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import ListingsHeader from '../../shared/ListingsHeader';
-import ListingCard from '../../shared/ListingCard';
 import NotAutomatedListingCard from '../../shared/NotAutomatedListingCard';
 import { notAutomatedListingsData } from './notAutomatedListingsData';
 import './NotAutomatedListings.css';
+import { autoListingsService } from '../../../../../api/services/autoListingsService';
+import { toast } from 'react-toastify';
 
 const NotAutomatedListings = () => {
   const [globalFilter, setGlobalFilter] = useState('');
-  const [employmentTypeFilter, setEmploymentTypeFilter] = useState('');
-  const [accountFilter, setAccountFilter] = useState('');
+  const [employmentTypeFilter, setEmploymentTypeFilter] = useState('internship');
+  const [accountFilter, setAccountFilter] = useState('pv');
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 9;
-  
+  const [isLoading, setIsLoading] = useState(false);
+  const [listings, setListings] = useState([]);
+
   // Filter the data based on employment type and account
   const filteredData = useMemo(() => {
     let filtered = [...notAutomatedListingsData];
@@ -46,6 +49,30 @@ const NotAutomatedListings = () => {
     (currentPage + 1) * itemsPerPage
   );
 
+  useEffect(() => {
+    fetchListings();
+  }, [employmentTypeFilter, accountFilter]);
+
+  const fetchListings = async () => {
+    try {
+      setIsLoading(true);
+      const response = await autoListingsService.getAutoListings({
+        emp_type: employmentTypeFilter.toLowerCase() || 'internship',
+        account: accountFilter.toLowerCase() || 'pv'
+      });
+      
+      // Update the listings with the non-automated listings from the response
+      const notAutomatedListings = response.not_automated || [];
+      setListings(notAutomatedListings);
+    } catch (error) {
+      toast.error('Error fetching non-automated listings');
+      console.error('Error:', error);
+      setListings([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="not-automated-container">
       <div className="not-automated-header-wrapper">
@@ -59,19 +86,23 @@ const NotAutomatedListings = () => {
       </div>
 
       <div className="listings-grid">
-        {paginatedData.map((listing, index) => (
-          <NotAutomatedListingCard 
-            key={`${listing.listingNo}-${index}`}
-            data={listing}
-          />
-        ))}
+        {isLoading ? (
+          <div>Loading...</div>
+        ) : (
+          listings.length === 0 ? (
+            <div className="no-results">
+              <p>No listings found matching your criteria</p>
+            </div>
+          ) : (
+            paginatedData.map((listing, index) => (
+              <NotAutomatedListingCard 
+                key={`${listing.listingNo}-${index}`}
+                data={listing}
+              />
+            ))
+          )
+        )}
       </div>
-
-      {filteredData.length === 0 && (
-        <div className="no-results">
-          <p>No listings found matching your criteria</p>
-        </div>
-      )}
 
       <div className="pagination">
         <button

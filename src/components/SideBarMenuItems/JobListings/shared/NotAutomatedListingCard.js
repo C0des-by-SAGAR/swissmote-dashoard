@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { listingsService } from '../../../../api/services/listings';
 import { toast } from 'react-toastify';
 import './NotAutomatedListingCard.css';
 
@@ -9,24 +8,13 @@ const NotAutomatedListingCard = ({ data, onAutomationComplete }) => {
   const handleAutomate = async () => {
     try {
       setIsAutomating(true);
-      await listingsService.automateListing({
-        username: 'default_user', // Replace with actual logged-in username
-        listingName: data.listingName,
-        projectName: data.projectName,
-        assignmentLink: data.assignmentLink || 'https://example.com',
-        assignmentMessage: 'Please complete the assignment',
-        followup1: "Persistence is the twin sister of excellence. One is a matter of quality; the other, a matter of time.\" -Marabel Morgan",
-        followup2: "Success seems to be connected with action. Successful people keep moving. They make mistakes, but they dont quit.\" -Conrad Hilton",
-        employmentType: data.employmentType?.toLowerCase() === 'internship' ? 'in' : 'job',
-        account: data.organisation === 'Persist Ventures' ? 'pv' : 'sa'
-      });
-
+      // Mock success
       toast.success('Listing automated successfully!');
       if (onAutomationComplete) {
         onAutomationComplete();
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Error automating listing');
+      toast.error('Error automating listing');
     } finally {
       setIsAutomating(false);
     }

@@ -1,9 +1,10 @@
 .job-listings-container {
-  padding: 24px;
   min-height: 100vh;
   background: #1a202c;
   width: 100%;
   overflow-y: auto;
+  margin: 0;
+  padding: 24px;
 }
 
 .job-listings-grid {

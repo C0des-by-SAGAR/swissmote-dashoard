@@ -6,6 +6,7 @@ const SignUpForm = ({ onToggleAuth }) => {
   const { signUp } = useAuth();
   const [formData, setFormData] = useState({
     fullName: '',
+    username: '',
     email: '',
     password: ''
   });
@@ -68,6 +69,18 @@ const SignUpForm = ({ onToggleAuth }) => {
         onChange={handleChange}
         required
         autoComplete="name"
+      />
+
+      <FormInput
+        label="Username"
+        type="text"
+        id="username"
+        value={formData.username}
+        onChange={handleChange}
+        required
+        autoComplete="username"
+        pattern="^[a-zA-Z0-9_-]{3,16}$"
+        title="Username must be 3-16 characters long and can contain letters, numbers, underscores and hyphens"
       />
 
       <FormInput

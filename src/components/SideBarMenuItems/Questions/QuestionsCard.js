@@ -1,22 +1,47 @@
 import React, { useState } from 'react';
+import { questionService } from '../../../api/services/questionService';
+import { toast } from 'react-toastify';
 
-const QuestionsCard = ({ question }) => {
-  const { author, date, content, id } = question;
+const QuestionsCard = ({ question, listingId }) => {
+  const { author, date, content, id: message_id, chat_id } = question;
   const [isReplying, setIsReplying] = useState(false);
   const [replyContent, setReplyContent] = useState('');
+  const [isSending, setIsSending] = useState(false);
 
   const handleReplyClick = () => {
     setIsReplying(!isReplying);
+    if (!isReplying) {
+      setReplyContent('');
+    }
   };
 
   const handleReplyChange = (e) => {
     setReplyContent(e.target.value);
   };
 
-  const handleSendReply = () => {
-    console.log('Reply sent:', replyContent);
-    setReplyContent('');
-    setIsReplying(false);
+  const handleSendReply = async () => {
+    if (!replyContent.trim()) {
+      toast.error('Reply cannot be empty');
+      return;
+    }
+
+    try {
+      setIsSending(true);
+      await questionService.replyQuestion({
+        listing: listingId,
+        chat_id,
+        message_id,
+        message: replyContent.trim()
+      });
+      
+      toast.success('Reply sent successfully');
+      setReplyContent('');
+      setIsReplying(false);
+    } catch (error) {
+      toast.error('Failed to send reply: ' + error.message);
+    } finally {
+      setIsSending(false);
+    }
   };
 
   return (
@@ -32,18 +57,25 @@ const QuestionsCard = ({ question }) => {
           </div>
         </div>
         <div className="flex items-center">
-          <span className="f6 gray mr2">ID: {id}</span>
+          <span className="f6 gray mr2">ID: {message_id}</span>
           <span className="f6 blue">text</span>
         </div>
       </div>
+      
       <div className="bg-light-gray pa3 br2">
         <p className="f5 dark-gray mv0">{content}</p>
       </div>
+      
       <div className="flex justify-end mt3">
-        <button className="action-btn blue" onClick={handleReplyClick}>
+        <button 
+          className="action-btn blue"
+          onClick={handleReplyClick}
+          disabled={isSending}
+        >
           <span className="mr2">↩</span> Reply
         </button>
       </div>
+      
       {isReplying && (
         <div className="mt3">
           <textarea
@@ -52,13 +84,22 @@ const QuestionsCard = ({ question }) => {
             value={replyContent}
             onChange={handleReplyChange}
             rows="4"
+            disabled={isSending}
           />
           <div className="flex justify-end mt2">
-            <button className="action-btn red mr3" onClick={() => setIsReplying(false)}>
+            <button 
+              className="action-btn red mr3" 
+              onClick={() => setIsReplying(false)}
+              disabled={isSending}
+            >
               Cancel
             </button>
-            <button className="action-btn blue" onClick={handleSendReply}>
-              Send Reply
+            <button 
+              className="action-btn blue" 
+              onClick={handleSendReply}
+              disabled={isSending || !replyContent.trim()}
+            >
+              {isSending ? 'Sending...' : 'Send Reply'}
             </button>
           </div>
         </div>

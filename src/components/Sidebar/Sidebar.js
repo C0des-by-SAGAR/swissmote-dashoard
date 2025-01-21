@@ -1,15 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { FiLogOut, FiBriefcase, FiFileText, FiChevronLeft, FiChevronRight, FiChevronDown } from 'react-icons/fi';
 import { MdWork, MdSchool, MdVolunteerActivism, MdAutorenew, MdCheckCircle, MdCancel } from 'react-icons/md';
 import './Sidebar.css';
 import { useNavigate } from 'react-router-dom';
-import { FiMessageCircle } from 'react-icons/fi';
+import { FiMessageCircle, FiMessageSquare } from 'react-icons/fi';
 
 const Sidebar = ({ isExpanded, onToggle }) => {
   const navigate = useNavigate();
+  const sidebarRef = useRef(null);
   const [activeItem, setActiveItem] = useState('dashboard');
   const [isPostJobsOpen, setIsPostJobsOpen] = useState(false);
   const [isJobListingsOpen, setIsJobListingsOpen] = useState(false);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+        if (isExpanded) {
+          onToggle();
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isExpanded, onToggle]);
 
   const postJobsSubmenu = [
     {
@@ -116,8 +132,10 @@ const Sidebar = ({ isExpanded, onToggle }) => {
     setActiveItem(itemId);
     if (path) {
       navigate(path);
+      if (isExpanded) {
+        onToggle();
+      }
     }
-    onToggle(); // Always collapse sidebar after selection
   };
 
   const handleSubmenuItemClick = (itemId, path) => {
@@ -131,7 +149,10 @@ const Sidebar = ({ isExpanded, onToggle }) => {
   };
 
   return (
-    <aside className={`sidebar ${isExpanded ? 'expanded' : 'collapsed'}`}>
+    <aside 
+      ref={sidebarRef} 
+      className={`sidebar ${isExpanded ? 'expanded' : 'collapsed'}`}
+    >
       {/* Brand Header */}
       <div className="sidebar-header">
         <div 
@@ -277,8 +298,20 @@ const Sidebar = ({ isExpanded, onToggle }) => {
         <div 
           className={`logout-button ${!isExpanded ? 'collapsed-item' : ''}`}
           onClick={() => {
+            navigate('/feedback');
+            onToggle();
+          }}
+        >
+          <FiMessageSquare />
+          <span className={`${!isExpanded ? 'collapsed-label' : ''}`}>
+            Feed back
+          </span>
+        </div>
+        <div 
+          className={`logout-button ${!isExpanded ? 'collapsed-item' : ''}`}
+          onClick={() => {
             console.log('Logout clicked');
-            onToggle(); // Collapse sidebar on logout
+            onToggle();
           }}
         >
           <FiLogOut />

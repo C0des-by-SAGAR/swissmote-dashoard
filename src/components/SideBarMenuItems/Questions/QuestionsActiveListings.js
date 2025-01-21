@@ -19,9 +19,9 @@ const ActiveListingsCard = ({ listing, isSelected, onSelect }) => (
 
 const QuestionsActiveListings = ({ selectedListing, onListingSelect, listings }) => {
   return (
-    <div className="active-listings-container bg-white br3 shadow-1">
+    <div className="active-listings-container">
       <div className="fixed-header bb b--light-gray">
-        <h2 className="f4 fw6 pa3 mb0">Active Listings</h2>
+        <h2 className="f4 fw6 pa3 mb0 white">Active Listings</h2>
       </div>
       <div className="scrollable-content">
         {listings.map((listing) => (

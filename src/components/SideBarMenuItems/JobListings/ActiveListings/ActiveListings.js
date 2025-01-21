@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import ListingsHeader from '../shared/ListingsHeader';
 import ActiveListingCard from '../shared/ActiveListingCards';
-import { listingsService } from '../../../../api/services/listings';
 import { toast } from 'react-toastify';
+import { activeListingService } from '../../../../api/services/activeListingService';
 import './ActiveListings.css';
 
 const ActiveListings = ({ isSidebarExpanded }) => {
@@ -12,22 +12,23 @@ const ActiveListings = ({ isSidebarExpanded }) => {
   const [listings, setListings] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    fetchActiveListings();
-  }, [employmentType, account]);
-
   const fetchActiveListings = async () => {
     try {
       setIsLoading(true);
-      const data = await listingsService.getActiveListings();
-      setListings(data || []);
+      const response = await activeListingService.getActiveListings();
+      setListings(response || []);
     } catch (error) {
       toast.error('Error fetching active listings');
       console.error('Error:', error);
+      setListings([]);
     } finally {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchActiveListings();
+  }, [employmentType, account]);
 
   const filteredListings = listings.filter(listing => {
     const matchesSearch = !searchQuery || 
@@ -59,28 +60,15 @@ const ActiveListings = ({ isSidebarExpanded }) => {
       ) : filteredListings.length > 0 ? (
         <div className="job-listings-grid">
           {filteredListings.map((listing) => (
-            <ActiveListingCard 
-              key={listing.id} 
-              data={{
-                listingNumber: listing.listingNo,
-                projectName: listing.process,
-                date: listing.date,
-                organization: listing.organisation,
-                createdBy: listing.createdBy,
-                createdPlatform: listing.createdPlatform,
-                automatedBy: listing.automatedBy,
-                automatedPlatform: listing.automatedPlatform,
-                expiryDate: listing.expiryDate,
-                conversionRate: listing.conversionRate,
-                status: 'active',
-                assignmentType: listing.assignmentType,
-                links: {
-                  internshala: listing.internshalaLink,
-                  leader: listing.leaderLink,
-                  candidate: listing.candidateLink,
-                  assignment: listing.assignmentLinks
-                }
-              }} 
+            <ActiveListingCard
+              key={listing.listingNo}
+              data={listing}
+              links={{
+                internshala: listing.internshalaLink,
+                leader: listing.leaderLink,
+                candidate: listing.candidateLink,
+                assignment: listing.assignmentLinks
+              }}
             />
           ))}
         </div>

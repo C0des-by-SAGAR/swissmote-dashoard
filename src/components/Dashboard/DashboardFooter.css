@@ -1,9 +1,11 @@
 .dashboard-footer {
-  background: white;
-  border-radius: 12px;
+  background: rgba(30, 41, 59, 0.5);
+  border-radius: 0.75rem;
   margin: 1.5rem;
   padding: 2rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  backdrop-filter: blur(8px);
 }
 
 .footer-content {
@@ -20,7 +22,7 @@
 .ratio-title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1a202c;
+  color: #e2e8f0;
   margin: 0;
 }
 
@@ -34,20 +36,20 @@
 }
 
 .active-number {
-  color: #4299e1;  /* Blue color matching our theme */
+  color: #00ffff;  /* Neon cyan */
 }
 
 .ratio-separator {
-  color: #4299e1;
+  color: #94a3b8;
 }
 
 .total-number {
-  color: #4299e1;
+  color: #ff00ff;  /* Neon magenta */
 }
 
 .ratio-description {
   font-size: 1rem;
-  color: #718096;
+  color: #94a3b8;
   margin: 0;
 }
 

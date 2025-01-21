@@ -8,8 +8,8 @@ import {
 } from 'react-icons/fi';
 import { BiBuilding, BiRupee } from 'react-icons/bi';
 import './PostInternship.css';
-import { internshipsService } from '../../../../api/services/internships';
 import { toast } from 'react-toastify';
+import { internshipService } from '../../../../api/services/internshipService';
 
 const organizationMap = {
   'org1': 'Persist Ventures',
@@ -41,19 +41,8 @@ const PostInternship = () => {
     e.preventDefault();
     if (currentStep === 3) {
       try {
-        const response = await internshipsService.postInternship({
-          username: formData.username || 'default_user',
-          internshipTitle: formData.internshipTitle,
-          skills: formData.requiredSkills,
-          jobTypeFull: formData.employment === 'Full-Time',
-          positions: formData.positions,
-          stipend: formData.stipend,
-          account: formData.organization === 'Persist Ventures' ? 'pv' : 'sa',
-          postOnLinkedin: false
-        });
-
+        await internshipService.createInternship(formData);
         toast.success('Internship posted successfully!');
-        // Reset form
         setFormData({
           internshipTitle: '',
           requiredSkills: '',
@@ -66,7 +55,7 @@ const PostInternship = () => {
         });
         setCurrentStep(1);
       } catch (error) {
-        toast.error(error.response?.data?.message || 'Error posting internship');
+        toast.error(error.message || 'Error posting internship');
       }
     } else {
       setCurrentStep(prev => prev + 1);

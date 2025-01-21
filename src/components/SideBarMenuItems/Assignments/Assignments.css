@@ -1,7 +1,9 @@
 /* Card and Container Styles */
 .assignment-card {
   transition: all 0.2s ease-in-out;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #4a5568;
+  background-color: #2d3748;
+  color: #e2e8f0;
 }
 
 .assignment-card:hover {
@@ -10,14 +12,16 @@
 }
 
 .active-listings-container {
-  border: 1px solid #e0e0e0;
+  border: 1px solid #4a5568;
   height: calc(100vh - 220px);
   min-width: 250px;
   width: 100%;
+  background-color: #2d3748;
 }
 
 .fixed-header {
-  background: white;
+  background-color: #2d3748;
+  border-bottom: 1px solid #4a5568;
   z-index: 1;
   width: 100%;
 }
@@ -33,12 +37,12 @@
 }
 
 .scrollable-content::-webkit-scrollbar-thumb {
-  background-color: #cbd5e0;
+  background-color: #4a5568;
   border-radius: 3px;
 }
 
 .scrollable-content::-webkit-scrollbar-track {
-  background-color: #f1f1f1;
+  background-color: #1a202c;
 }
 
 /* Status Indicators */
@@ -89,7 +93,7 @@
 }
 
 .white {
-  color: #ffffff;
+  color: #e2e8f0;
 }
 
 .action-button:hover {
@@ -119,7 +123,7 @@
 
 /* Legend Styles */
 .status-legend {
-  background-color: rgba(255, 255, 255, 0.95);
+  background-color: #2d3748;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -145,15 +149,16 @@
 
 .listing-card {
   transition: all 0.2s ease-in-out;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #4a5568;
   border-radius: 0.5rem;
   width: 100%;
   box-sizing: border-box;
+  background-color: #2d3748;
 }
 
 .listing-card:hover {
   transform: translateX(2px);
-  border-color: #90cdf4;
+  border-color: #4299e1;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -172,7 +177,7 @@
 
 /* Project details text colors */
 .moon-gray {
-  color: #999999;
+  color: #718096;
 }
 
 .details-grid {
@@ -196,30 +201,31 @@
   background: transparent;
   display: flex;
   align-items: center;
+  background-color: #2d3748;
 }
 
 .light-blue-btn {
-  background-color: #f0f7ff;
+  background-color: #2c5282;
 }
 
 .light-blue-btn:hover {
-  background-color: #e6f0ff;
+  background-color: #2b6cb0;
 }
 
 .light-green-btn {
-  background-color: #f0fff4;
+  background-color: #276749;
 }
 
 .light-green-btn:hover {
-  background-color: #e6ffed;
+  background-color: #2f855a;
 }
 
 .light-purple-btn {
-  background-color: #f5f0ff;
+  background-color: #553c9a;
 }
 
 .light-purple-btn:hover {
-  background-color: #ebe6ff;
+  background-color: #6b46c1;
 }
 
 .blue {
@@ -247,7 +253,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.75);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -263,6 +269,8 @@
   padding: 24px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   animation: slideIn 0.3s ease-out;
+  background-color: #2d3748;
+  color: #e2e8f0;
 }
 
 @keyframes slideIn {
@@ -278,7 +286,7 @@
 
 .reply-textarea {
   width: 100%;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #4a5568;
   border-radius: 6px;
   padding: 12px;
   font-size: 16px;
@@ -286,6 +294,8 @@
   resize: vertical;
   min-height: 120px;
   transition: border-color 0.2s ease;
+  background-color: #1a202c;
+  color: #e2e8f0;
 }
 
 .reply-textarea:focus {
@@ -340,4 +350,25 @@
 
 .close-button:hover {
   background-color: #f5f5f5;
+}
+
+.listing-card.bg-white {
+  background-color: #2d3748;
+}
+
+.listing-card.bg-light-blue {
+  background-color: #2c5282;
+}
+
+.dark-gray {
+  color: #e2e8f0;
+}
+
+.gray {
+  color: #a0aec0;
+}
+
+/* Update border color */
+.bb.b--light-gray {
+  border-bottom-color: #4a5568;
 }

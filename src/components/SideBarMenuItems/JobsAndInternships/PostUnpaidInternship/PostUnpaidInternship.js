@@ -9,8 +9,8 @@ import {
 } from 'react-icons/fi';
 import { BiBuilding } from 'react-icons/bi';
 import './PostUnpaidInternship.css';
-import { unpaidInternshipsService } from '../../../../api/services/unpaidInternships';
 import { toast } from 'react-toastify';
+import { unpaidInternshipService } from '../../../../api/services/unpaidInternshipService';
 
 const PostUnpaidInternship = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -36,18 +36,8 @@ const PostUnpaidInternship = () => {
     e.preventDefault();
     if (currentStep === 3) {
       try {
-        const response = await unpaidInternshipsService.postUnpaidInternship({
-          username: formData.username || 'default_user',
-          internshipTitle: formData.internshipTitle,
-          skills: formData.requiredSkills,
-          jobTypeFull: formData.employment === 'Full-Time',
-          positions: formData.positions,
-          duration: formData.duration,
-          postOnLinkedin: false
-        });
-
+        await unpaidInternshipService.createUnpaidInternship(formData);
         toast.success('Unpaid internship posted successfully!');
-        // Reset form
         setFormData({
           internshipTitle: '',
           requiredSkills: '',
@@ -59,7 +49,7 @@ const PostUnpaidInternship = () => {
         });
         setCurrentStep(1);
       } catch (error) {
-        toast.error(error.response?.data?.message || 'Error posting unpaid internship');
+        toast.error(error.message || 'Error posting unpaid internship');
       }
     } else {
       setCurrentStep(prev => prev + 1);

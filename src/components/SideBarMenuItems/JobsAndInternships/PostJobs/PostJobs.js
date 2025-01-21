@@ -9,8 +9,8 @@ import {
 } from 'react-icons/fi';
 import { BiBuilding, BiRupee } from 'react-icons/bi';
 import './PostJobs.css';
-import { jobsService } from '../../../../api/services/jobs';
 import { toast } from 'react-toastify';
+import { jobService } from '../../../../api/services/jobService';
 
 const organizationMap = {
   'org1': 'Persist Ventures',
@@ -43,21 +43,7 @@ const PostJobs = () => {
     e.preventDefault();
     if (currentStep === 3) {
       try {
-        const response = await jobsService.postJob({
-          username: formData.username || 'default_user',
-          jobTitle: formData.jobTitle,
-          minExperience: formData.minExperience,
-          skills: formData.requiredSkills,
-          python: formData.requiredSkills?.includes('Python'),
-          django: formData.requiredSkills?.includes('Django'),
-          jobTypeFull: formData.employment === 'Full-Time',
-          minPosition: formData.positions,
-          maxPosition: formData.positions,
-          minSalary: formData.minSalary,
-          account: formData.organization === 'Persist Ventures' ? 'pv' : 'sa',
-          postOnLinkedin: true
-        });
-
+        await jobService.createJob(formData);
         toast.success('Job posted successfully!');
         setFormData({
           jobTitle: '',
@@ -72,7 +58,7 @@ const PostJobs = () => {
         });
         setCurrentStep(1);
       } catch (error) {
-        toast.error(error.response?.data?.message || 'Error posting job');
+        toast.error(error.message || 'Error posting job');
       }
     } else {
       setCurrentStep(prev => prev + 1);

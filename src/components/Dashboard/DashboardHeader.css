@@ -92,13 +92,13 @@
 
 .dashboard-header-container {
   padding: 2rem 1.5rem;
-  background-color: #f8f9fa;
+  background-color: #1a202c;
 }
 
 .dashboard-title {
   font-size: 2rem;
   font-weight: 700;
-  color: #1a202c;
+  color: #e2e8f0;
   margin-bottom: 1.5rem;
 }
 
@@ -110,19 +110,21 @@
 }
 
 .stats-card {
-  background: white;
-  border-radius: 12px;
+  background: rgba(30, 41, 59, 0.5);
+  border-radius: 0.75rem;
   padding: 1.5rem;
   display: flex;
   align-items: center;
   gap: 1rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  backdrop-filter: blur(8px);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .stats-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
 }
 
 .stats-icon {
@@ -139,25 +141,25 @@
   height: 24px;
 }
 
-/* Icon background colors */
-.stats-icon.blue {
-  background-color: #ebf5ff;
-  color: #4299e1;
+/* Neon icon colors */
+.stats-icon.cyan {
+  background-color: rgba(0, 255, 255, 0.15);
+  color: #00ffff;
 }
 
 .stats-icon.green {
-  background-color: #f0fff4;
-  color: #48bb78;
+  background-color: rgba(57, 255, 20, 0.15);
+  color: #39ff14;
 }
 
 .stats-icon.yellow {
-  background-color: #fffaf0;
-  color: #ecc94b;
+  background-color: rgba(255, 255, 0, 0.15);
+  color: #ffff00;
 }
 
-.stats-icon.red {
-  background-color: #fff5f5;
-  color: #f56565;
+.stats-icon.magenta {
+  background-color: rgba(255, 0, 255, 0.15);
+  color: #ff00ff;
 }
 
 .stats-content {
@@ -167,14 +169,14 @@
 .stats-count {
   font-size: 1.875rem;
   font-weight: 700;
-  color: #2d3748;
+  color: #e2e8f0;
   margin: 0;
   line-height: 1.2;
 }
 
 .stats-label {
   font-size: 0.875rem;
-  color: #718096;
+  color: #94a3b8;
   margin: 0;
   margin-top: 0.25rem;
 }

@@ -1,26 +1,60 @@
-import React, { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
+import { userService } from '../api/services/userService';
 
-const AuthContext = createContext(null);
+const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(true); // For development
   const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Temporary sign in function that bypasses backend
-  const signIn = async (credentials) => {
-    // Simulate successful sign in
-    setUser({
-      id: '1',
-      email: credentials.email,
-      name: 'Test User'
-    });
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (process.env.NODE_ENV === 'development') {
+        // Mock user for development
+        setUser({
+          username: 'dev_user',
+          email: 'dev@example.com',
+          full_name: 'Development User',
+          disabled: false
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const userData = await userService.getCurrentUser();
+        setUser(userData);
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error('Error fetching user:', error);
+        setIsAuthenticated(false);
+        setUser(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  const signIn = async (userData) => {
+    setUser(userData);
+    setIsAuthenticated(true);
   };
 
   const signOut = () => {
     setUser(null);
+    setIsAuthenticated(false);
+    localStorage.removeItem('access_token');
   };
 
+  if (isLoading) {
+    return <div>Loading...</div>; // Or your loading component
+  }
+
   return (
-    <AuthContext.Provider value={{ user, signIn, signOut }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ListingsHeader from '../shared/ListingsHeader';
 import ClosedListingCard from '../shared/ClosedListingCard';
-import { listingsService } from '../../../../api/services/listings';
+import { closedListingService } from '../../../../api/services/closedListingService';
 import { toast } from 'react-toastify';
 import './ClosedListings.css';
 
@@ -12,22 +12,23 @@ const ClosedListings = () => {
   const [listings, setListings] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    fetchClosedListings();
-  }, [employmentType, account]);
-
   const fetchClosedListings = async () => {
     try {
       setIsLoading(true);
-      const data = await listingsService.getClosedListings();
-      setListings(data || []);
+      const response = await closedListingService.getClosedListings();
+      setListings(response || []); // Set empty array if no response
     } catch (error) {
       toast.error('Error fetching closed listings');
       console.error('Error:', error);
+      setListings([]); // Set empty array on error
     } finally {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchClosedListings();
+  }, [employmentType, account]);
 
   const filteredListings = listings.filter(listing => {
     const matchesSearch = !searchQuery || 
