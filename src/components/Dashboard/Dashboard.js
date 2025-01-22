@@ -13,7 +13,17 @@ import './Dashboard.css';
 const Dashboard = () => {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [chartType, setChartType] = useState('Line');
-  const [dashboardData, setDashboardData] = useState(null);
+  const [dashboardData, setDashboardData] = useState({
+    stats: {
+      totalJobs: 0,
+      automatedListings: 0,
+      notAutomatedListings: 0,
+      expiredListings: 0
+    },
+    followUpData: [],
+    conversionData: [],
+    reviewData: []
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [reviewStats, setReviewStats] = useState({
     added: 0,
@@ -35,22 +45,31 @@ const Dashboard = () => {
 
   // Fetch dashboard data
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchDashboardData = async () => {
       try {
         setIsLoading(true);
-        const response = await dashboardService.getDashboardData();
-        const validatedData = validateDashboardData(response);
-        setDashboardData(validatedData);
+        const data = await dashboardService.getDashboardData();
+        setDashboardData(data);
       } catch (error) {
+        console.error('Error fetching dashboard data:', error);
         toast.error('Error fetching dashboard data');
-        console.error('Dashboard Error:', error);
-        setDashboardData(null);
+        setDashboardData({
+          stats: {
+            totalJobs: 0,
+            automatedListings: 0,
+            notAutomatedListings: 0,
+            expiredListings: 0
+          },
+          followUpData: [],
+          conversionData: [],
+          reviewData: []
+        });
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchData();
+    fetchDashboardData();
   }, []);
 
   // Listen for sidebar toggle event

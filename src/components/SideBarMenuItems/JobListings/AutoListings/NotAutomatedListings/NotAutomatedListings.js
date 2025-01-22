@@ -12,7 +12,7 @@ const NotAutomatedListings = () => {
   const [accountFilter, setAccountFilter] = useState('pv');
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 9;
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [listings, setListings] = useState([]);
 
   // Filter the data based on employment type and account
@@ -50,28 +50,25 @@ const NotAutomatedListings = () => {
   );
 
   useEffect(() => {
-    fetchListings();
-  }, [employmentTypeFilter, accountFilter]);
+    const fetchNotAutomatedListings = async () => {
+      try {
+        const data = await autoListingsService.getAutoListings({
+          emp_type: 'all',
+          account: 'all'
+        });
+        // Filter not automated listings
+        const notAutomated = data.filter(listing => !listing.is_automated);
+        setListings(notAutomated);
+      } catch (error) {
+        console.error('Error fetching not automated listings:', error);
+        toast.error('Error fetching not automated listings');
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const fetchListings = async () => {
-    try {
-      setIsLoading(true);
-      const response = await autoListingsService.getAutoListings({
-        emp_type: employmentTypeFilter.toLowerCase() || 'internship',
-        account: accountFilter.toLowerCase() || 'pv'
-      });
-      
-      // Update the listings with the non-automated listings from the response
-      const notAutomatedListings = response.not_automated || [];
-      setListings(notAutomatedListings);
-    } catch (error) {
-      toast.error('Error fetching non-automated listings');
-      console.error('Error:', error);
-      setListings([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    fetchNotAutomatedListings();
+  }, []);
 
   return (
     <div className="not-automated-container">

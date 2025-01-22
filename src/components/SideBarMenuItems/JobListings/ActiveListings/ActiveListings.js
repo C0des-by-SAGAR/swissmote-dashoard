@@ -9,28 +9,26 @@ const ActiveListings = ({ isSidebarExpanded }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [employmentType, setEmploymentType] = useState('job');
   const [account, setAccount] = useState('pv');
-  const [listings, setListings] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const fetchActiveListings = async () => {
-    try {
-      setIsLoading(true);
-      const response = await activeListingService.getActiveListings();
-      setListings(response || []);
-    } catch (error) {
-      toast.error('Error fetching active listings');
-      console.error('Error:', error);
-      setListings([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const [activeListings, setActiveListings] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetchActiveListings();
-  }, [employmentType, account]);
+    const fetchActiveListings = async () => {
+      try {
+        const data = await activeListingService.getActiveListings();
+        setActiveListings(data);
+      } catch (error) {
+        console.error('Error fetching active listings:', error);
+        toast.error('Error fetching active listings');
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const filteredListings = listings.filter(listing => {
+    fetchActiveListings();
+  }, []);
+
+  const filteredListings = activeListings.filter(listing => {
     const matchesSearch = !searchQuery || 
       Object.values(listing).some(val => 
         String(val).toLowerCase().includes(searchQuery.toLowerCase())
