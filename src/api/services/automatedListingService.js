@@ -42,20 +42,22 @@ export const automatedListingService = {
    * @param {number} [params.limit=10] - Limit for pagination
    * @returns {Promise<Object>} Daily updates data
    */
-  getDailyUpdates: async ({ listing = 'all', offset = 0, limit = 10 }) => {
+  getDailyUpdates: async () => {
     try {
       const response = await axiosInstance.get('/getUpdates', {
         params: {
-          listing,
-          offset,
-          limit
+          offset: 0,
+          limit: 1000,
+          listing: 'all'
+        },
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
         }
       });
       return response.data;
     } catch (error) {
-      // Log the error for debugging
-      console.error('getDailyUpdates error:', error.response?.data || error.message);
-      throw handleApiError(error);
+      console.error('getDailyUpdates error:', error.response?.data);
+      return [];
     }
   },
 
