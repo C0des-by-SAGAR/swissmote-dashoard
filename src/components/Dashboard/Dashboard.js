@@ -54,17 +54,40 @@ const Dashboard = () => {
 
     const fetchDashboardData = async () => {
       try {
-        // Start with initial state
-        setDashboardData(initialState);
+        setIsLoading(true);
         
-        // For now, just set loading to false
-        if (isMounted) {
-          setIsLoading(false);
-        }
+        // Fetch active listings first
+        const activeListings = await activeListingService.getActiveListings();
+        
+        if (!isMounted) return;
+
+        // Ensure we have an array and calculate stats
+        const listings = Array.isArray(activeListings) ? activeListings : [];
+        
+        // Calculate stats safely
+        const stats = {
+          totalJobs: listings.length,
+          automatedListings: listings.filter(listing => listing?.is_automated).length,
+          notAutomatedListings: listings.filter(listing => !listing?.is_automated).length,
+          expiredListings: listings.filter(listing => {
+            if (!listing?.expiry_date) return false;
+            const expiryDate = new Date(listing.expiry_date);
+            return !isNaN(expiryDate.getTime()) && expiryDate < new Date();
+          }).length
+        };
+
+        setDashboardData({
+          ...initialState,
+          stats
+        });
       } catch (error) {
-        console.error('Dashboard data fetch error:', error);
+        console.error('Error fetching dashboard data:', error);
         if (isMounted) {
+          toast.error('Error loading dashboard data. Please try again.');
           setDashboardData(initialState);
+        }
+      } finally {
+        if (isMounted) {
           setIsLoading(false);
         }
       }
