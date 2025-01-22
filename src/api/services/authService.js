@@ -14,23 +14,17 @@ export const authService = {
    */
   login: async (credentials) => {
     try {
-      // Create form data as the API expects application/x-www-form-urlencoded
       const formData = new URLSearchParams();
       formData.append('username', credentials.username);
       formData.append('password', credentials.password);
       formData.append('grant_type', 'password');
-      // Optional fields if needed
-      // formData.append('scope', '');
-      // formData.append('client_id', '');
-      // formData.append('client_secret', '');
 
-      const response = await axiosInstance.post('/token', formData, {
+      const response = await axiosInstance.post('/api/proxy/token', formData, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         }
       });
-
-      // The API returns access_token and token_type
+      
       return {
         access_token: response.data.access_token,
         token_type: response.data.token_type,
@@ -39,10 +33,6 @@ export const authService = {
         }
       };
     } catch (error) {
-      // Handle 401 Unauthorized specifically
-      if (error.response?.status === 401) {
-        throw new Error('Incorrect username or password');
-      }
       throw handleApiError(error);
     }
   },
@@ -58,16 +48,13 @@ export const authService = {
    */
   register: async (userData) => {
     try {
-      const response = await axiosInstance.post('/auth/register', {
+      const response = await axiosInstance.post('/api/proxy/auth/register', {
         username: userData.username,
         email: userData.email,
         password: userData.password,
         full_name: userData.fullName
       });
-      return {
-        access_token: response.data.access_token,
-        user: response.data.user
-      };
+      return response.data;
     } catch (error) {
       throw handleApiError(error);
     }
@@ -79,7 +66,7 @@ export const authService = {
    */
   getCurrentUser: async () => {
     try {
-      const response = await axiosInstance.get('/auth/me');
+      const response = await axiosInstance.get('/api/proxy/auth/me');
       return response.data;
     } catch (error) {
       throw handleApiError(error);
