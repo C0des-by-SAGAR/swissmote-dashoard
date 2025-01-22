@@ -37,6 +37,13 @@ const AutomatedListings = () => {
   const [dailyUpdates, setDailyUpdates] = useState({});
   const [isLoadingUpdates, setIsLoadingUpdates] = useState(false);
 
+  const [replyData, setReplyData] = useState({
+    message: '',
+    chat_id: null,
+    message_id: null,
+    listing: null
+  });
+
   useEffect(() => {
     fetchListings();
   }, [employmentType, account]);
@@ -143,6 +150,35 @@ const AutomatedListings = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleReplySubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await automatedListingService.replyDaily(replyData);
+      toast.success('Reply sent successfully!');
+      // Clear reply data
+      setReplyData({
+        message: '',
+        chat_id: null,
+        message_id: null,
+        listing: null
+      });
+      // Refresh daily updates if needed
+      if (selectedListing?.listingId) {
+        fetchDailyUpdates(selectedListing.listingId);
+      }
+    } catch (error) {
+      toast.error('Failed to send reply: ' + error.message);
+    }
+  };
+
+  const handleReplyChange = (e) => {
+    const { name, value } = e.target;
+    setReplyData(prev => ({
       ...prev,
       [name]: value
     }));

@@ -16,18 +16,5 @@ export const closedListingService = {
     } catch (error) {
       throw handleApiError(error);
     }
-  },
-
-  /**
-   * Get expired listings count
-   * @returns {Promise<number>} Number of expired listings
-   */
-  getExpiredCount: async () => {
-    try {
-      const response = await axiosInstance.get('/expired_listings/count');
-      return response.data.count || 0;
-    } catch (error) {
-      throw handleApiError(error);
-    }
   }
 }; 

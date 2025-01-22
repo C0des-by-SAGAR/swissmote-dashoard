@@ -12,7 +12,7 @@ export const automatedListingService = {
    */
   createAutomatedListing: async (listingData) => {
     try {
-      const response = await axiosInstance.post('/automatedListing', {
+      const response = await axiosInstance.post('/automateListing', {
         username: listingData.username,
         listing: listingData.listing,
         listing_name: listingData.listingName,
@@ -35,32 +35,6 @@ export const automatedListingService = {
   },
 
   /**
-   * Get automated listings count
-   * @returns {Promise<number>} Number of automated listings
-   */
-  getAutomatedCount: async () => {
-    try {
-      const response = await axiosInstance.get('/automated_listings/count');
-      return response.data.count || 0;
-    } catch (error) {
-      throw handleApiError(error);
-    }
-  },
-
-  /**
-   * Get not automated listings count
-   * @returns {Promise<number>} Number of non-automated listings
-   */
-  getNotAutomatedCount: async () => {
-    try {
-      const response = await axiosInstance.get('/not_automated_listings/count');
-      return response.data.count || 0;
-    } catch (error) {
-      throw handleApiError(error);
-    }
-  },
-
-  /**
    * Get daily updates for automated listings
    * @param {Object} params - Query parameters
    * @param {string} params.listing - Listing ID
@@ -76,6 +50,29 @@ export const automatedListingService = {
           offset,
           limit
         }
+      });
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  /**
+   * Reply to daily updates
+   * @param {Object} params - Parameters for the reply
+   * @param {number} params.listing - Listing ID
+   * @param {string} params.message - Reply message
+   * @param {number} params.chat_id - Chat ID to reply to
+   * @param {number} params.message_id - Message ID to reply to
+   * @returns {Promise<string>} Success message
+   */
+  replyDaily: async ({ listing, message, chat_id, message_id }) => {
+    try {
+      const response = await axiosInstance.post('/reply_daily', {
+        chat_id,
+        message_id,
+        message,
+        listing
       });
       return response.data;
     } catch (error) {

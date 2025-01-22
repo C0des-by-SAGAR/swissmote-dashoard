@@ -14,7 +14,7 @@ export const evaluatedAssignmentService = {
    */
   getEvaluatedAssignment: async (params) => {
     try {
-      const response = await axiosInstance.get('/evaluated_assignment', {
+      const response = await axiosInstance.get('/mark_eval_internshala', {
         params: {
           applicant_id: params.applicant_id,
           org: params.org

@@ -1,11 +1,7 @@
 import { axiosInstance } from '../config/axiosConfig';
 import { handleApiError } from '../utils/errorHandler';
-import { autoListingsService } from './autoListingsService';
-import { internshipService } from './internshipService';
-import { jobService } from './jobService';
-import { unpaidInternshipService } from './unpaidInternshipService';
+import { activeListingService } from './activeListingService';
 import { automatedListingService } from './automatedListingService';
-import { closedListingService } from './closedListingService';
 
 /**
  * Service for dashboard-related API operations
@@ -17,44 +13,28 @@ export const dashboardService = {
    */
   getDashboardData: async () => {
     try {
-      // Fetch all counts in parallel
-      const [
-        totalJobs,
-        automatedCount,
-        notAutomatedCount,
-        expiredCount
-      ] = await Promise.all([
-        jobService.getTotalJobsCount(),
-        automatedListingService.getAutomatedCount(),
-        automatedListingService.getNotAutomatedCount(),
-        closedListingService.getExpiredCount()
+      // Get active listings and automated listings
+      const [activeListings, automatedListings] = await Promise.all([
+        activeListingService.getActiveListings(),
+        automatedListingService.getDailyUpdates({ limit: 1000 })
       ]);
 
-      // Fetch data from all relevant endpoints
-      const [
-        pvInternships,
-        saInternships,
-        pvJobs,
-        saJobs,
-        automatedListings,
-        unpaidInternships
-      ] = await Promise.all([
-        autoListingsService.getAutoListings({ emp_type: 'internship', account: 'pv' }),
-        autoListingsService.getAutoListings({ emp_type: 'internship', account: 'sa' }),
-        autoListingsService.getAutoListings({ emp_type: 'job', account: 'pv' }),
-        autoListingsService.getAutoListings({ emp_type: 'job', account: 'sa' }),
-        automatedListingService.getAutomatedListings(),
-        unpaidInternshipService.getUnpaidInternships()
-      ]);
+      // Calculate expired listings from active listings
+      const expiredListings = activeListings.filter(listing => 
+        listing.expiry_date && new Date(listing.expiry_date) < new Date()
+      );
+
+      // Calculate stats for the dashboard header
+      const stats = {
+        totalJobs: activeListings.length,
+        automatedListings: automatedListings.length || 0,
+        notAutomatedListings: activeListings.length - (automatedListings.length || 0),
+        expiredListings: expiredListings.length
+      };
 
       // Process and combine the data
       const dashboardData = {
-        stats: {
-          totalJobs,
-          automatedListings: automatedCount,
-          notAutomatedListings: notAutomatedCount,
-          expiredListings: expiredCount
-        },
+        stats,
         followUpData: [
           { 
             name: 'Day 2 Sent', 
@@ -88,29 +68,7 @@ export const dashboardService = {
             name: 'Reviews Pending', 
             value: automatedListings.review_stats?.pending || 0 
           }
-        ],
-        summaryData: {
-          followUp: {
-            day2: {
-              sent: automatedListings.followup_stats?.day2_sent || 0,
-              pending: automatedListings.followup_stats?.day2_pending || 0
-            },
-            day4: {
-              sent: automatedListings.followup_stats?.day4_sent || 0,
-              pending: automatedListings.followup_stats?.day4_pending || 0
-            }
-          },
-          distribution: {
-            '0-25%': automatedListings.conversion_stats?.['0-25'] || 0,
-            '26-50%': automatedListings.conversion_stats?.['26-50'] || 0,
-            '51-75%': automatedListings.conversion_stats?.['51-75'] || 0,
-            '76-100%': automatedListings.conversion_stats?.['76-100'] || 0
-          },
-          reviews: {
-            added: automatedListings.review_stats?.added || 0,
-            pending: automatedListings.review_stats?.pending || 0
-          }
-        }
+        ]
       };
 
       return dashboardData;

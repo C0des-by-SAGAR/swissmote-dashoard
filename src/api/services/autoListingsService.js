@@ -1,5 +1,7 @@
 import { axiosInstance } from '../config/axiosConfig';
 import { handleApiError } from '../utils/errorHandler';
+import { activeListingService } from './activeListingService';
+import { automatedListingService } from './automatedListingService';
 
 /**
  * Service for auto listings-related API operations
@@ -27,20 +29,28 @@ export const autoListingsService = {
   },
 
   /**
-   * Fetch expired listings
-   * @param {Object} params - Query parameters
-   * @param {string} params.account - Account type (pv/sa)
-   * @returns {Promise<Array>} Array of expired listings
+   * Get counts for dashboard by combining active and automated listings
+   * @returns {Promise<Object>} Counts of different listing types
    */
-  getExpiredListings: async (params) => {
+  getDashboardCounts: async () => {
     try {
-      const response = await axiosInstance.get('/get_auto_listings', {
-        params: {
-          emp_type: 'expired',
-          account: params.account
-        }
-      });
-      return response.data;
+      // Get active listings and automated listings
+      const [activeListings, automatedListings] = await Promise.all([
+        activeListingService.getActiveListings(),
+        automatedListingService.getDailyUpdates({ limit: 1000 }) // Adjust limit as needed
+      ]);
+
+      // Calculate counts
+      const counts = {
+        total: activeListings.length, // Total jobs from active listings
+        automated: automatedListings.length || 0,
+        notAutomated: activeListings.length - (automatedListings.length || 0),
+        expired: activeListings.filter(listing => 
+          listing.expiry_date && new Date(listing.expiry_date) < new Date()
+        ).length
+      };
+
+      return counts;
     } catch (error) {
       throw handleApiError(error);
     }

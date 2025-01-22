@@ -42,8 +42,9 @@ export const jobService = {
    */
   getTotalJobsCount: async () => {
     try {
+      // Fetch the job count from the appropriate endpoint
       const response = await axiosInstance.get('/jobs/count');
-      return response.data.total || 0;
+      return response.data.count || 0;
     } catch (error) {
       throw handleApiError(error);
     }
