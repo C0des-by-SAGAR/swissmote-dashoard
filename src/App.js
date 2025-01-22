@@ -5,7 +5,7 @@ import Dashboard from './components/Dashboard/Dashboard';
 import { AuthProvider } from './context/AuthContext';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import './App.css';
+import './styles/global.css';
 import ErrorBoundary from './components/ErrorBoundary';
 
 // Import other components
@@ -25,7 +25,7 @@ const App = () => {
     <Router>
       <AuthProvider>
         <ErrorBoundary>
-          <div className="app-container">
+          <div className="app-wrapper bg-dark-blue min-h-screen">
             <Routes>
               {/* Redirect /auth to root */}
               <Route path="/auth" element={<Navigate to="/" replace />} />
@@ -45,7 +45,7 @@ const App = () => {
                 <Route path="questions" element={<Questions />} />
               </Route>
             </Routes>
-            <ToastContainer />
+            <ToastContainer theme="dark" />
           </div>
         </ErrorBoundary>
       </AuthProvider>
