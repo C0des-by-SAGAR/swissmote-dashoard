@@ -37,12 +37,12 @@ export const automatedListingService = {
   /**
    * Get daily updates for automated listings
    * @param {Object} params - Query parameters
-   * @param {string} params.listing - Listing ID
+   * @param {string} params.listing - Listing ID or 'all'
    * @param {number} [params.offset=0] - Offset for pagination
    * @param {number} [params.limit=10] - Limit for pagination
    * @returns {Promise<Object>} Daily updates data
    */
-  getDailyUpdates: async ({ listing, offset = 0, limit = 10 }) => {
+  getDailyUpdates: async ({ listing = 'all', offset = 0, limit = 10 }) => {
     try {
       const response = await axiosInstance.get('/getUpdates', {
         params: {
@@ -53,6 +53,8 @@ export const automatedListingService = {
       });
       return response.data;
     } catch (error) {
+      // Log the error for debugging
+      console.error('getDailyUpdates error:', error.response?.data || error.message);
       throw handleApiError(error);
     }
   },
