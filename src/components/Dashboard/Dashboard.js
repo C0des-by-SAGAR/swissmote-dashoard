@@ -54,18 +54,36 @@ const Dashboard = () => {
         
         // Calculate stats
         const stats = {
-          totalJobs: activeListings.length,
+          totalJobs: activeListings.length || 0,
           automatedListings: 0,
-          notAutomatedListings: activeListings.length,
+          notAutomatedListings: activeListings.length || 0,
           expiredListings: activeListings.filter(listing => 
             listing.expiry_date && new Date(listing.expiry_date) < new Date()
-          ).length
+          ).length || 0
         };
 
-        setDashboardData({ stats });
+        // Initialize other data with empty arrays if no data is available
+        setDashboardData({
+          stats,
+          followUpData: [], // Empty arrays instead of undefined
+          conversionData: [],
+          reviewData: []
+        });
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
         toast.error('Error fetching dashboard data');
+        // Set default state on error
+        setDashboardData({
+          stats: {
+            totalJobs: 0,
+            automatedListings: 0,
+            notAutomatedListings: 0,
+            expiredListings: 0
+          },
+          followUpData: [],
+          conversionData: [],
+          reviewData: []
+        });
       } finally {
         setIsLoading(false);
       }
