@@ -1,30 +1,27 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { authService } from '../api/services/authService';
 import { toast } from 'react-toastify';
 
 const AuthContext = createContext();
+
+const HARDCODED_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJOaXRlc2gifQ.YQXiLNdHeIz-drgnh7J1Ym2am_89ZM8yGjc9zigJlY0';
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const initializeAuth = async () => {
-      try {
-        const { access_token, token_type } = await authService.login();
-        localStorage.setItem('access_token', access_token);
-        localStorage.setItem('token_type', token_type);
-        setIsAuthenticated(true);
-      } catch (error) {
-        console.error('Authentication failed:', error);
-        toast.error('Authentication failed. Please try again later.');
-        setIsAuthenticated(false);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    initializeAuth();
+    // Bypass authentication and use hardcoded token
+    try {
+      localStorage.setItem('access_token', HARDCODED_TOKEN);
+      localStorage.setItem('token_type', 'Bearer');
+      setIsAuthenticated(true);
+    } catch (error) {
+      console.error('Token storage failed:', error);
+      toast.error('Authentication failed. Please try again later.');
+      setIsAuthenticated(false);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
   const signOut = () => {
@@ -34,7 +31,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>; // Or your loading component
+    return <div>Loading...</div>;
   }
 
   return (
