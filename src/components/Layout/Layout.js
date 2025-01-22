@@ -5,11 +5,13 @@ import './Layout.css';
 
 const Layout = () => {
   return (
-    <div className="layout-container">
+    <div className="flex h-screen bg-gray-100">
       <Sidebar />
-      <main className="main-content">
-        <Outlet />
-      </main>
+      <div className="flex-1 overflow-auto">
+        <main className="p-4">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 };
