@@ -12,21 +12,24 @@ import './Dashboard.css';
 import { activeListingService } from '../../api/services/activeListingService';
 import { automatedListingService } from '../../api/services/automatedListingService';
 
+const initialState = {
+  stats: {
+    totalJobs: 0,
+    automatedListings: 0,
+    notAutomatedListings: 0,
+    expiredListings: 0
+  },
+  followUpData: [],
+  conversionData: [],
+  reviewData: []
+};
+
 const Dashboard = () => {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [chartType, setChartType] = useState('Line');
-  const [dashboardData, setDashboardData] = useState({
-    stats: {
-      totalJobs: 0,
-      automatedListings: 0,
-      notAutomatedListings: 0,
-      expiredListings: 0
-    },
-    followUpData: [],
-    conversionData: [],
-    reviewData: []
-  });
+  const [dashboardData, setDashboardData] = useState(initialState);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [reviewStats, setReviewStats] = useState({
     added: 0,
     pending: 0
@@ -47,49 +50,54 @@ const Dashboard = () => {
 
   // Fetch dashboard data
   useEffect(() => {
+    let isMounted = true;
+
     const fetchDashboardData = async () => {
       try {
-        // Get active listings
+        setIsLoading(true);
+        setError(null);
+
+        // Safely fetch active listings
         const activeListings = await activeListingService.getActiveListings();
+
+        if (!isMounted) return;
+
+        // Ensure activeListings is an array
+        const listings = Array.isArray(activeListings) ? activeListings : [];
         
-        // Calculate stats
+        // Calculate stats with safe defaults
         const stats = {
-          totalJobs: activeListings.length || 0,
+          totalJobs: listings.length || 0,
           automatedListings: 0,
-          notAutomatedListings: activeListings.length || 0,
-          expiredListings: activeListings.filter(listing => 
-            listing.expiry_date && new Date(listing.expiry_date) < new Date()
+          notAutomatedListings: listings.length || 0,
+          expiredListings: listings.filter(listing => 
+            listing?.expiry_date && new Date(listing.expiry_date) < new Date()
           ).length || 0
         };
 
-        // Initialize other data with empty arrays if no data is available
         setDashboardData({
-          stats,
-          followUpData: [], // Empty arrays instead of undefined
-          conversionData: [],
-          reviewData: []
+          ...initialState,
+          stats
         });
       } catch (error) {
-        console.error('Error fetching dashboard data:', error);
-        toast.error('Error fetching dashboard data');
-        // Set default state on error
-        setDashboardData({
-          stats: {
-            totalJobs: 0,
-            automatedListings: 0,
-            notAutomatedListings: 0,
-            expiredListings: 0
-          },
-          followUpData: [],
-          conversionData: [],
-          reviewData: []
-        });
+        console.error('Dashboard data fetch error:', error);
+        if (isMounted) {
+          setError(error.message || 'Failed to fetch dashboard data');
+          setDashboardData(initialState);
+          toast.error('Error loading dashboard data');
+        }
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     fetchDashboardData();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // Listen for sidebar toggle event
@@ -305,6 +313,17 @@ const Dashboard = () => {
       }
     };
   };
+
+  if (error) {
+    return (
+      <div className="error-container">
+        <h2>Error loading dashboard</h2>
+        <button onClick={() => window.location.reload()}>
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
