@@ -28,7 +28,7 @@ const Dashboard = () => {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [chartType, setChartType] = useState('Line');
   const [dashboardData, setDashboardData] = useState(initialState);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [reviewStats, setReviewStats] = useState({
     added: 0,
@@ -54,36 +54,13 @@ const Dashboard = () => {
 
     const fetchDashboardData = async () => {
       try {
-        setIsLoading(true);
-        setError(null);
-
-        // Safely fetch active listings
-        const activeListings = await activeListingService.getActiveListings();
-
-        if (!isMounted) return;
-
-        // Ensure activeListings is an array
-        const listings = Array.isArray(activeListings) ? activeListings : [];
-        
-        // Calculate stats with safe defaults
-        const stats = {
-          totalJobs: listings.length || 0,
-          automatedListings: 0,
-          notAutomatedListings: listings.length || 0,
-          expiredListings: listings.filter(listing => 
-            listing?.expiry_date && new Date(listing.expiry_date) < new Date()
-          ).length || 0
-        };
-
-        setDashboardData({
-          ...initialState,
-          stats
-        });
+        // Start with default data
+        if (isMounted) {
+          setDashboardData(initialState);
+        }
       } catch (error) {
         console.error('Dashboard data fetch error:', error);
         if (isMounted) {
-          setError(error.message || 'Failed to fetch dashboard data');
-          setDashboardData(initialState);
           toast.error('Error loading dashboard data');
         }
       } finally {
