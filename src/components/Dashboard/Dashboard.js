@@ -24,6 +24,26 @@ const initialState = {
   reviewData: []
 };
 
+const LoadingSpinner = () => (
+  <div className="flex items-center justify-center min-h-[200px]">
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+  </div>
+);
+
+const LoadingDashboard = () => (
+  <div className="dashboard-container bg-dark-blue p-6 rounded-lg">
+    <h1 className="text-2xl font-bold mb-8">Welcome to Swissmote Dashboard</h1>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {[...Array(4)].map((_, i) => (
+        <div key={i} className="bg-light-blue p-6 rounded-lg animate-pulse">
+          <div className="h-8 bg-gray-700 rounded w-1/3 mb-4"></div>
+          <div className="h-6 bg-gray-700 rounded w-1/2"></div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
 const Dashboard = () => {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [chartType, setChartType] = useState('Line');
@@ -54,9 +74,12 @@ const Dashboard = () => {
 
     const fetchDashboardData = async () => {
       try {
-        setIsLoading(true);
-        
-        // Fetch active listings first
+        // Show loading state first
+        if (isMounted) {
+          setIsLoading(true);
+        }
+
+        // Fetch active listings
         const activeListings = await activeListingService.getActiveListings();
         
         if (!isMounted) return;
@@ -76,18 +99,18 @@ const Dashboard = () => {
           }).length
         };
 
-        setDashboardData({
-          ...initialState,
-          stats
-        });
+        if (isMounted) {
+          setDashboardData({
+            ...initialState,
+            stats
+          });
+          setIsLoading(false);
+        }
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
         if (isMounted) {
           toast.error('Error loading dashboard data. Please try again.');
           setDashboardData(initialState);
-        }
-      } finally {
-        if (isMounted) {
           setIsLoading(false);
         }
       }
@@ -326,11 +349,7 @@ const Dashboard = () => {
   }
 
   if (isLoading) {
-    return (
-      <div className="dashboard-loading">
-        <p>Loading dashboard data...</p>
-      </div>
-    );
+    return <LoadingDashboard />;
   }
 
   return (
