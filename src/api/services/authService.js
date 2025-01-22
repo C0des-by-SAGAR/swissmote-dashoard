@@ -6,20 +6,17 @@ import { handleApiError } from '../utils/errorHandler';
  */
 export const authService = {
   /**
-   * Login user
-   * @param {Object} credentials User credentials
-   * @param {string} credentials.username Username
-   * @param {string} credentials.password Password
-   * @returns {Promise<Object>} User data with access token
+   * Login user to get access token
+   * @returns {Promise<Object>} Access token response
    */
-  login: async (credentials) => {
+  login: async () => {
     try {
       const formData = new URLSearchParams();
-      formData.append('username', credentials.username);
-      formData.append('password', credentials.password);
+      formData.append('username', 'Nitesh');
+      formData.append('password', 'njpass123');
       formData.append('grant_type', 'password');
 
-      const response = await axiosInstance.post('/api/proxy/token', formData, {
+      const response = await axiosInstance.post('/token', formData, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         }
@@ -27,10 +24,7 @@ export const authService = {
       
       return {
         access_token: response.data.access_token,
-        token_type: response.data.token_type,
-        user: {
-          username: credentials.username
-        }
+        token_type: response.data.token_type
       };
     } catch (error) {
       throw handleApiError(error);

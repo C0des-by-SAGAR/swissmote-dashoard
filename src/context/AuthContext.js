@@ -1,40 +1,47 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
+import { authService } from '../api/services/authService';
+import { toast } from 'react-toastify';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  // Set default authenticated state to true to bypass login
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
-  const [user, setUser] = useState({
-    id: 'temp_user',
-    username: 'temp_user',
-    role: 'user'
-  });
-  const [isLoading, setIsLoading] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Simplified mock methods
-  const signIn = async () => {
-    console.log('Sign in bypassed');
-    return true;
-  };
+  useEffect(() => {
+    const initializeAuth = async () => {
+      try {
+        const { access_token, token_type } = await authService.login();
+        localStorage.setItem('access_token', access_token);
+        localStorage.setItem('token_type', token_type);
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error('Authentication failed:', error);
+        toast.error('Authentication failed. Please try again later.');
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const signUp = async () => {
-    console.log('Sign up bypassed');
-    return true;
-  };
+    initializeAuth();
+  }, []);
 
   const signOut = () => {
-    console.log('Sign out bypassed');
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('token_type');
+    setIsAuthenticated(false);
   };
+
+  if (isLoading) {
+    return <div>Loading...</div>; // Or your loading component
+  }
 
   return (
     <AuthContext.Provider value={{ 
-      isAuthenticated, 
-      user, 
-      signIn, 
-      signUp, 
+      isAuthenticated,
       signOut,
-      isLoading 
+      isLoading
     }}>
       {children}
     </AuthContext.Provider>
