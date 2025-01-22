@@ -9,6 +9,8 @@ import DashboardHeader from './DashboardHeader';
 import DashboardFooter from './DashboardFooter';
 import { toast } from 'react-toastify';
 import './Dashboard.css';
+import { activeListingService } from '../../api/services/activeListingService';
+import { automatedListingService } from '../../api/services/automatedListingService';
 
 const Dashboard = () => {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
@@ -47,23 +49,23 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        setIsLoading(true);
-        const data = await dashboardService.getDashboardData();
-        setDashboardData(data);
+        // Get active listings
+        const activeListings = await activeListingService.getActiveListings();
+        
+        // Calculate stats
+        const stats = {
+          totalJobs: activeListings.length,
+          automatedListings: 0,
+          notAutomatedListings: activeListings.length,
+          expiredListings: activeListings.filter(listing => 
+            listing.expiry_date && new Date(listing.expiry_date) < new Date()
+          ).length
+        };
+
+        setDashboardData({ stats });
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
         toast.error('Error fetching dashboard data');
-        setDashboardData({
-          stats: {
-            totalJobs: 0,
-            automatedListings: 0,
-            notAutomatedListings: 0,
-            expiredListings: 0
-          },
-          followUpData: [],
-          conversionData: [],
-          reviewData: []
-        });
       } finally {
         setIsLoading(false);
       }

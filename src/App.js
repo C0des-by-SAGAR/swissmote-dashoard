@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout/Layout';
 import Dashboard from './components/Dashboard/Dashboard';
 import PostJobs from './components/SideBarMenuItems/JobsAndInternships/PostJobs/PostJobs';
@@ -24,38 +24,21 @@ const App = () => {
       <AuthProvider>
         <div className="min-vh-100 w-100 overflow-hidden">
           <Routes>
-            {/* Redirect /auth to dashboard */}
-            <Route path="/auth" element={<Navigate to="/" replace />} />
-
-            {/* All routes wrapped in Layout */}
-            <Route path="/" element={<Layout>
-              <Routes>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/post-jobs" element={<PostJobs />} />
-                <Route path="/post-internship" element={<PostInternship />} />
-                <Route path="/post-unpaid-internship" element={<PostUnpaidInternship />} />
-                <Route path="/active-listings" element={<ActiveListings />} />
-                <Route path="/closed-listings" element={<ClosedListings />} />
-                <Route path="/automated-listings" element={<AutomatedListings />} />
-                <Route path="/not-automated-listings" element={<NotAutomatedListings />} />
-                <Route path="/expired-listings" element={<ExpiredListings />} />
-                <Route path="/assignments" element={<Assignments />} />
-                <Route path="/questions" element={<Questions />} />
-              </Routes>
-            </Layout>} />
+            <Route element={<Layout />}>
+              <Route index element={<Dashboard />} />
+              <Route path="post-jobs" element={<PostJobs />} />
+              <Route path="post-internship" element={<PostInternship />} />
+              <Route path="post-unpaid-internship" element={<PostUnpaidInternship />} />
+              <Route path="active-listings" element={<ActiveListings />} />
+              <Route path="closed-listings" element={<ClosedListings />} />
+              <Route path="automated-listings" element={<AutomatedListings />} />
+              <Route path="not-automated-listings" element={<NotAutomatedListings />} />
+              <Route path="expired-listings" element={<ExpiredListings />} />
+              <Route path="assignments" element={<Assignments />} />
+              <Route path="questions" element={<Questions />} />
+            </Route>
           </Routes>
-          <ToastContainer
-            position="top-right"
-            autoClose={3000}
-            hideProgressBar={false}
-            newestOnTop
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="light"
-          />
+          <ToastContainer />
         </div>
       </AuthProvider>
     </Router>
