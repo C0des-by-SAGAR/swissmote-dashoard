@@ -28,7 +28,7 @@ const Dashboard = () => {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [chartType, setChartType] = useState('Line');
   const [dashboardData, setDashboardData] = useState(initialState);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [reviewStats, setReviewStats] = useState({
     added: 0,
@@ -54,10 +54,27 @@ const Dashboard = () => {
 
     const fetchDashboardData = async () => {
       try {
-        // Start with default data
-        if (isMounted) {
-          setDashboardData(initialState);
-        }
+        // Fetch active listings
+        const [activeListings, automatedListings] = await Promise.all([
+          activeListingService.getActiveListings(),
+          automatedListingService.getDailyUpdates({ offset: 0, limit: 1000 })
+        ]);
+
+        if (!isMounted) return;
+
+        // Calculate stats
+        const stats = {
+          totalJobs: Array.isArray(activeListings) ? activeListings.length : 0,
+          automatedListings: Array.isArray(automatedListings) ? automatedListings.length : 0,
+          notAutomatedListings: Array.isArray(activeListings) ? 
+            activeListings.filter(listing => !listing.is_automated).length : 0,
+          expiredListings: Array.isArray(activeListings) ? 
+            activeListings.filter(listing => 
+              listing?.expiry_date && new Date(listing.expiry_date) < new Date()
+            ).length : 0
+        };
+
+        setDashboardData({ stats });
       } catch (error) {
         console.error('Dashboard data fetch error:', error);
         if (isMounted) {
