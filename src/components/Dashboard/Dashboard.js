@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line 
 } from 'recharts';
 import DashboardHeader from './DashboardHeader';
 import DashboardFooter from './DashboardFooter';
-import { followUpData, conversionData, reviewData, summaryData } from './data/dashboardGraphData';
+import { dashboardGraphService } from '../../api/services/dashboardGraphService';
 import './Dashboard.css';
+import { toast } from 'react-hot-toast';
 
 const LoadingDashboard = () => (
   <div className="dashboard-container bg-dark-blue p-6 rounded-lg">
@@ -35,7 +36,17 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 const Dashboard = () => {
   const [chartType, setChartType] = useState('Bar');
-  const [isLoading] = useState(false);
+  const [graphData, setGraphData] = useState({
+    followUpData: [],
+    conversionData: [],
+    reviewData: [],
+    summaryData: {
+      followUp: { day2: { sent: 0, pending: 0 }, day4: { sent: 0, pending: 0 } },
+      distribution: { '0-25%': 0, '26-50%': 0, '51-75%': 0, '76-100%': 0 },
+      reviews: { added: 0, pending: 0 }
+    }
+  });
+  const [isLoading, setIsLoading] = useState(true);
 
   // Neon colors for charts
   const neonColors = {
@@ -45,6 +56,22 @@ const Dashboard = () => {
     yellow: '#ffff00',
     orange: '#ff9100',
     pink: '#ff69b4'
+  };
+
+  useEffect(() => {
+    fetchGraphData();
+  }, []);
+
+  const fetchGraphData = async () => {
+    try {
+      setIsLoading(true);
+      const data = await dashboardGraphService.getDashboardGraphData();
+      setGraphData(data);
+    } catch (error) {
+      toast.error('Failed to fetch dashboard data');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const renderChart = (data) => {
@@ -104,7 +131,7 @@ const Dashboard = () => {
 
   return (
     <div className={`dashboard-container ${chartType === 'Pie' ? 'single-line' : ''}`}>
-      <DashboardHeader stats={summaryData} />
+      <DashboardHeader stats={graphData.summaryData} />
       
       {/* Global Chart Type Selector */}
       <div className="global-chart-selector">
@@ -128,7 +155,7 @@ const Dashboard = () => {
           <h2 className="chart-title">Follow-up Status</h2>
         </div>
         <ResponsiveContainer width="100%" height={300}>
-          {renderChart(followUpData)}
+          {renderChart(graphData.followUpData)}
         </ResponsiveContainer>
         <div className="follow-up-summary">
           <h3>Day 2 Follow-ups</h3>
@@ -136,12 +163,12 @@ const Dashboard = () => {
             <div className="status-item">
               <span className="dot" style={{ backgroundColor: neonColors.cyan }}></span>
               <span className="status-label">Sent:</span>
-              <span className="status-value">{summaryData.followUp.day2.sent}</span>
+              <span className="status-value">{graphData.summaryData.followUp.day2.sent}</span>
             </div>
             <div className="status-item">
               <span className="dot" style={{ backgroundColor: neonColors.magenta }}></span>
               <span className="status-label">Pending:</span>
-              <span className="status-value">{summaryData.followUp.day2.pending}</span>
+              <span className="status-value">{graphData.summaryData.followUp.day2.pending}</span>
             </div>
           </div>
         </div>
@@ -151,12 +178,12 @@ const Dashboard = () => {
       <div className="chart-card">
         <h2 className="chart-title">Conversion Rate Distribution</h2>
         <ResponsiveContainer width="100%" height={300}>
-          {renderChart(conversionData)}
+          {renderChart(graphData.conversionData)}
         </ResponsiveContainer>
         <div className="distribution-summary">
           <h3>Distribution</h3>
           <div className="distribution-list">
-            {Object.entries(summaryData.distribution).map(([range, value], index) => (
+            {Object.entries(graphData.summaryData.distribution).map(([range, value], index) => (
               <div key={range} className="distribution-item">
                 <span className="dot" style={{ backgroundColor: Object.values(neonColors)[index] }}></span>
                 {range}: {value} listings
@@ -170,7 +197,7 @@ const Dashboard = () => {
       <div className="chart-card">
         <h2 className="chart-title">Review Links Status</h2>
         <ResponsiveContainer width="100%" height={300}>
-          {renderChart(reviewData)}
+          {renderChart(graphData.reviewData)}
         </ResponsiveContainer>
         <div className="review-summary">
           <h3>Review Links</h3>
@@ -178,18 +205,18 @@ const Dashboard = () => {
             <div className="status-item">
               <span className="dot" style={{ backgroundColor: neonColors.green }}></span>
               <span className="status-label">Added:</span>
-              <span className="status-value">{summaryData.reviews.added}</span>
+              <span className="status-value">{graphData.summaryData.reviews.added}</span>
             </div>
             <div className="status-item">
               <span className="dot" style={{ backgroundColor: neonColors.orange }}></span>
               <span className="status-label">Pending:</span>
-              <span className="status-value">{summaryData.reviews.pending}</span>
+              <span className="status-value">{graphData.summaryData.reviews.pending}</span>
             </div>
           </div>
         </div>
       </div>
 
-      <DashboardFooter stats={summaryData} />
+      <DashboardFooter stats={graphData.summaryData} />
     </div>
   );
 };
