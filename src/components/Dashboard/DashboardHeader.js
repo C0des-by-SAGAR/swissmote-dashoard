@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
+import { dashboardStatsService } from '../../api/services/dashboardStatsService';
 import './DashboardHeader.css';
 
 const StatsCard = ({ icon, count = 0, label = '', color = '' }) => (
@@ -13,14 +15,36 @@ const StatsCard = ({ icon, count = 0, label = '', color = '' }) => (
   </div>
 );
 
-const DashboardHeader = ({ stats = {} }) => {
-  // Provide default values to prevent undefined errors
-  const {
-    totalJobs = 0,
-    automatedListings = 0,
-    notAutomatedListings = 0,
-    expiredListings = 0
-  } = stats;
+const DashboardHeader = () => {
+  const [stats, setStats] = useState({
+    totalJobs: 0,
+    automatedListings: 0,
+    notAutomatedListings: 0,
+    expiredListings: 0
+  });
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchDashboardStats();
+  }, []);
+
+  const fetchDashboardStats = async () => {
+    try {
+      setIsLoading(true);
+      const dashboardStats = await dashboardStatsService.getDashboardStats();
+      setStats(dashboardStats);
+    } catch (error) {
+      toast.error('Failed to fetch dashboard statistics');
+      setStats({
+        totalJobs: 0,
+        automatedListings: 0,
+        notAutomatedListings: 0,
+        expiredListings: 0
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const statsConfig = [
     {
@@ -29,7 +53,7 @@ const DashboardHeader = ({ stats = {} }) => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m-6-8h6m-6-4h6" />
         </svg>
       ),
-      count: totalJobs,
+      count: stats.totalJobs,
       label: 'Total Jobs',
       color: 'blue'
     },
@@ -39,7 +63,7 @@ const DashboardHeader = ({ stats = {} }) => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
         </svg>
       ),
-      count: automatedListings,
+      count: stats.automatedListings,
       label: 'Automated Listings',
       color: 'green'
     },
@@ -49,7 +73,7 @@ const DashboardHeader = ({ stats = {} }) => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3" />
         </svg>
       ),
-      count: notAutomatedListings,
+      count: stats.notAutomatedListings,
       label: 'Not Automated Listings',
       color: 'yellow'
     },
@@ -59,7 +83,7 @@ const DashboardHeader = ({ stats = {} }) => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m-6-8h6m-6-4h6" />
         </svg>
       ),
-      count: expiredListings,
+      count: stats.expiredListings,
       label: 'Expired Listings',
       color: 'red'
     }
