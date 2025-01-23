@@ -1,80 +1,138 @@
-import React, { useState, useEffect } from 'react';
-import ListingsHeader from '../../shared/ListingsHeader';
-import ExpiredListingCard from '../../shared/ExpiredListingCard';
-import { autoListingsService } from '../../../../../api/services/autoListingsService';
-import { toast } from 'react-toastify';
+import React, { useState } from 'react';
 import './ExpiredListings.css';
 
-const ExpiredListings = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [account, setAccount] = useState('pv');
-  const [listings, setListings] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+// Mock data
+const mockExpiredListings = [
+  {
+    id: 1,
+    title: 'Frontend Developer',
+    company: 'Tech Corp',
+    expiry_date: '2024-01-01'
+  },
+  // Add more mock data as needed
+];
 
-  useEffect(() => {
-    fetchExpiredListings();
-  }, [account]);
+const ExpiredListings = ({ listings }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const cardsPerPage = 3;
 
-  const fetchExpiredListings = async () => {
-    try {
-      setIsLoading(true);
-      const response = await autoListingsService.getExpiredListings({
-        account: account.toLowerCase()
-      });
-      
-      setListings(response.expired || []);
-    } catch (error) {
-      toast.error('Error fetching expired listings');
-      console.error('Error:', error);
-      setListings([]);
-    } finally {
-      setIsLoading(false);
-    }
+  // Calculate pagination
+  const indexOfLastCard = currentPage * cardsPerPage;
+  const indexOfFirstCard = indexOfLastCard - cardsPerPage;
+  const currentCards = listings.slice(indexOfFirstCard, indexOfLastCard);
+  const totalPages = Math.ceil(listings.length / cardsPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
   };
-
-  const filteredListings = listings.filter(listing => {
-    const matchesSearch = !searchQuery || 
-      Object.values(listing).some(val => 
-        String(val).toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      
-    const matchesAccount = 
-      (account === 'pv' && listing.createdBy.includes('Persist Ventures')) ||
-      (account === 'sa' && listing.createdBy.includes('Systemic Altruism'));
-
-    return matchesSearch && matchesAccount;
-  });
 
   return (
     <div className="expired-listings-container">
-      <ListingsHeader
-        title="Expired Listings"
-        subtitle="View and manage all expired job listings"
-        onSearch={setSearchQuery}
-        onAccountChange={setAccount}
-      />
-
-      {isLoading ? (
-        <div className="loading-state">
-          <p>Loading expired listings...</p>
-        </div>
-      ) : (
-        <>
-          <div className="listings-grid">
-            {filteredListings.map((listing) => (
-              <ExpiredListingCard 
-                key={listing.listingNumber} 
-                data={listing} 
-              />
-            ))}
-          </div>
-
-          {filteredListings.length === 0 && (
-            <div className="no-results">
-              <p>No expired listings found matching your criteria</p>
+      <div className="listings-grid">
+        {currentCards.map((listing, index) => (
+          <div key={index} className="listing-card">
+            <div className="card-header">
+              <div className="header-content">
+                <h2 className="listing-title">{listing.projectName}</h2>
+                <p className="listing-number">#{listing.listingNumber}</p>
+              </div>
+              <div className="organization-info">
+                <span className="organization">{listing.organisation}</span>
+              </div>
             </div>
-          )}
-        </>
+
+            <div className="card-body">
+              <div className="info-grid">
+                <div className="info-item">
+                  <label className="info-label">Posted Date</label>
+                  <span className="info-value">{listing.postedDate}</span>
+                </div>
+                <div className="info-item">
+                  <label className="info-label">Posted Over</label>
+                  <span className="info-value">{listing.postedOver}</span>
+                </div>
+              </div>
+
+              <div className="info-grid">
+                <div className="info-item">
+                  <label className="info-label">Created By</label>
+                  <span className="info-value">{listing.createdBy}</span>
+                </div>
+                <div className="info-item">
+                  <label className="info-label">Automated By</label>
+                  <span className="info-value">{listing.automatedBy}</span>
+                </div>
+              </div>
+
+              <div className="info-grid">
+                <div className="info-item">
+                  <label className="info-label">Conversion Rate</label>
+                  <span className="info-value">{listing.conversionRate}%</span>
+                </div>
+                <div className="info-item">
+                  <label className="info-label">Total Applications</label>
+                  <span className="info-value">{listing.totalApplications}</span>
+                </div>
+              </div>
+
+              <div className="info-grid">
+                <div className="info-item">
+                  <label className="info-label">Assignments Received</label>
+                  <span className="info-value">{listing.assignmentsReceived}</span>
+                </div>
+                <div className="info-item">
+                  <label className="info-label">Assignments Sent</label>
+                  <span className="info-value">{listing.assignmentsSent}</span>
+                </div>
+              </div>
+
+              <div className="links-section">
+                <div className="info-item full-width">
+                  <label className="info-label">Assignment Links</label>
+                  <a href={listing.assignmentLinks} className="link-value" target="_blank" rel="noopener noreferrer">
+                    {listing.assignmentLinks}
+                  </a>
+                </div>
+                <div className="info-item full-width">
+                  <label className="info-label">Review Links</label>
+                  <span className="info-value">{listing.reviewLinks}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="card-footer">
+              <span className="status-badge expired">Expired</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {listings.length > cardsPerPage && (
+        <div className="pagination">
+          <button 
+            className="pagination-button"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+          <span className="pagination-info">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button 
+            className="pagination-button"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
+      )}
+
+      {listings.length === 0 && (
+        <div className="no-results">
+          <p>No expired listings found.</p>
+        </div>
       )}
     </div>
   );

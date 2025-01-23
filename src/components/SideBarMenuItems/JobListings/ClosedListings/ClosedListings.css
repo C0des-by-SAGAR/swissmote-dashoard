@@ -79,106 +79,89 @@
 
 .closed-listings-container {
   width: 100%;
-  max-width: 100%;
-  padding: 1.5rem;
-  background-color: white;
   min-height: 100vh;
+  background-color: #1a1d21;
+  padding: 2rem;
 }
 
-.listings-header {
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 2rem;
 }
 
-.listings-title {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1a202c;
-  margin-bottom: 1rem;
+.page-title {
+  font-size: 2.25rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
 }
 
-.header-controls {
+.filter-controls {
   display: flex;
   gap: 1rem;
-  flex-wrap: wrap;
+  align-items: center;
 }
 
-.search-container {
-  flex: 1;
-  min-width: 250px;
-}
-
-.search-input {
-  width: 100%;
-  padding: 0.75rem;
+.filter-input {
+  background-color: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  transition: all 0.2s ease;
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.sort-select {
-  padding: 0.75rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
   min-width: 200px;
-  background-color: white;
+  font-size: 0.875rem;
+  color: #1a202c;
+}
+
+.filter-input:focus {
+  outline: none;
+  border-color: #3182ce;
+  box-shadow: 0 0 0 1px #3182ce;
+}
+
+.filter-input::placeholder {
+  color: #a0aec0;
+}
+
+.filter-select {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 0.5rem 2.5rem 0.5rem 1rem;
+  font-size: 0.875rem;
+  color: #1a202c;
   cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  min-width: 120px;
 }
 
-.listings-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+.filter-select:focus {
+  outline: none;
+  border-color: #3182ce;
+  box-shadow: 0 0 0 1px #3182ce;
 }
 
-.no-results {
-  text-align: center;
-  padding: 3rem;
-  color: #64748b;
-  font-size: 1.125rem;
-}
-
-/* Responsive Styles */
+/* Responsive styles */
 @media (max-width: 640px) {
-  .closed-listings-container {
-    padding: 1rem;
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
   }
 
-  .listings-title {
-    font-size: 1.5rem;
-  }
-
-  .header-controls {
+  .filter-controls {
+    width: 100%;
     flex-direction: column;
   }
 
-  .search-container,
-  .sort-select {
+  .filter-input,
+  .filter-select {
     width: 100%;
-  }
-
-  .listings-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (min-width: 1024px) {
-  .listings-grid {
-    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-  }
-}
-
-@media (min-width: 1536px) {
-  .listings-grid {
-    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
   }
 }
 
@@ -202,10 +185,315 @@
   .search-input:focus {
     border-color: #3b82f6;
   }
+
+  .input-reset {
+    background-color: #2d3748;
+    border-color: #4a5568;
+    color: #e2e8f0;
+  }
 }
 
 /* Status badge for closed listings */
 .status-badge.closed {
   background-color: #fee2e2;
   color: #991b1b;
+}
+
+.search-input-dark {
+  background-color: #2d3748;
+  border: 1px solid #4a5568;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  min-width: 240px;
+  font-size: 0.875rem;
+  color: #e2e8f0;
+}
+
+.search-input-dark::placeholder {
+  color: #a0aec0;
+}
+
+.search-input-dark:focus {
+  outline: none;
+  border-color: #4a5568;
+  box-shadow: 0 0 0 1px #4a5568;
+}
+
+.sort-select-dark {
+  background-color: #2d3748;
+  border: 1px solid #4a5568;
+  border-radius: 4px;
+  padding: 0.5rem 2.5rem 0.5rem 1rem;
+  font-size: 0.875rem;
+  color: #e2e8f0;
+  cursor: pointer;
+  appearance: none;
+  min-width: 120px;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+}
+
+.sort-select-dark:focus {
+  outline: none;
+  border-color: #4a5568;
+  box-shadow: 0 0 0 1px #4a5568;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .closed-listings-container {
+    padding: 1rem;
+  }
+  
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  header h1 {
+    margin-bottom: 1rem;
+  }
+  
+  .search-input-dark {
+    min-width: 200px;
+    margin-bottom: 1rem;
+  }
+  
+  header > div {
+    width: 100%;
+    flex-direction: column;
+  }
+  
+  header > div > div {
+    width: 100%;
+    margin-right: 0;
+    margin-bottom: 0.5rem;
+  }
+  
+  .sort-select-dark {
+    width: 100%;
+  }
+}
+
+.job-listings-container {
+  min-height: 100vh;
+  background: #1a202c;
+  width: 100%;
+  overflow-y: auto;
+  margin: 0;
+  padding: 24px;
+}
+
+/* Header controls */
+.input-reset {
+  background-color: #2d3748;
+  border: 1px solid #4a5568;
+  color: #e2e8f0;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease;
+}
+
+.input-reset:focus {
+  outline: none;
+  border-color: #4299e1;
+  box-shadow: 0 0 0 1px #4299e1;
+}
+
+.input-reset::placeholder {
+  color: #a0aec0;
+}
+
+select.input-reset {
+  appearance: none;
+  padding-right: 2.5rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23CBD5E0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1.2em 1.2em;
+  min-width: 120px;
+}
+
+/* Ensure the select text is properly visible */
+select.input-reset option {
+  background-color: #1a202c;
+  color: #CBD5E0;
+  padding: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .job-listings-container {
+    padding: 16px;
+  }
+
+  .flex.items-center {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  input[type="search"] {
+    width: 100% !important;
+  }
+  
+  select.input-reset {
+    width: 100%;
+  }
+}
+
+.listings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.listing-card {
+  background: #1e2837;
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid #2d3748;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #2d3748;
+}
+
+.card-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #63b3ed;
+}
+
+.listing-number {
+  color: #a0aec0;
+  font-size: 1rem;
+  padding: 0.25rem 0.75rem;
+  background: #2d3748;
+  border-radius: 4px;
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 0.5rem;
+}
+
+.info-row {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #2d3748;
+}
+
+.info-label {
+  color: #718096;
+  font-size: 0.9rem;
+  width: 140px;
+  line-height: 1.5;
+  flex-shrink: 0;
+}
+
+.info-value {
+  color: #e2e8f0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5;
+  margin: 1rem;
+  margin-left: 2rem;
+}
+
+.card-footer {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.link-button {
+  padding: 0.5rem 1rem;
+  background: #2d3748;
+  color: #e2e8f0;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.link-button:hover {
+  background: #4a5568;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding: 1rem 0;
+}
+
+.pagination-button {
+  padding: 0.5rem 1rem;
+  background: #2d3748;
+  border: none;
+  border-radius: 4px;
+  color: #e2e8f0;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pagination-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-button:hover:not(:disabled) {
+  background: #4a5568;
+}
+
+.pagination-info {
+  color: #a0aec0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .listings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card-footer {
+    flex-direction: column;
+  }
+
+  .link-button {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .info-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .info-label {
+    width: 100%;
+  }
+
+  .info-value {
+    margin-left: 0;
+    width: 100%;
+  }
 }

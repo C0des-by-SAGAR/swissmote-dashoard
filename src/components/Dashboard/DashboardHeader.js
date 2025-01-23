@@ -24,25 +24,41 @@ const DashboardHeader = ({ stats = {} }) => {
 
   const statsConfig = [
     {
-      icon: '📊',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m-6-8h6m-6-4h6" />
+        </svg>
+      ),
       count: totalJobs,
       label: 'Total Jobs',
       color: 'blue'
     },
     {
-      icon: '✅',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+        </svg>
+      ),
       count: automatedListings,
       label: 'Automated Listings',
       color: 'green'
     },
     {
-      icon: '⏳',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3" />
+        </svg>
+      ),
       count: notAutomatedListings,
       label: 'Not Automated Listings',
       color: 'yellow'
     },
     {
-      icon: '⚠️',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m-6-8h6m-6-4h6" />
+        </svg>
+      ),
       count: expiredListings,
       label: 'Expired Listings',
       color: 'red'

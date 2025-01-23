@@ -26,9 +26,9 @@ You have been shortlisted, and I would love to connect with you!
 Please check the assignment video below:
 https://www.loom.com/share/94651009f6ae4b938f6b63d627cc0c1e?sid=d40a7eb7-f21c-4edd-b324-d65229d441dd
 
-I’m looking forward to receive a loom video from you as directed in the assignment video
+I'm looking forward to receive a loom video from you as directed in the assignment video
 
-I’m looking for a tech person, so if you're reviewing assignments, you should have some insight into whether the person is doing it right or wrong. Go through https://persistventures.com/startupathon/ and you'll understand our recruiting process better. Please share the Loom video as soon as possible. I'm excited to connect with you and have you onboard within the team.
+I'm looking for a tech person, so if you're reviewing assignments, you should have some insight into whether the person is doing it right or wrong. Go through https://persistventures.com/startupathon/ and you'll understand our recruiting process better. Please share the Loom video as soon as possible. I'm excited to connect with you and have you onboard within the team.
 
 Good luck!!
 https://persistventures.com/careers

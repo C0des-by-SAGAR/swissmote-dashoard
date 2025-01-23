@@ -1,23 +1,37 @@
-import { axiosInstance } from '../config/axiosConfig';
-import { handleApiError } from '../utils/errorHandler';
+import axios from 'axios';
+import { authService } from './authService';
 
-/**
- * Service for managing reviews
- */
 export const reviewService = {
-  /**
-   * Add a review
-   * @param {Object} data Review data
-   * @param {number} data.listing Listing ID
-   * @param {string} data.link Review link
-   * @returns {Promise<Object>} Response data
-   */
-  addReview: async (data) => {
+  addReview: async (listingId, reviewLinks) => {
     try {
-      const response = await axiosInstance.patch('/add_review', data);
-      return response.data;
+      const response = await axios.patch(
+        'https://api.swissmote.com/add_review',
+        {
+          listing: listingId,
+          link: reviewLinks
+        },
+        {
+          headers: authService.getAuthHeaders()
+        }
+      );
+
+      if (response.data?.detail?.success === false) {
+        throw new Error(response.data.detail.error || 'Failed to add review');
+      }
+
+      return {
+        success: true,
+        message: 'Review added successfully'
+      };
     } catch (error) {
-      throw handleApiError(error);
+      if (error.response?.data?.detail) {
+        const { error: errorMessage, code } = error.response.data.detail;
+        if (code === 'LISTING_NOT_FOUND') {
+          throw new Error('Listing not found');
+        }
+        throw new Error(errorMessage || 'Failed to add review');
+      }
+      throw new Error('Failed to add review');
     }
   }
 }; 

@@ -1,150 +1,295 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import './Questions.css';
-import QuestionsActiveListings from './QuestionsActiveListings';
-import QuestionsCard from './QuestionsCard';
 import { activeListingService } from '../../../api/services/activeListingService';
-import { questionService } from '../../../api/services/questionService';
+import { questionsService } from '../../../api/services/questionsService';
 import { toast } from 'react-toastify';
+import { replyService } from '../../../api/services/replyService';
 
 const Questions = () => {
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedListing, setSelectedListing] = useState(null);
-  const [listings, setListings] = useState([]);
-  const [questions, setQuestions] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [questionsList, setQuestionsList] = useState([]);
+  const [activeListings, setActiveListings] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [page, setPage] = useState(0);
-  const LIMIT = 10;
-
-  const filteredQuestions = questions.filter(question => {
-    const content = question.content || '';
-    return content.toLowerCase().includes(searchQuery.toLowerCase());
+  const [replyingTo, setReplyingTo] = useState(null);
+  const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({
+    totalPages: 1,
+    totalCount: 0
   });
+  const [isSubmittingReply, setIsSubmittingReply] = useState(false);
 
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
-  };
+  useEffect(() => {
+    fetchActiveListings();
+  }, []);
 
-  const handleListingSelect = (listingId) => {
-    setSelectedListing(listingId);
-    setPage(0); // Reset pagination when changing listings
-    setQuestions([]); // Clear existing questions
-  };
+  // Fetch questions when listing is selected or page changes
+  useEffect(() => {
+    if (selectedListing) {
+      fetchQuestions();
+    }
+  }, [selectedListing, currentPage]);
 
-  const fetchQuestions = async () => {
-    if (!selectedListing) return;
-    
+  const fetchActiveListings = async () => {
     try {
       setIsLoading(true);
-      const fetchedQuestions = await questionService.getQuestions({
-        listing: selectedListing,
-        offset: page * LIMIT,
-        limit: LIMIT
-      });
-      
-      setQuestions(prev => 
-        page === 0 ? fetchedQuestions : [...prev, ...fetchedQuestions]
-      );
+      const listings = await activeListingService.getActiveListings();
+      setActiveListings(listings.map(listing => ({
+        id: listing.id,
+        name: listing.projectName
+      })));
     } catch (error) {
-      toast.error('Failed to fetch questions');
-      console.error('Error:', error);
+      toast.error(error.message || 'Failed to fetch active listings');
+      setActiveListings([]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleRefresh = () => {
-    setPage(0);
-    fetchQuestions();
+  const fetchQuestions = async () => {
+    try {
+      setIsLoadingQuestions(true);
+      const offset = (currentPage - 1) * 10; // 10 items per page
+
+      const response = await questionsService.getQuestions(
+        selectedListing,
+        offset,
+        10
+      );
+
+      if (response.success) {
+        const formattedQuestions = response.data.questions.map(q => ({
+          id: q.message_id,
+          author: q.name,
+          content: q.question,
+          date: new Date(q.time_stamp).toLocaleString(),
+          listingId: selectedListing
+        }));
+
+        setQuestionsList(formattedQuestions);
+        setPagination({
+          totalPages: response.data.pagination.total_pages,
+          totalCount: response.data.pagination.total_count
+        });
+      }
+    } catch (error) {
+      toast.error(error.message || 'Failed to fetch questions');
+      setQuestionsList([]);
+    } finally {
+      setIsLoadingQuestions(false);
+    }
   };
 
-  // Fetch active listings on mount
-  useEffect(() => {
-    const fetchActiveListings = async () => {
-      try {
-        const fetchedListings = await activeListingService.getActiveListingsForQuestions();
-        setListings(fetchedListings);
-        if (!selectedListing && fetchedListings.length > 0) {
-          setSelectedListing(fetchedListings[0].id);
-        }
-      } catch (error) {
-        toast.error('Failed to fetch active listings');
-        console.error('Error:', error);
-      }
-    };
+  // Filter questions based on selected listing and search query
+  const filteredQuestions = questionsList.filter(question => {
+    const matchesListing = selectedListing ? question.listingId === selectedListing : true;
+    const matchesSearch = searchQuery.trim() === '' ? true : 
+      question.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      question.author.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesListing && matchesSearch;
+  });
 
-    fetchActiveListings();
+  // Handle search input change
+  const handleSearch = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
+  // Handle refresh button click
+  const handleRefresh = useCallback(() => {
+    // Reset the questions list to original data
+    setQuestionsList([...questionsList]);
+    // Optionally clear search and selection
+    setSearchQuery('');
   }, []);
 
-  // Fetch questions when selected listing changes
-  useEffect(() => {
-    if (selectedListing) {
-      fetchQuestions();
-    }
-  }, [selectedListing, page]);
+  const handleReplyClick = (questionId) => {
+    setReplyingTo(replyingTo === questionId ? null : questionId);
+  };
 
-  const selectedListingDetails = listings.find(listing => listing.id === selectedListing);
-  const questionsCount = filteredQuestions.length;
+  const handleReplySubmit = async (question, event) => {
+    event.preventDefault();
+    const replyText = event.target.reply.value.trim();
+
+    if (!replyText) {
+      toast.error('Please enter a reply message');
+      return;
+    }
+
+    try {
+      setIsSubmittingReply(true);
+      const loadingToast = toast.loading('Sending reply...');
+
+      await replyService.replyToQuestion(
+        selectedListing,
+        question.chatId,
+        question.id,
+        replyText
+      );
+
+      toast.update(loadingToast, {
+        render: 'Reply sent successfully!',
+        type: 'success',
+        isLoading: false,
+        autoClose: 3000
+      });
+
+      setReplyingTo(null); // Close reply form
+      event.target.reset(); // Clear form
+      
+      // Optionally refresh questions list
+      fetchQuestions();
+    } catch (error) {
+      toast.error(error.message || 'Failed to send reply');
+    } finally {
+      setIsSubmittingReply(false);
+    }
+  };
+
+  // Handle page change
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
 
   return (
-    <div className="pa4">
-      <div className="mb4">
-        <div className="flex justify-between items-center mb3">
-          <div className="flex items-center">
-            <h1 className="f1 fw6 mv0">Questions Dashboard</h1>
-            <span className="ml3 f6 bg-light-blue blue br2 ph3 pv1">
-              {questionsCount} Questions
-            </span>
-          </div>
-          <div className="flex items-center">
-            <input
-              type="search"
+    <div className="questions-dashboard">
+      <header className="dashboard-header">
+        <div className="header-title">
+          <h1>Questions Dashboard</h1>
+          <span className="question-count">{filteredQuestions.length} Questions</span>
+        </div>
+        <div className="header-actions">
+          <div className="search-container">
+            <input 
+              type="search" 
               placeholder="Search questions..."
-              className="pa2 br2 ba b--light-gray mr3"
+              className="search-input"
               value={searchQuery}
-              onChange={handleSearchChange}
+              onChange={handleSearch}
             />
-            <button 
-              className="action-button f6 link dim br2 ph3 pv2 dib white bg-blue bn"
-              onClick={handleRefresh}
-              disabled={isLoading}
-            >
-              {isLoading ? 'Refreshing...' : 'Refresh'}
-            </button>
           </div>
+          <button 
+            className="refresh-button"
+            onClick={handleRefresh}
+          >
+            <span>Refresh</span>
+          </button>
         </div>
-        {selectedListingDetails && (
-          <div className="flex items-center gray mt2">
-            <span className="f4 fw5 dark-gray">{selectedListingDetails.name}</span>
-            <span className="mh2 f6">•</span>
-            <span className="f5 moon-gray">#{selectedListingDetails.id}</span>
-          </div>
-        )}
-      </div>
+      </header>
 
-      <div className="flex">
-        <div className="w-25">
-          <QuestionsActiveListings 
-            selectedListing={selectedListing}
-            onListingSelect={handleListingSelect}
-            listings={listings}
-          />
-        </div>
-
-        <div className="w-75 pl4">
-          <div className="questions-grid">
-            {filteredQuestions.map(question => (
-              <QuestionsCard 
-                key={question.id}
-                question={question}
-              />
-            ))}
-            {isLoading && (
-              <div className="tc pa4">
-                <div className="loading-spinner"></div>
+      <div className="dashboard-content">
+        <aside className="active-listings">
+          <h2>Active Listings</h2>
+          <div className="listings-scroll">
+            {activeListings.map((listing) => (
+              <div 
+                key={listing.id} 
+                className={`listing-item ${selectedListing === listing.id ? 'selected' : ''}`}
+                onClick={() => setSelectedListing(listing.id)}
+              >
+                <span>{listing.name}</span>
+                <span className="listing-id">#{listing.id}</span>
               </div>
-            )}
+            ))}
           </div>
-        </div>
+        </aside>
+
+        <main className="questions-container">
+          {isLoadingQuestions ? (
+            <div className="loading-state">Loading questions...</div>
+          ) : (
+            <>
+              {filteredQuestions.map((question) => (
+                <div key={question.id} className="question-card">
+                  <div className="question-header">
+                    <div className="author-avatar">
+                      {question.author[0]}
+                    </div>
+                    <div className="question-meta">
+                      <h3>{question.author}</h3>
+                      <time>{question.date}</time>
+                    </div>
+                    <div className="question-id">
+                      ID: {question.id}
+                    </div>
+                  </div>
+                  <div className="question-content">
+                    {question.content}
+                  </div>
+                  <div className="question-actions">
+                    <button 
+                      className="reply-button"
+                      onClick={() => handleReplyClick(question.id)}
+                      disabled={isSubmittingReply}
+                    >
+                      Reply
+                    </button>
+                    {replyingTo === question.id && (
+                      <form 
+                        className="reply-form"
+                        onSubmit={(e) => handleReplySubmit(question, e)}
+                      >
+                        <textarea 
+                          name="reply"
+                          className="reply-input"
+                          placeholder="Write your reply..."
+                          rows="3"
+                          required
+                          disabled={isSubmittingReply}
+                        />
+                        <div className="reply-form-actions">
+                          <button 
+                            type="submit" 
+                            className="submit-reply"
+                            disabled={isSubmittingReply}
+                          >
+                            {isSubmittingReply ? 'Sending...' : 'Submit'}
+                          </button>
+                          <button 
+                            type="button" 
+                            className="cancel-reply"
+                            onClick={() => setReplyingTo(null)}
+                            disabled={isSubmittingReply}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </form>
+                    )}
+                  </div>
+                </div>
+              ))}
+
+              {pagination.totalPages > 1 && (
+                <div className="pagination-controls">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="pagination-button"
+                  >
+                    Previous
+                  </button>
+                  <span className="page-info">
+                    Page {currentPage} of {pagination.totalPages}
+                  </span>
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === pagination.totalPages}
+                    className="pagination-button"
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
+
+              {filteredQuestions.length === 0 && (
+                <div className="no-questions">
+                  {selectedListing ? 'No questions found for this listing' : 'Select a listing to view questions'}
+                </div>
+              )}
+            </>
+          )}
+        </main>
       </div>
     </div>
   );

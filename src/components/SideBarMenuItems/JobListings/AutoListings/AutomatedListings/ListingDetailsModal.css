@@ -1,0 +1,62 @@
+.message-scroll-container {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+.message-scroll-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.message-scroll-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.message-scroll-container::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.bg-light-blue-10 {
+  background-color: rgba(33, 150, 243, 0.1);
+}
+
+.bg-light-green-10 {
+  background-color: rgba(76, 175, 80, 0.1);
+}
+
+.bg-white-05 {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.message-text {
+  font-family: inherit;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-size: 14px;
+  line-height: 1.6;
+  background: transparent;
+  border: none;
+  width: 100%;
+}
+
+.messages-section {
+  margin-bottom: 2rem;
+}
+
+.message-item {
+  width: 100%;
+}
+
+.message-header {
+  font-weight: 500;
+}
+
+.message-content {
+  max-height: none;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+pre.message-text {
+  font-family: inherit;
+} 

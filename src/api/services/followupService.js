@@ -1,28 +1,34 @@
-import { axiosInstance } from '../config/axiosConfig';
-import { handleApiError } from '../utils/errorHandler';
+import axios from 'axios';
+import { authService } from './authService';
 
-/**
- * Service for managing followup-related operations
- */
 export const followupService = {
-  /**
-   * Modify a followup message
-   * @param {Object} data - The followup data
-   * @param {string} data.listing - The listing ID
-   * @param {string} data.day - The day number ("2" or "4")
-   * @param {string} data.followup - The new followup message
-   * @returns {Promise<Object>} Response data
-   */
-  modifyFollowup: async (data) => {
+  modifyFollowup: async (listingId, day, followupMessage) => {
     try {
-      const response = await axiosInstance.patch('/modify_followup', {
-        listing: data.listing,
-        day: data.day,
-        followup: data.followup
-      });
-      return response.data;
+      const response = await axios.patch(
+        'https://api.swissmote.com/modify_followup',
+        {
+          listing: listingId,
+          day: day, // "d2" or "d4"
+          followup: followupMessage
+        },
+        {
+          headers: authService.getAuthHeaders()
+        }
+      );
+
+      if (response.data?.detail === 'listing not found') {
+        throw new Error('Listing not found');
+      }
+
+      return {
+        success: true,
+        message: 'Follow-up message updated successfully'
+      };
     } catch (error) {
-      throw handleApiError(error);
+      if (error.response?.data?.detail === 'listing not found') {
+        throw new Error('Listing not found');
+      }
+      throw new Error(error.response?.data?.detail || 'Failed to update follow-up message');
     }
   }
 }; 

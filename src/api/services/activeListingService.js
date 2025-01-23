@@ -1,42 +1,41 @@
-import { axiosInstance } from '../config/axiosConfig';
-import { handleApiError } from '../utils/errorHandler';
+import axios from 'axios';
+import { authService } from './authService';
 
-/**
- * Service for managing active listings
- */
 export const activeListingService = {
-  /**
-   * Get all active listings
-   * @returns {Promise<Array>} Array of active listings
-   */
   getActiveListings: async () => {
     try {
-      const response = await axiosInstance.get('/active_listing');
-      return response.data.map(listing => ({
-        id: listing.id.toString(), // Ensure consistent ID format
-        name: listing.name,
-        role: listing.role || '',
-        assignmentCount: listing.assignment_count || 0,
-        isSelected: false
-      }));
-    } catch (error) {
-      throw handleApiError(error);
-    }
-  },
+      const response = await axios.get(
+        'https://api.swissmote.com/active_listing',
+        {
+          headers: authService.getAuthHeaders()
+        }
+      );
 
-  /**
-   * Get active listings for questions
-   * @returns {Promise<Array>} Array of simplified active listings for questions
-   */
-  getActiveListingsForQuestions: async () => {
-    try {
-      const response = await axiosInstance.get('/active_listing');
+      // Transform the API response to match our component's data structure
       return response.data.map(listing => ({
-        id: listing.id,
-        name: listing.role || listing.name
+        id: listing['Listing No'],
+        listingName: listing.listing_name,
+        projectName: listing['Project Name'],
+        organisation: listing.Organisation,
+        process: listing.Process,
+        designation: listing.Designation,
+        date: listing.Date,
+        postedOver: listing.posted_over,
+        platformData: {
+          createdBy: listing.platform_data.created_by,
+          createdByPlatform: listing.platform_data.created_by_platform,
+          automatedBy: listing.platform_data.automated_by,
+          automatedByPlatform: listing.platform_data.automated_by_platform
+        },
+        expiryAt: listing.expiry_at,
+        conversionRate: listing['Conversion Rate'],
+        internshalaLink: listing.Internshala,
+        leaderLink: listing['Leader link'],
+        candidateLink: listing['Candidate link'],
+        assignmentLink: JSON.parse(listing['Assignment link'])
       }));
     } catch (error) {
-      throw handleApiError(error);
+      throw new Error(error.response?.data?.message || 'Failed to fetch active listings');
     }
   }
 }; 

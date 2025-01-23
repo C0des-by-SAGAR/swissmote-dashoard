@@ -1,20 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../Sidebar/Sidebar';
+import './Layout.css';
 
-const Layout = () => {
+const Layout = ({ children }) => {
+  const [isExpanded, setIsExpanded] = useState(true);
+
+  const handleSidebarToggle = () => {
+    setIsExpanded(!isExpanded);
+  };
+
   return (
-    <div className="flex min-h-screen bg-dark-blue">
-      <Sidebar />
-      <div className="flex-1 flex flex-col">
-        <div className="flex-1 overflow-x-hidden overflow-y-auto bg-dark-blue text-white">
-          <main className="container mx-auto px-6 py-8">
-            <div className="relative">
-              <Outlet />
-            </div>
-          </main>
+    <div className="layout-container">
+      <Sidebar 
+        isExpanded={isExpanded} 
+        onToggle={handleSidebarToggle}
+      />
+      <main className={`main-content ${isExpanded ? 'content-expanded' : 'content-collapsed'}`}>
+        <div className="content-wrapper">
+          <Outlet />
         </div>
-      </div>
+      </main>
     </div>
   );
 };

@@ -10,7 +10,7 @@ import {
 import { BiBuilding } from 'react-icons/bi';
 import './PostUnpaidInternship.css';
 import { toast } from 'react-toastify';
-import { unpaidInternshipService } from '../../../../api/services/unpaidInternshipService';
+import { unpaidArmyService } from '../../../../api/services/unpaidArmyService';
 
 const PostUnpaidInternship = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -34,40 +34,45 @@ const PostUnpaidInternship = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (currentStep === 3) {
-      try {
-        await unpaidInternshipService.createUnpaidInternship(formData);
-        toast.success('Unpaid internship posted successfully!');
-        setFormData({
-          internshipTitle: '',
-          requiredSkills: '',
-          positions: '',
-          duration: '',
-          workType: 'Virtual',
-          employment: 'Part-Time',
-          organization: 'Systemic Altruism'
-        });
-        setCurrentStep(1);
-      } catch (error) {
-        toast.error(error.message || 'Error posting unpaid internship');
-      }
-    } else {
+    
+    if (currentStep !== 3) {
       setCurrentStep(prev => prev + 1);
+      return;
+    }
+
+    try {
+      const loadingToast = toast.loading('Posting unpaid internship...');
+      
+      await unpaidArmyService.postUnpaidInternship(formData);
+      
+      toast.update(loadingToast, {
+        render: 'Unpaid internship posted successfully!',
+        type: 'success',
+        isLoading: false,
+        autoClose: 3000
+      });
+
+      setFormData({
+        internshipTitle: '',
+        requiredSkills: '',
+        positions: '',
+        duration: '',
+        workType: 'Virtual',
+        employment: 'Part-Time',
+        organization: 'Systemic Altruism'
+      });
+      
+      setCurrentStep(1);
+    } catch (error) {
+      toast.error(error.message || 'Failed to post unpaid internship. Please try again.');
     }
   };
 
-  const handleStepClick = (step) => {
-    setCurrentStep(step);
-  };
-
   const renderBasicInfo = () => (
-    <div className="form-section-card mb4">
-      <div className="section-header">
-        <h2 className="f3 fw6 mb3">Basic Information</h2>
-        <div className="section-divider"></div>
-      </div>
+    <div className="form-section">
+      <h2 className="section-title">Basic Information</h2>
       
-      <div className="field-group mb4">
+      <div className="field-group">
         <label className="field-label">
           <FiBriefcase className="field-icon" />
           Internship Title<span className="required">*</span>
@@ -78,12 +83,12 @@ const PostUnpaidInternship = () => {
           value={formData.internshipTitle}
           onChange={handleInputChange}
           placeholder="e.g., Software Development Intern"
-          className="modern-input"
+          className="form-input"
           required
         />
       </div>
 
-      <div className="field-group mb4">
+      <div className="field-group">
         <label className="field-label">
           <FiCode className="field-icon" />
           Required Skills<span className="required">*</span>
@@ -94,14 +99,14 @@ const PostUnpaidInternship = () => {
           value={formData.requiredSkills}
           onChange={handleInputChange}
           placeholder="e.g., React, Node.js, TypeScript"
-          className="modern-input"
+          className="form-input"
           required
         />
         <small className="field-hint">Separate skills with commas</small>
       </div>
 
-      <div className="flex flex-wrap">
-        <div className="w-50-l w-100 pr3-l mb3">
+      <div className="flex-row">
+        <div className="field-group half-width">
           <label className="field-label">
             <FiMonitor className="field-icon" />
             Work Type
@@ -110,14 +115,14 @@ const PostUnpaidInternship = () => {
             name="workType"
             value={formData.workType}
             onChange={handleInputChange}
-            className="modern-select"
+            className="form-select"
           >
             <option value="Virtual">Virtual</option>
             <option value="On-Site">On-Site</option>
           </select>
         </div>
 
-        <div className="w-50-l w-100 mb3">
+        <div className="field-group half-width">
           <label className="field-label">
             <FiClock className="field-icon" />
             Employment
@@ -126,7 +131,7 @@ const PostUnpaidInternship = () => {
             name="employment"
             value={formData.employment}
             onChange={handleInputChange}
-            className="modern-select"
+            className="form-select"
           >
             <option value="Part-Time">Part-Time</option>
             <option value="Full-Time">Full-Time</option>
@@ -137,14 +142,11 @@ const PostUnpaidInternship = () => {
   );
 
   const renderInternshipDetails = () => (
-    <div className="form-section-card mb4">
-      <div className="section-header">
-        <h2 className="f3 fw6 mb3">Internship Details</h2>
-        <div className="section-divider"></div>
-      </div>
+    <div className="form-section">
+      <h2 className="section-title">Internship Details</h2>
       
-      <div className="flex flex-wrap">
-        <div className="w-50-l w-100 pr3-l mb4">
+      <div className="flex-row">
+        <div className="field-group half-width">
           <label className="field-label">
             <FiUsers className="field-icon" />
             Positions<span className="required">*</span>
@@ -155,13 +157,13 @@ const PostUnpaidInternship = () => {
             value={formData.positions}
             onChange={handleInputChange}
             placeholder="e.g., 5"
-            className="modern-input"
+            className="form-input"
             min="1"
             required
           />
         </div>
 
-        <div className="w-50-l w-100 mb4">
+        <div className="field-group half-width">
           <label className="field-label">
             <FiClock className="field-icon" />
             Duration<span className="required">*</span>
@@ -172,28 +174,28 @@ const PostUnpaidInternship = () => {
             value={formData.duration}
             onChange={handleInputChange}
             placeholder="Months"
-            className="modern-input"
+            className="form-input"
             required
           />
         </div>
       </div>
 
-      <div className="important-note mb4">
-        <h3 className="f4 mb2">
-          <FiAlertTriangle className="mr2 v-mid" /> Important Note
+      <div className="important-note">
+        <h3>
+          <FiAlertTriangle className="note-icon" />Important Note
         </h3>
-        <p className="ma0">
+        <p>
           This is an unpaid internship opportunity. Ensure candidates understand there is no 
           monetary compensation, but they will gain valuable experience and mentorship.
         </p>
       </div>
 
-      <div className="w-100 mb3">
+      <div className="field-group">
         <label className="field-label">
           <BiBuilding className="field-icon" />
-          Organization
+          Organization<span className="required">*</span>
         </label>
-        <div className="modern-input bg-light-gray">
+        <div className="form-input disabled">
           Systemic Altruism
         </div>
       </div>
@@ -241,37 +243,36 @@ const PostUnpaidInternship = () => {
   );
 
   return (
-    <div className="post-internship-container">
-      <div className="header-section mb4">
-        <div className="flex items-center mb3">
-          <div className="header-icon-wrapper mr3">
-            <FiBriefcase className="header-icon" />
+    <div className="post-container">
+      <div className="header">
+        <div className="header-content">
+          <div className="header-icon">
+            <FiBriefcase />
           </div>
-          <div>
-            <h1 className="f2 fw6 navy mb0">Post Unpaid Internship</h1>
-            <p className="f4 gray mt2 mb0">
-              Create a new unpaid internship opportunity to attract talented individuals.
-            </p>
+          <div className="header-text">
+            <h1>Post Unpaid Internship</h1>
+            <p>Create an unpaid internship posting to attract passionate volunteers.</p>
           </div>
         </div>
-        <div className="progress-bar mt4">
+
+        <div className="progress-bar">
           <div 
-            className={`progress-step ${currentStep === 1 ? 'active' : ''}`}
-            onClick={() => handleStepClick(1)}
+            className={`step ${currentStep === 1 ? 'active' : ''}`}
+            onClick={() => setCurrentStep(1)}
           >
             <span className="step-number">1</span>
             <span className="step-text">Basic Info</span>
           </div>
           <div 
-            className={`progress-step ${currentStep === 2 ? 'active' : ''}`}
-            onClick={() => handleStepClick(2)}
+            className={`step ${currentStep === 2 ? 'active' : ''}`}
+            onClick={() => setCurrentStep(2)}
           >
             <span className="step-number">2</span>
             <span className="step-text">Internship Details</span>
           </div>
           <div 
-            className={`progress-step ${currentStep === 3 ? 'active' : ''}`}
-            onClick={() => handleStepClick(3)}
+            className={`step ${currentStep === 3 ? 'active' : ''}`}
+            onClick={() => setCurrentStep(3)}
           >
             <span className="step-number">3</span>
             <span className="step-text">Review</span>
@@ -284,19 +285,19 @@ const PostUnpaidInternship = () => {
         {currentStep === 2 && renderInternshipDetails()}
         {currentStep === 3 && renderReview()}
 
-        <div className="form-actions flex justify-end mt4">
+        <div className="form-actions">
           {currentStep > 1 && (
             <button
               type="button"
               onClick={() => setCurrentStep(prev => prev - 1)}
-              className="reset-button mr3"
+              className="btn-secondary"
             >
               Previous
             </button>
           )}
           <button
             type="submit"
-            className="submit-button"
+            className="btn-primary"
           >
             {currentStep === 3 ? 'Post Internship' : 'Next'}
           </button>

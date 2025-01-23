@@ -1,49 +1,38 @@
+/* Base sidebar styles */
 .sidebar {
   height: 100vh;
+  min-height: 100vh;
   background: #1a1a1a;
   color: white;
-  transition: all 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
   position: fixed;
   top: 0;
   left: 0;
   z-index: 1000;
+  display: flex;
+  flex-direction: column;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
-  width: 240px;
-  padding: 0;
+  transition: all 0.3s ease;
 }
 
-.sidebar::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: -20px;
-  width: 20px;
-  height: 100%;
-  background-color: #1a202c;
-  z-index: -1;
-}
-
+/* Sidebar states */
 .sidebar.expanded {
   width: 240px;
 }
 
-.sidebar.expanded ~ .content-wrapper {
-  margin-left: 10rem;
-  transition: margin-left 0.3s ease;
+.sidebar.collapsed {
+  width: 100px;
 }
 
-.sidebar.collapsed {
-  width: 72px;
+/* Content wrapper adjustments */
+.sidebar.expanded ~ .content-wrapper {
+  margin-left: 240px;
 }
 
 .sidebar.collapsed ~ .content-wrapper {
-  margin-left: 72px;
-  transition: margin-left 0.3s ease;
+  margin-left: 80px;
 }
 
+/* Header styles */
 .sidebar-header {
   position: relative;
   padding: 0.875rem 1rem;
@@ -69,6 +58,7 @@
   font-weight: 500;
 }
 
+/* Navigation styles */
 .sidebar-nav {
   flex: 1;
   padding: 0.5rem 0;
@@ -77,16 +67,15 @@
   gap: 0.25rem;
 }
 
+/* Navigation items */
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  position: relative;
   justify-content: space-between;
   padding: 0.625rem 1rem;
   margin: 0.125rem 0;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .nav-item:hover {
@@ -95,6 +84,13 @@
 
 .nav-item.active {
   background: rgba(255, 255, 255, 0.15);
+}
+
+/* Item components */
+.item-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .item-icon {
@@ -106,22 +102,36 @@
 }
 
 .item-label {
-  transition: all 0.2s ease;
   flex: 1;
   font-size: 0.95rem;
   font-weight: 500;
 }
 
+/* Dropdown styles */
 .dropdown-icon {
   font-size: 1.25rem;
-  transition: transform 0.2s ease;
   opacity: 0.7;
+  transition: transform 0.2s ease;
 }
 
 .dropdown-icon.rotated {
   transform: rotate(180deg);
 }
 
+/* Submenu styles */
+.submenu, .nested-submenu {
+  display: flex;
+  flex-direction: column;
+  background: rgba(0, 0, 0, 0.15);
+  padding: 0.25rem 0;
+}
+
+.nested-submenu {
+  background: rgba(0, 0, 0, 0.2);
+  margin-left: 1rem;
+}
+
+/* Footer styles */
 .sidebar-footer {
   padding: 0.875rem 1rem;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -132,17 +142,30 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  cursor: pointer;
   padding: 0.75rem 1rem;
+  width: 100%;
+  cursor: pointer;
   border-radius: 4px;
   transition: background-color 0.2s;
-  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .logout-button:hover {
   background: rgba(255, 255, 255, 0.1);
 }
 
+.sidebar.collapsed .logout-button {
+  justify-content: center;
+  padding: 0.75rem;
+}
+
+.sidebar.collapsed .logout-button span {
+  display: none;
+}
+
+/* Toggle button */
 .toggle-button {
   position: absolute;
   right: -12px;
@@ -158,361 +181,113 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
   padding: 0;
   z-index: 10;
+  transition: background-color 0.2s ease;
 }
 
 .toggle-button:hover {
   background: #333;
 }
 
-.toggle-button svg {
-  width: 16px;
-  height: 16px;
-}
-
-.collapsed-item {
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 0.625rem 0.375rem;
-}
-
-.collapsed-label {
-  font-size: 0.7rem;
-  margin-top: 0.5rem;
-  white-space: normal;
-  text-align: center;
-  line-height: 1.2;
-}
-
-.expanded-item {
-  padding: 0.75rem 1rem;
-  line-height: 1.2;
-  transition: background-color 0.2s;
-}
-
-.submenu {
-  display: flex;
-  flex-direction: column;
-  background: rgba(0, 0, 0, 0.15);
-  padding: 0.25rem 0;
-}
-
-.submenu-item {
-  padding: 0.5rem 1rem 0.5rem 2.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  cursor: pointer;
-  width: 100%;
-}
-
-.submenu-item:hover {
-  border-left: 3px solid rgba(255, 255, 255, 1);
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.submenu-item.active {
-  border-left: 3px solid rgba(255, 255, 255, 1);
-  background: rgba(255, 255, 255, 0.15);
-}
-
-/* Adjust nested submenu styles for better visual appearance */
-.nested-submenu {
-  display: flex;
-  flex-direction: column;
-  background: rgba(0, 0, 0, 0.2);
-  padding: 0.25rem 0;
-  margin-left: 0.75rem; /* Reduced from 1rem */
-}
-
-.nested-submenu-item {
-  padding: 0.5rem 1rem 0.5rem 3rem; /* Reduced left padding from 4rem to 3rem */
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.nested-submenu-item:hover {
-  border-left: 2px solid rgba(255, 255, 255, 1);
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.nested-submenu-item.active {
-  background: rgba(255, 255, 255, 0.15);
-}
-
-/* Dropdown icon */
-.dropdown-icon {
-  margin-left: auto;
-  transition: transform 0.2s ease;
-}
-
-.dropdown-icon.rotated {
-  transform: rotate(180deg); /* Rotate down when expanded */
-}
-
-/* Adjust mobile spacing */
-@media screen and (max-width: 768px) {
-  .nested-submenu {
-    margin-left: 1rem; /* Reduced from 1.5rem */
-  }
-  
-  .nested-submenu-item {
-    padding-left: 2.5rem; /* Reduced from 3rem */
-  }
-}
-
-/* iPhone SE, iPhone XR (smaller phones) */
-@media screen and (max-width: 375px) {
-  .sidebar.expanded {
-    width: 200px;
-  }
-  
-  .sidebar.collapsed {
-    width: 60px;
-  }
-  
-  .sidebar.collapsed ~ .content-wrapper {
-    margin-left: 60px;
-  }
-  
-  .sidebar.expanded ~ .content-wrapper {
-    margin-left: 200px;
-  }
-}
-
-/* iPhone 12 Pro, iPhone 14 Pro Max (larger phones) */
-@media screen and (min-width: 376px) and (max-width: 428px) {
-  .sidebar.expanded {
-    width: 220px;
-  }
-  
-  .sidebar.expanded ~ .content-wrapper {
-    margin-left: 220px;
-  }
-}
-
-/* Tablets - iPad Mini, iPad Air */
-@media screen and (min-width: 768px) and (max-width: 1024px) {
-  .sidebar.expanded {
-    width: 260px;
-  }
-  
-  .sidebar.expanded ~ .content-wrapper {
-    margin-left: 260px;
-  }
-}
-
-/* iPad Pro, Surface Pro 7 */
-@media screen and (min-width: 1024px) and (max-width: 1366px) {
-  .sidebar.expanded {
-    width: 280px;
-  }
-  
-  .sidebar.expanded ~ .content-wrapper {
-    margin-left: 280px;
-  }
-}
-
-/* Foldables - Galaxy Z Fold, Surface Duo (unfolded) */
-@media screen and (min-width: 717px) and (max-width: 767px) {
-  .sidebar.expanded {
-    width: 230px;
-  }
-  
-  .sidebar.expanded ~ .content-wrapper {
-    margin-left: 230px;
-  }
-}
-
-/* MacBook Air (1440 x 900) */
-@media screen and (min-width: 1440px) {
-  .sidebar.expanded {
-    width: 300px;
-  }
-  
-  .sidebar.expanded ~ .content-wrapper {
-    margin-left: 300px;
-  }
-}
-
-/* MacBook Pro 14" (2021) and similar */
-@media screen and (min-width: 1512px) {
-  .sidebar.expanded {
-    width: 320px;
-  }
-  
-  .sidebar.expanded ~ .content-wrapper {
-    margin-left: 320px;
-  }
-}
-
-/* MacBook Pro 16" and larger displays */
-@media screen and (min-width: 1728px) {
-  .sidebar.expanded {
-    width: 340px;
-  }
-  
-  .sidebar.expanded ~ .content-wrapper {
-    margin-left: 340px;
-  }
-}
-
-/* Half screen support for all devices */
-@media screen and (max-width: 50vw) {
-  .sidebar.expanded {
-    width: 180px;
-  }
-  
-  .sidebar.collapsed {
-    width: 50px;
-  }
-  
-  .sidebar.collapsed ~ .content-wrapper {
-    margin-left: 50px;
-  }
-  
-  .sidebar.expanded ~ .content-wrapper {
-    margin-left: 180px;
-  }
-  
-  .brand-text {
-    font-size: 0.9rem;
-  }
-  
-  .item-label {
-    font-size: 0.85rem;
-  }
-  
-  .submenu-item {
-    padding: 0.75rem !important;
-  }
-}
-
-/* Ensure minimum usable size */
-@media screen and (max-width: 320px) {
-  .sidebar.expanded {
-    width: 160px;
-  }
-  
-  .sidebar.collapsed {
-    width: 45px;
-  }
-  
-  .sidebar.collapsed ~ .content-wrapper {
-    margin-left: 45px;
-  }
-  
-  .sidebar.expanded ~ .content-wrapper {
-    margin-left: 160px;
-  }
-  
-  .brand-icon {
-    width: 32px;
-    height: 32px;
-  }
-  
-  .item-icon {
-    font-size: 1rem;
-  }
-}
-
-/* Adjust font sizes for very small screens */
-@media screen and (max-width: 280px) {
-  .brand-text {
-    font-size: 0.8rem;
-  }
-  
-  .item-label {
-    font-size: 0.8rem;
-  }
-  
-  .collapsed-label {
-    font-size: 0.6rem;
-  }
-}
-
-/* Add these styles for smaller screens */
+/* Mobile styles */
 @media screen and (max-width: 768px) {
   .sidebar.collapsed {
     transform: translateX(-100%);
     width: 0;
   }
-  
-  .sidebar.collapsed ~ .content-wrapper {
-    margin-left: 0;
-  }
-  
-  .sidebar.collapsed .brand-icon {
-    display: none;
-  }
-  
-  .toggle-button {
-    background: #1a1a1a;
-    /* right: -32px; */
-    top: 12px;
-    transform: none;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
-    z-index: 100;
-  }
-  
+
   .sidebar.expanded {
     transform: translateX(0);
     width: 100%;
     max-width: 300px;
   }
-  
-  .submenu {
-    flex-direction: column;
+
+  .sidebar.collapsed ~ .content-wrapper {
+    margin-left: 0;
+  }
+
+  .toggle-button {
+    top: 12px;
+    transform: none;
+    width: 32px;
+    height: 32px;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
   }
 }
 
-/* Update the horizontal submenu styles to be vertical */
-.horizontal-submenu {
-  display: flex;
-  flex-direction: column; /* Change to vertical layout */
-  background: rgba(0, 0, 0, 0.15);
-  margin-left: 2.5rem; /* Align with parent menu item's content */
+/* Responsive breakpoints */
+@media screen and (min-width: 1024px) {
+  .sidebar.expanded {
+    width: 280px;
+  }
 }
 
-.horizontal-submenu-item {
-  padding: 0.75rem 1rem;
-  white-space: nowrap;
-  cursor: pointer;
-  width: 100%;
-  display: flex;
+@media screen and (min-width: 1440px) {
+  .sidebar.expanded {
+    width: 300px;
+  }
+}
+
+/* Navigation items - collapsed state */
+.sidebar.collapsed .nav-item {
+  padding: 0.625rem 0.5rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: auto;
+  text-align: center;
+}
+
+.sidebar.collapsed .item-content {
+  flex-direction: column;
   align-items: center;
   gap: 0.5rem;
+  width: 100%;
 }
 
-.horizontal-submenu-item:hover {
-  background: rgba(255, 255, 255, 0.1);
+.sidebar.collapsed .item-icon {
+  margin: 0;
+  font-size: 1.5rem;
 }
 
-.horizontal-submenu-item.active {
-  background: rgba(255, 255, 255, 0.15);
+.sidebar.collapsed .item-label {
+  font-size: 0.75rem;
+  text-align: center;
+  white-space: normal;
+  overflow: visible;
+  width: 100%;
+  line-height: 1.2;
+  padding: 0 2px;
 }
 
-/* Update dropdown icon rotation */
-.dropdown-icon.rotated {
-  transform: rotate(180deg); /* Rotate downward when open */
+/* Hide dropdown icons in collapsed state */
+.sidebar.collapsed .dropdown-icon {
+  display: none;
 }
 
-/* Responsive adjustments */
-@media screen and (max-width: 768px) {
-  .horizontal-submenu {
-    margin-left: 2rem;
-  }
+/* Remove the collapsed-item class styles as we're handling it directly */
+.collapsed-item {
+  display: none;
 }
 
-/* Optional: Add transition for smoother collapse/expand */
-.sidebar {
-  transition: width 0.3s ease, transform 0.3s ease;
+/* Update footer styles for collapsed state */
+.sidebar.collapsed .sidebar-footer {
+  padding: 0.875rem 0.5rem;
+}
+
+.sidebar.collapsed .logout-button {
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.sidebar.collapsed .logout-button span {
+  display: block;
+  font-size: 0.75rem;
+  text-align: center;
+  white-space: normal;
+  width: 100%;
 }

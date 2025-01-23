@@ -1,4 +1,5 @@
 import React from 'react';
+import './ListingDetailsModal.css';
 
 const ListingDetailsModal = ({ data, dailyUpdates, isLoadingUpdates, onClose }) => {
   if (!data || !data.listingName) {
@@ -49,29 +50,38 @@ const ListingDetailsModal = ({ data, dailyUpdates, isLoadingUpdates, onClose }) 
             </div>
           </div>
 
-          {/* Messages */}
-          <div className="message-section mb4">
+          {/* Messages Section */}
+          <div className="messages-section mb4">
             {/* Intro Message */}
-            <div className="bg-dark-gray pa3 mb3 br2">
-              <div className="flex items-center mb2">
-                <span className="light-blue mr2">⟲</span>
-                <span className="f6 fw5 white-90">Intro Message</span>
+            <div className="message-item mb4">
+              <div className="message-header flex items-center mb2">
+                <span className="blue mr2">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M8 0C3.58 0 0 3.58 0 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/>
+                    <path d="M7 7h2v5H7zm0-3h2v2H7z"/>
+                  </svg>
+                </span>
+                <span className="f6 blue">Intro Message</span>
               </div>
-              <div className="message-scroll-container bg-dark-gray">
-                <pre className="ma0 pa0 f6 lh-copy white-80 message-text">
+              <div className="message-content bg-black-20 pa3 br2 lh-copy white-90">
+                <pre className="message-text ma0 white-90 overflow-auto">
                   {data.introMessage || 'No intro message available'}
                 </pre>
               </div>
             </div>
 
             {/* Assignment Message */}
-            <div className="bg-dark-gray pa3 br2">
-              <div className="flex items-center mb2">
-                <span className="light-blue mr2">⟲</span>
-                <span className="f6 fw5 white-90">Assignment Message</span>
+            <div className="message-item">
+              <div className="message-header flex items-center mb2">
+                <span className="green mr2">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M8 0a8 8 0 100 16A8 8 0 008 0zm0 14A6 6 0 118 2a6 6 0 010 12zm1-6h2a1 1 0 010 2H9v2a1 1 0 01-2 0V8H5a1 1 0 010-2h2V4a1 1 0 012 0v2z"/>
+                  </svg>
+                </span>
+                <span className="f6 green">Assignment Message</span>
               </div>
-              <div className="message-scroll-container bg-dark-gray">
-                <pre className="ma0 pa0 f6 lh-copy white-80 message-text">
+              <div className="message-content bg-black-20 pa3 br2 lh-copy white-90">
+                <pre className="message-text ma0 white-90 overflow-auto">
                   {data.assignmentMessage || 'No assignment message available'}
                 </pre>
               </div>

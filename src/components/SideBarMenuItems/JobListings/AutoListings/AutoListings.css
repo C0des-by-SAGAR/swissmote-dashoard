@@ -1,0 +1,27 @@
+.auto-listings-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #1a1a1a;
+}
+
+/* Add styles for active tab state */
+.tab-button.active {
+  opacity: 1;
+  font-weight: 600;
+}
+
+.tab-button.automated.active {
+  background-color: #48bb78;
+  border-color: #48bb78;
+}
+
+.tab-button.not-automated.active {
+  background-color: #ed8936;
+  border-color: #ed8936;
+}
+
+.tab-button.expired.active {
+  background-color: #f56565;
+  border-color: #f56565;
+}

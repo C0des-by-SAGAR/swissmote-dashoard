@@ -1,26 +1,32 @@
-import { axiosInstance } from '../config/axiosConfig';
-import { handleApiError } from '../utils/errorHandler';
+import axios from 'axios';
+import { authService } from './authService';
 
-/**
- * Service for announcement-related API operations
- */
 export const announcementService = {
-  /**
-   * Send an announcement
-   * @param {Object} data - The request data
-   * @param {number|string} data.listing - The listing ID
-   * @param {string} data.message - The announcement message
-   * @returns {Promise<Object>} Response data
-   */
-  doAnnounce: async (data) => {
+  makeAnnouncement: async (listingId, message) => {
     try {
-      const response = await axiosInstance.post('/announcement', {
-        listing: data.listing,
-        message: data.message
-      });
-      return response.data;
+      const response = await axios.post(
+        'https://api.swissmote.com/announcement',
+        {
+          listing: listingId,
+          message: message
+        },
+        {
+          headers: authService.getAuthHeaders()
+        }
+      );
+
+      // Check if the announcement was successful
+      if (response.data?.success && response.data?.status === 'initiated') {
+        return {
+          success: true,
+          requestId: response.data.request_id,
+          message: response.data.message
+        };
+      }
+
+      throw new Error('Failed to initiate announcement');
     } catch (error) {
-      throw handleApiError(error);
+      throw new Error(error.response?.data?.message || 'Failed to send announcement');
     }
   }
 }; 

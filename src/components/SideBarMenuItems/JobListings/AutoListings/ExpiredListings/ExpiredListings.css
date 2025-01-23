@@ -1,16 +1,92 @@
 .expired-listings-container {
-  width: 100%;
-  max-width: 100%;
   padding: 1.5rem;
-  background-color: #1a202c;
-  min-height: 100vh;
+  width: 100%;
 }
 
 .listings-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   gap: 1.5rem;
-  margin: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.listing-card {
+  background: #1e2837;
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card-header {
+  margin-bottom: 1.5rem;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.listing-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.listing-number {
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.organization-info {
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.info-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.info-label {
+  color: #94a3b8;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.info-value {
+  color: #e2e8f0;
+  font-size: 0.875rem;
+}
+
+.link-value {
+  color: #60a5fa;
+  font-size: 0.875rem;
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.link-value:hover {
+  text-decoration: underline;
+}
+
+.card-footer {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .no-results {

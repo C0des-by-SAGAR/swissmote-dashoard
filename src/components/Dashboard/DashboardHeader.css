@@ -1,11 +1,8 @@
 .dashboard-header {
-  background: white;
-  border-bottom: 1px solid #e2e8f0;
-  padding: 1rem 1.5rem;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  background-color: #1a202c;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
 }
 
 .header-content {
@@ -106,7 +103,6 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 1.5rem;
-  margin-bottom: 2rem;
 }
 
 .stats-card {
@@ -142,24 +138,24 @@
 }
 
 /* Neon icon colors */
-.stats-icon.cyan {
-  background-color: rgba(0, 255, 255, 0.15);
-  color: #00ffff;
+.stats-icon.blue {
+  background-color: rgba(0, 123, 255, 0.15);
+  color: #007bff;
 }
 
 .stats-icon.green {
-  background-color: rgba(57, 255, 20, 0.15);
-  color: #39ff14;
+  background-color: rgba(40, 167, 69, 0.15);
+  color: #28a745;
 }
 
 .stats-icon.yellow {
-  background-color: rgba(255, 255, 0, 0.15);
-  color: #ffff00;
+  background-color: rgba(255, 193, 7, 0.15);
+  color: #ffc107;
 }
 
-.stats-icon.magenta {
-  background-color: rgba(255, 0, 255, 0.15);
-  color: #ff00ff;
+.stats-icon.red {
+  background-color: rgba(220, 53, 69, 0.15);
+  color: #dc3545;
 }
 
 .stats-content {

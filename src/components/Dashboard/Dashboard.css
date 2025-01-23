@@ -1,10 +1,13 @@
 /* Dashboard container */
 .dashboard-container {
   width: 100%;
-  min-height: 100vh;
+  min-height: calc(100vh - 3rem);
   background-color: #1a202c;
-  padding: 1.5rem 1.5rem 1.5rem 3rem;
-  transition: margin-left 0.3s ease;
+  padding: 1rem;
+  margin: 0;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(148, 163, 184, 0.1);
 }
 
 .dashboard-container.sidebar-collapsed {
@@ -29,10 +32,11 @@
   background: rgba(30, 41, 59, 0.5);
   border-radius: 0.75rem;
   padding: 1.5rem;
+  margin-bottom: 1.5rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(148, 163, 184, 0.1);
   backdrop-filter: blur(8px);
-  margin-bottom: 1.5rem;
+  margin-top: 0.5rem;
 }
 
 /* Responsive grid layout */
@@ -51,7 +55,8 @@
 
 @media screen and (max-width: 768px) {
   .dashboard-container {
-    padding: 1rem;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
   }
   
   .dashboard-container.sidebar-collapsed {
@@ -70,6 +75,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 1.5rem;
+  margin-top: 2rem;
 }
 
 .chart-title {
@@ -161,7 +167,7 @@
 @media (max-width: 768px) {
   .dashboard-charts-container {
     grid-template-columns: 1fr;
-    padding: 1rem;
+    gap: 1rem;
   }
   
   .summary-row {
@@ -297,7 +303,7 @@
 /* iPad Pro, Surface Pro 7 */
 @media screen and (max-width: 1024px) {
   .dashboard-charts-container {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   }
 }
 
@@ -368,82 +374,108 @@
   }
 }
 
-.chart-type-selector {
-  margin-bottom: 1.5rem;
+.global-chart-selector {
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(8px);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(148, 163, 184, 0.1);
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  position: relative;
+  gap: 2rem;
 }
 
-.chart-type-selector label {
+.chart-type-label {
   color: #94a3b8;
   font-weight: 500;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-.chart-type-selector select {
-  padding: 0.75rem 2.5rem 0.75rem 1.5rem;
+.chart-type-options {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.chart-type-btn {
+  background: rgba(30, 41, 59, 0.6);
   border: 1px solid rgba(148, 163, 184, 0.2);
-  background-color: rgba(30, 41, 59, 0.8);
   color: #e2e8f0;
+  padding: 0.5rem 1.25rem;
   border-radius: 0.75rem;
   font-size: 0.875rem;
-  backdrop-filter: blur(8px);
   cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  min-width: 160px;
   transition: all 0.2s ease;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  background-size: 1em;
 }
 
-.chart-type-selector select:hover {
+.chart-type-btn:hover {
+  background: rgba(30, 41, 59, 0.8);
   border-color: rgba(148, 163, 184, 0.4);
-  background-color: rgba(30, 41, 59, 0.9);
+  transform: translateY(-1px);
 }
 
-.chart-type-selector select:focus {
-  outline: none;
+.chart-type-btn.active {
+  background: #3b82f6;
   border-color: #60a5fa;
-  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2);
+  color: white;
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
 }
 
-.chart-type-selector select option {
-  background-color: #1e293b;
-  color: #e2e8f0;
-  padding: 12px;
-}
-
-/* Add smooth transition for option hover states */
-.chart-type-selector select option:hover {
-  background-color: #2d3748;
-}
-
-/* Ensure consistent styling across browsers */
-.chart-type-selector select::-ms-expand {
-  display: none;
-}
-
-/* Style for Firefox */
-@-moz-document url-prefix() {
-  .chart-type-selector select {
-    padding-right: 2.5rem;
-  }
-}
-
-/* Mobile optimization */
-@media screen and (max-width: 480px) {
-  .chart-type-selector {
+/* Responsive styles for the chart selector */
+@media screen and (max-width: 640px) {
+  .global-chart-selector {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.5rem;
+    gap: 1rem;
+    padding: 1rem;
   }
 
-  .chart-type-selector select {
+  .chart-type-options {
     width: 100%;
+    justify-content: space-between;
+  }
+
+  .chart-type-btn {
+    flex: 1;
+    text-align: center;
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+.chart-header {
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-container.single-line .chart-card {
+  display: inline-block;
+  width: calc(33.33% - 1rem); /* Adjust width as needed */
+  vertical-align: top;
+  margin-right: 1rem;
+}
+
+.dashboard-container.single-line {
+  white-space: nowrap;
+  overflow-x: auto;
+  padding-bottom: 1rem;
+}
+
+/* Ensure the last card doesn't have extra margin */
+.dashboard-container.single-line .chart-card:last-child {
+  margin-right: 0;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+  .dashboard-container.single-line .chart-card {
+    width: calc(50% - 1rem);
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .dashboard-container.single-line .chart-card {
+    width: 100%;
+    margin-right: 0;
   }
 }

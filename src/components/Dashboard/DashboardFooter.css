@@ -1,7 +1,7 @@
 .dashboard-footer {
   background: rgba(30, 41, 59, 0.5);
   border-radius: 0.75rem;
-  margin: 1.5rem;
+  margin: 1.5rem 0;
   padding: 2rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(148, 163, 184, 0.1);

@@ -1,26 +1,37 @@
-import { axiosInstance } from '../config/axiosConfig';
-import { handleApiError } from '../utils/errorHandler';
+import axios from 'axios';
+import { authService } from './authService';
 
-/**
- * Service for adding assignments
- */
 export const addAssignmentService = {
-  /**
-   * Add a new assignment
-   * @param {Object} data Assignment data
-   * @param {number} data.listing - Listing ID
-   * @param {string} data.link - Assignment link
-   * @returns {Promise<Object>} Response with success status and message
-   */
-  addAssignment: async (data) => {
+  addAssignment: async (listingId, assignmentLink) => {
     try {
-      const response = await axiosInstance.patch('/add_assignment', {
-        listing: data.listing,
-        link: data.link
-      });
-      return response.data;
+      const response = await axios.patch(
+        'https://api.swissmote.com/add_assignment',
+        {
+          listing: listingId,
+          link: assignmentLink
+        },
+        {
+          headers: authService.getAuthHeaders()
+        }
+      );
+
+      if (response.data?.detail?.success === false) {
+        throw new Error(response.data.detail.error || 'Failed to add assignment');
+      }
+
+      return {
+        success: true,
+        message: 'Assignment added successfully'
+      };
     } catch (error) {
-      throw handleApiError(error);
+      if (error.response?.data?.detail) {
+        const { error: errorMessage, code } = error.response.data.detail;
+        if (code === 'LISTING_NOT_FOUND') {
+          throw new Error('Listing not found');
+        }
+        throw new Error(errorMessage || 'Failed to add assignment');
+      }
+      throw new Error('Failed to add assignment');
     }
   }
 }; 

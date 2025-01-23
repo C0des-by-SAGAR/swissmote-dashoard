@@ -1,203 +1,514 @@
-import React, { useState, useEffect } from 'react';
-import { FiCheck, FiClock } from 'react-icons/fi';
+import React, { useState, useEffect, useRef } from 'react';
+import { activeListings } from './mockData';
 import './Assignments.css';
-import ActiveListings from './AssignmentsActiveListings';
-import AssignmentCard from './AssignmentCard';
-import toast from 'react-hot-toast';
-import { assignmentService } from '../../../api/services/assignmentService';
-import { addAssignmentService } from '../../../api/services/addAssignmentService';
+import { assignmentsService } from '../../../api/services/assignmentsService';
+import { toast } from 'react-toastify';
 import { activeListingService } from '../../../api/services/activeListingService';
+import { candidateService } from '../../../api/services/candidateService';
+import { candidateEmailService } from '../../../api/services/candidateEmailService';
+import { evaluationService } from '../../../api/services/evaluationService';
 
-const StatusLegend = () => (
-  <div className="status-legend pa4 mb4 bg-white br3 shadow-1">
-    <h4 className="f5 fw6 mt0 mb3 gray">Status Legend:</h4>
-    <div className="flex items-center flex-wrap">
-      <div className="flex items-center mr4 mb2">
-        <FiCheck className="mr2 green" size={18} />
-        <span className="f6 dark-gray">Evaluated</span>
+const AssignmentCards = ({ assignments, projectName, listingId, onBack, filterBy, searchTerm }) => {
+  const [localAssignments, setLocalAssignments] = useState(assignments);
+  const [activeReplyId, setActiveReplyId] = useState(null);
+  const [replyText, setReplyText] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const replyInputRef = useRef(null);
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [emailData, setEmailData] = useState(null);
+  const [loadingEmail, setLoadingEmail] = useState(false);
+
+  const handleChat = (assignmentId) => {
+    // Chat functionality implementation
+    console.log('Opening chat for assignment:', assignmentId);
+  };
+
+  const handleEvaluate = async (assignment) => {
+    try {
+      const loadingToast = toast.loading('Marking as evaluated...');
+      
+      await evaluationService.markAsEvaluated(assignment.candidateId, listingId);
+      
+      // Update local state to reflect the evaluation
+      setLocalAssignments(prevAssignments => 
+        prevAssignments.map(item => {
+          if (item.id === assignment.id) {
+            return {
+              ...item,
+              status: 'evaluated'
+            };
+          }
+          return item;
+        })
+      );
+
+      toast.update(loadingToast, {
+        render: 'Assignment marked as evaluated!',
+        type: 'success',
+        isLoading: false,
+        autoClose: 3000
+      });
+    } catch (error) {
+      toast.error(error.message || 'Failed to mark assignment as evaluated');
+    }
+  };
+
+  const handleReplyClick = (assignmentId) => {
+    setActiveReplyId(activeReplyId === assignmentId ? null : assignmentId);
+    // Focus the input field when it appears
+    setTimeout(() => {
+      replyInputRef.current?.focus();
+    }, 0);
+  };
+
+  const handleReplySubmit = async (listingNum, candidateId, event) => {
+    event.preventDefault();
+    const message = event.target.elements.replyMessage.value;
+
+    try {
+      setIsSubmitting(true);
+      const loadingToast = toast.loading('Sending reply...');
+
+      await candidateService.replyToCandidate(listingNum, candidateId, message);
+
+      toast.update(loadingToast, {
+        render: 'Reply sent successfully!',
+        type: 'success',
+        isLoading: false,
+        autoClose: 3000
+      });
+
+      // Reset form and close reply field
+      event.target.reset();
+      setActiveReplyId(null);
+    } catch (error) {
+      toast.error(error.message || 'Failed to send reply');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleReplyCancel = () => {
+    setReplyText('');
+    setActiveReplyId(null);
+  };
+
+  const handleEmail = async (assignment) => {
+    try {
+      setLoadingEmail(true);
+      const loadingToast = toast.loading('Fetching email...');
+      
+      const data = await candidateEmailService.getCandidateEmail(
+        assignment.candidateId,
+        assignment.organization // Make sure this is passed from the parent
+      );
+      
+      setEmailData(data);
+      setShowEmailModal(true);
+      
+      toast.dismiss(loadingToast);
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setLoadingEmail(false);
+    }
+  };
+
+  const handleCopyEmail = () => {
+    if (emailData) {
+      navigator.clipboard.writeText(emailData.email)
+        .then(() => toast.success('Email copied to clipboard!'))
+        .catch(() => toast.error('Failed to copy email'));
+    }
+  };
+
+  // Filter assignments based on selected filter and search term
+  const filteredAssignments = localAssignments.filter(assignment => {
+    const matchesFilter = filterBy === 'all' || assignment.status === filterBy.toLowerCase();
+    const matchesSearch = searchTerm.trim() === '' || 
+      assignment.candidateName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      assignment.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      assignment.location.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    return matchesFilter && matchesSearch;
+  });
+
+  return (
+    <div>
+      <div className="pv4 ph3">
+        <button 
+          onClick={onBack}
+          className="back-btn mr3 bg-blue bn br3 pa2 flex items-center pointer"
+          aria-label="Go back to listings"
+        >
+          <span className="white hover-white">Back</span>
+        </button>
       </div>
-      <div className="flex items-center mr4 mb2">
-        <FiClock className="mr2 orange" size={18} />
-        <span className="f6 dark-gray">Pending</span>
+      <div className="flex items-baseline mb4">
+        <div className="flex items-center">
+          <h2 className="f3 fw5 white mv0 ml3">{projectName}</h2>
+          <span className="project-id ml2">#{listingId}</span>
+        </div>
       </div>
+      <div className="assignments-grid">
+        {filteredAssignments.map(assignment => (
+          <div key={assignment.id} className="assignment-card pa3 br2">
+            <div className="flex justify-between items-start mb3">
+              <div>
+                <h3 className="f4 fw6 white mv0">{assignment.candidateName}</h3>
+                <p className="f6 gray mv2">{assignment.company}</p>
+              </div>
+              <div className={`status-badge ${assignment.status.toLowerCase()}`}>
+                {assignment.status.charAt(0).toUpperCase() + assignment.status.slice(1)}
+              </div>
+            </div>
+            <div className="details-grid mb3">
+              <div className="detail-item">
+                <span className="moon-gray">Location:</span>
+                <span className="white ml2">{assignment.location}</span>
+              </div>
+              <div className="detail-item">
+                <span className="moon-gray">Experience:</span>
+                <span className="white ml2">{assignment.experience}</span>
+              </div>
+              <div className="detail-item">
+                <span className="moon-gray">Received:</span>
+                <span className="white ml2">{assignment.receivedDate}</span>
+              </div>
+              <div className="detail-item">
+                <span className="moon-gray">Relocation:</span>
+                <span className="white ml2">{assignment.relocation}</span>
+              </div>
+            </div>
+            <div className="action-buttons-container">
+              <button
+                onClick={() => handleChat(assignment.id)}
+                className="action-button chat-btn"
+              >
+                <span className="button-icon">💬</span>
+                Chat
+              </button>
+              <button
+                onClick={() => handleEvaluate(assignment)}
+                className="action-button evaluate-btn"
+                disabled={assignment.status.toLowerCase() === 'evaluated'}
+              >
+                <span className="button-icon">✓</span>
+                Evaluate
+              </button>
+              <button
+                onClick={() => handleReplyClick(assignment.id)}
+                className={`action-button reply-btn ${activeReplyId === assignment.id ? 'active' : ''}`}
+              >
+                <span className="button-icon">↩</span>
+                Reply
+              </button>
+              <button
+                onClick={() => handleEmail(assignment)}
+                className="action-button email-btn"
+                disabled={loadingEmail}
+              >
+                <span className="button-icon">✉</span>
+                {loadingEmail ? 'Loading...' : 'Email'}
+              </button>
+            </div>
+            <div className="attachments-section mt3 pt3 bt b--dark-gray">
+              <h4 className="f6 gray mv2">Attachments</h4>
+              <div className="flex flex-wrap">
+                {assignment.attachments.map((attachment, index) => (
+                  <a
+                    key={index}
+                    href={attachment.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="attachment-link mr3 mb2"
+                  >
+                    {attachment.name}
+                  </a>
+                ))}
+              </div>
+            </div>
+            
+            {activeReplyId === assignment.id && (
+              <div className="reply-field-container mt3">
+                <form onSubmit={(e) => handleReplySubmit(assignment.listingNumber, assignment.candidateId, e)}>
+                  <textarea
+                    ref={replyInputRef}
+                    value={replyText}
+                    onChange={(e) => setReplyText(e.target.value)}
+                    className="reply-textarea"
+                    placeholder="Type your reply..."
+                    rows="3"
+                    name="replyMessage"
+                    required
+                    disabled={isSubmitting}
+                  />
+                  <div className="reply-actions mt2">
+                    <button 
+                      type="button" 
+                      onClick={handleReplyCancel}
+                      className="cancel-btn mr2"
+                      disabled={isSubmitting}
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      type="submit"
+                      className="submit-btn"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? 'Sending...' : 'Send Reply'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+          </div>
+        ))}
+        {filteredAssignments.length === 0 && (
+          <div className="no-assignments white-60 tc pa4">
+            {searchTerm 
+              ? `No assignments found matching "${searchTerm}"`
+              : `No ${filterBy.toLowerCase()} assignments found`}
+          </div>
+        )}
+      </div>
+
+      {/* Email Modal */}
+      {showEmailModal && emailData && (
+        <div className="modal-overlay">
+          <div className="modal-content br3 bg-white pa4">
+            <div className="flex justify-between items-center mb4">
+              <h2 className="f3 fw5 dark-gray mv0">Candidate Email</h2>
+              <button 
+                onClick={() => setShowEmailModal(false)}
+                className="close-button bn bg-transparent pointer"
+                aria-label="Close modal"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="email-display-container bg-near-white pa3 br2 mb4">
+              <p className="email-text blue mv0">{emailData.email}</p>
+              <button
+                onClick={handleCopyEmail}
+                className="copy-button ml3"
+                aria-label="Copy email"
+              >
+                📋
+              </button>
+            </div>
+
+            <div className="flex justify-end">
+              <button
+                onClick={() => setShowEmailModal(false)}
+                className="modal-button-secondary mr3"
+              >
+                Close
+              </button>
+              <button
+                onClick={handleCopyEmail}
+                className="modal-button-primary"
+              >
+                Copy Email
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
-  </div>
-);
+  );
+};
 
 const Assignments = () => {
   const [selectedListing, setSelectedListing] = useState(null);
-  const [selectedListingDetails, setSelectedListingDetails] = useState(null);
-  const [assignments, setAssignments] = useState([]);
+  const [assignmentsList, setAssignmentsList] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 10;
+  const [filterBy, setFilterBy] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [filter, setFilter] = useState('All Assignments');
-  const [assignmentData, setAssignmentData] = useState({
-    listing: '',
-    link: ''
-  });
   const [activeListings, setActiveListings] = useState([]);
-
-  const fetchAssignments = async (page = 1) => {
+  const [replyingTo, setReplyingTo] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const fetchAssignments = async (listingId) => {
     try {
       setIsLoading(true);
-      const offset = (page - 1) * rowsPerPage;
+      const loadingToast = toast.loading('Fetching assignments...');
       
-      const response = await assignmentService.getAssignments({
-        row_data: rowsPerPage,
-        offset_data: offset
-      });
+      const assignments = await assignmentsService.getAssignments(listingId);
+      
+      setAssignmentsList(prev => ({
+        ...prev,
+        [listingId]: assignments.map(assignment => ({
+          id: assignment.id,
+          candidateName: assignment.candidate_name,
+          company: assignment.company,
+          status: assignment.status,
+          location: assignment.location,
+          experience: assignment.experience,
+          receivedDate: assignment.received_date,
+          relocation: assignment.relocation,
+          attachments: assignment.attachments || [],
+          listingNumber: assignment.listing_number,
+          candidateId: assignment.candidate_id
+        }))
+      }));
 
-      if (response) {
-        setAssignments(response);
-        setCurrentPage(page);
-      }
+      toast.update(loadingToast, {
+        render: 'Assignments fetched successfully!',
+        type: 'success',
+        isLoading: false,
+        autoClose: 3000
+      });
     } catch (error) {
-      toast.error('Failed to fetch assignments');
-      console.error('Error fetching assignments:', error);
+      toast.error(error.message || 'Failed to fetch assignments');
+      setAssignmentsList(prev => ({
+        ...prev,
+        [listingId]: []
+      }));
     } finally {
       setIsLoading(false);
     }
   };
 
-  const fetchActiveListings = async () => {
-    try {
-      const listings = await activeListingService.getActiveListings();
-      setActiveListings(listings);
-    } catch (error) {
-      toast.error('Failed to fetch active listings');
-      console.error('Error:', error);
+  const handleReviewAssignments = async (listing) => {
+    setSelectedListing(listing);
+    if (!assignmentsList[listing.id]) {
+      await fetchAssignments(listing.id);
     }
   };
 
+  const handleBack = () => {
+    setSelectedListing(null);
+  };
+
+  // Filter listings based on search term
+  const filteredListings = activeListings.filter(listing =>
+    searchTerm.trim() === '' ||
+    listing.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    listing.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    listing.id.includes(searchTerm)
+  );
+
   useEffect(() => {
     fetchActiveListings();
-    fetchAssignments();
   }, []);
 
-  const handleListingSelect = (listingId, listingDetails) => {
-    setSelectedListing(listingId);
-    setSelectedListingDetails(listingDetails);
-  };
-
-  const handlePageChange = (newPage) => {
-    fetchAssignments(newPage);
-  };
-
-  const handleStatusChange = (assignmentId, newStatus) => {
-    setAssignments(prevAssignments => 
-      prevAssignments.map(assignment => 
-        assignment.id === assignmentId 
-          ? { ...assignment, status: newStatus }
-          : assignment
-      )
-    );
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const fetchActiveListings = async () => {
     try {
-      await addAssignmentService.addAssignment(assignmentData);
-      toast.success('Assignment added successfully');
-      setAssignmentData({ listing: '', link: '' });
-      fetchAssignments(); // Refresh the list
+      setIsLoading(true);
+      const listings = await activeListingService.getActiveListings();
+      setActiveListings(listings.map(listing => ({
+        id: listing.id,
+        name: listing.projectName,
+        role: listing.listingName,
+        assignmentCount: 0 // This would typically come from a separate API
+      })));
     } catch (error) {
-      toast.error('Failed to add assignment');
-      console.error('Error:', error);
+      toast.error(error.message || 'Failed to fetch active listings');
+      setActiveListings([]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="pa4">
-      <div className="mb4">
-        <div className="flex justify-between items-center mb3">
+    <div className="assignments-container">
+      <header className="fixed-header pa4">
+        <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <h1 className="f3 fw6 mv0">Assignments Dashboard</h1>
-            <span className="ml3 f6 bg-light-blue blue br2 ph3 pv1">
-              {assignments.length} Assignments
-            </span>
+            <h1 className="f2 fw5 white mv0">Assignments</h1>
+            <div className="flex items-center ml4 gray f6">
+              <span className="mr3">
+                <span className="status-indicator-dot bg-green mr2"></span>
+                Evaluated
+              </span>
+              <span className="mr3">
+                <span className="status-indicator-dot bg-gold mr2"></span>
+                Pending
+              </span>
+            </div>
           </div>
           <div className="flex items-center">
             <select 
-              className="custom-dropdown mr3 pa2 br2 ba b--light-gray bg-white"
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
+              className="custom-dropdown mr3 pa2 bg-dark-gray white bn br2"
+              value={filterBy}
+              onChange={(e) => setFilterBy(e.target.value)}
+              aria-label="Filter assignments"
             >
-              <option>All Assignments</option>
-              <option>Evaluated</option>
-              <option>Pending</option>
+              <option value="all">All Assignments</option>
+              <option value="evaluated">Evaluated</option>
+              <option value="pending">Pending</option>
             </select>
-            
-            <input
-              type="search"
-              placeholder="Search by name..."
-              className="pa2 br2 ba b--light-gray mr3"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+            <div className="search-container relative">
+              <input
+                type="search"
+                placeholder={selectedListing ? "Search assignments..." : "Search listings..."}
+                className="search-input pa2 pr4 br2 w5"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                aria-label={selectedListing ? "Search assignments" : "Search listings"}
+              />
+            </div>
           </div>
         </div>
+      </header>
 
-        {selectedListing && selectedListingDetails && (
-          <div className="flex items-center gray mt2">
-            <span className="f4 fw5 dark-gray">{selectedListingDetails.companyName}</span>
-            <span className="mh2 f6">•</span>
-            <span className="f5 moon-gray">{selectedListingDetails.role}</span>
-            <span className="mh2 f6">•</span>
-            <span className="f5 moon-gray">#{selectedListing}</span>
-          </div>
-        )}
-      </div>
-
-      <div className="flex">
-        <div className="w-25 pr4">
-          <ActiveListings
-            selectedListing={selectedListing}
-            onListingSelect={handleListingSelect}
-            listings={activeListings}
+      <div className="scrollable-content">
+        {selectedListing ? (
+          <AssignmentCards 
+            assignments={assignmentsList[selectedListing.id] || []}
+            projectName={selectedListing.name}
+            listingId={selectedListing.id}
+            onBack={handleBack}
+            filterBy={filterBy}
+            searchTerm={searchTerm}
           />
-        </div>
-
-        <div className="w-75">
-          <StatusLegend />
-          
-          {isLoading ? (
-            <div className="loading-spinner">Loading assignments...</div>
-          ) : (
-            <div className="assignments-grid">
-              {assignments.map(assignment => (
-                <AssignmentCard 
-                  key={assignment.id}
-                  assignment={assignment}
-                  onStatusChange={handleStatusChange}
-                />
+        ) : (
+          <>
+            <h2 className="f3 fw5 white mv3 ml4">Active Listings</h2>
+            <div className="active-listings-grid">
+              {filteredListings.map(listing => (
+                <div 
+                  key={listing.id}
+                  className="listing-card pa3 mb3 br2"
+                >
+                  <div className="flex justify-between items-start mb3">
+                    <div>
+                      <div className="flex items-baseline mb2">
+                        <h3 className="f4 fw6 white mv0">{listing.name}</h3>
+                        <span className="listing-id ml2 f7 moon-gray">#{listing.id}</span>
+                      </div>
+                      <p className="f6 gray mv0">{listing.role}</p>
+                    </div>
+                    <div className="assignment-count f6 white-80 bg-dark-blue br2 pa2">
+                      {listing.assignmentCount} Assignments
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center mt3">
+                    <button className="action-btn light-blue-btn white">
+                      View Details
+                    </button>
+                    {listing.assignmentCount > 0 && (
+                      <button 
+                        className="action-btn light-green-btn white ml2"
+                        onClick={() => handleReviewAssignments(listing)}
+                      >
+                        Review Assignments
+                      </button>
+                    )}
+                  </div>
+                </div>
               ))}
+              {filteredListings.length === 0 && (
+                <div className="no-listings white-60 tc pa4">
+                  No listings found matching "{searchTerm}"
+                </div>
+              )}
             </div>
-          )}
-
-          {assignments.length === 0 && !isLoading && (
-            <div className="empty-state pa4 tc">
-              <p className="f4 gray mb3">No assignments found</p>
-            </div>
-          )}
-
-          <div className="pagination-controls">
-            <button 
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-            >
-              Previous
-            </button>
-            <span>Page {currentPage}</span>
-            <button 
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={assignments.length < rowsPerPage}
-            >
-              Next
-            </button>
-          </div>
-        </div>
+          </>
+        )}
       </div>
     </div>
   );

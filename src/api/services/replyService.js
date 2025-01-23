@@ -1,28 +1,34 @@
-import { axiosInstance } from '../config/axiosConfig';
-import { handleApiError } from '../utils/errorHandler';
+import axios from 'axios';
+import { authService } from './authService';
 
-/**
- * Service for candidate reply operations
- */
 export const replyService = {
-  /**
-   * Send reply to a candidate
-   * @param {number} listing_num - The listing number
-   * @param {Object} data - Reply data
-   * @param {number} data.candidate_id - Candidate ID
-   * @param {string} data.message - Reply message
-   * @returns {Promise<string>} Success message
-   */
-  replyToCandidate: async (listing_num, data) => {
+  replyToQuestion: async (listingId, chatId, messageId, replyText) => {
     try {
-      const response = await axiosInstance.post('/reply_candidate', {
-        listing_num,
-        candidate_id: data.candidate_id,
-        message: data.message
-      });
-      return response.data;
+      const response = await axios.post(
+        `https://api.swissmote.com/reply_question`,
+        {
+          chat_id: chatId,
+          message_id: messageId,
+          message: replyText
+        },
+        {
+          params: {
+            listing: listingId
+          },
+          headers: authService.getAuthHeaders()
+        }
+      );
+
+      if (response.data?.detail === 'No candidate found for this listing') {
+        throw new Error('No candidate found for this listing');
+      }
+
+      return {
+        success: true,
+        message: 'Reply sent successfully'
+      };
     } catch (error) {
-      throw handleApiError(error);
+      throw new Error(error.response?.data?.detail || 'Failed to send reply');
     }
   }
 }; 

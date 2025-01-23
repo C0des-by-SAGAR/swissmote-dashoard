@@ -39,26 +39,38 @@ const PostInternship = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (currentStep === 3) {
-      try {
-        await internshipService.createInternship(formData);
-        toast.success('Internship posted successfully!');
-        setFormData({
-          internshipTitle: '',
-          requiredSkills: '',
-          positions: '',
-          duration: '',
-          stipend: '',
-          workType: 'Virtual',
-          employment: 'Part-Time',
-          organization: ''
-        });
-        setCurrentStep(1);
-      } catch (error) {
-        toast.error(error.message || 'Error posting internship');
-      }
-    } else {
+    
+    if (currentStep !== 3) {
       setCurrentStep(prev => prev + 1);
+      return;
+    }
+
+    try {
+      const loadingToast = toast.loading('Posting internship...');
+      
+      await internshipService.postInternship(formData);
+      
+      toast.update(loadingToast, {
+        render: 'Internship posted successfully!',
+        type: 'success',
+        isLoading: false,
+        autoClose: 3000
+      });
+
+      setFormData({
+        internshipTitle: '',
+        requiredSkills: '',
+        positions: '',
+        duration: '',
+        stipend: '',
+        workType: 'Virtual',
+        employment: 'Part-Time',
+        organization: ''
+      });
+      
+      setCurrentStep(1);
+    } catch (error) {
+      toast.error(error.message || 'Failed to post internship. Please try again.');
     }
   };
 
@@ -266,34 +278,35 @@ const PostInternship = () => {
   );
 
   return (
-    <div className="post-job-container">
-      <div className="header-section mb4">
-        <div className="flex items-center mb3">
-          <div className="header-icon-wrapper mr3">
-            <FiBriefcase className="header-icon" />
+    <div className="post-container">
+      <div className="header">
+        <div className="header-content">
+          <div className="header-icon">
+            <FiBriefcase />
           </div>
-          <div>
-            <h1 className="f2 fw6 navy mb0">Post Internship</h1>
-            <p className="f4 gray mt2 mb0">Create an internship posting to attract talented individuals for your organization.</p>
+          <div className="header-text">
+            <h1>Post Internship</h1>
+            <p>Create an internship posting to attract talented individuals for your organization.</p>
           </div>
         </div>
-        <div className="progress-bar mt4">
+
+        <div className="progress-bar">
           <div 
-            className={`progress-step ${currentStep === 1 ? 'active' : ''}`}
+            className={`step ${currentStep === 1 ? 'active' : ''}`}
             onClick={() => handleStepClick(1)}
           >
             <span className="step-number">1</span>
             <span className="step-text">Basic Info</span>
           </div>
           <div 
-            className={`progress-step ${currentStep === 2 ? 'active' : ''}`}
+            className={`step ${currentStep === 2 ? 'active' : ''}`}
             onClick={() => handleStepClick(2)}
           >
             <span className="step-number">2</span>
             <span className="step-text">Internship Details</span>
           </div>
           <div 
-            className={`progress-step ${currentStep === 3 ? 'active' : ''}`}
+            className={`step ${currentStep === 3 ? 'active' : ''}`}
             onClick={() => handleStepClick(3)}
           >
             <span className="step-number">3</span>

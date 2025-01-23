@@ -1,14 +1,20 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FiLogOut, FiBriefcase, FiFileText, FiChevronLeft, FiChevronRight, FiChevronDown } from 'react-icons/fi';
+import { FiLogOut, FiBriefcase, FiFileText, FiChevronLeft, FiChevronRight, FiChevronDown, FiMessageCircle, FiMessageSquare } from 'react-icons/fi';
 import { MdWork, MdSchool, MdVolunteerActivism, MdAutorenew, MdCheckCircle, MdCancel } from 'react-icons/md';
 import './Sidebar.css';
-import { useNavigate } from 'react-router-dom';
-import { FiMessageCircle, FiMessageSquare } from 'react-icons/fi';
+import { useNavigate, useLocation } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 const Sidebar = ({ isExpanded, onToggle }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const sidebarRef = useRef(null);
-  const [activeItem, setActiveItem] = useState('dashboard');
+  const [activeItem, setActiveItem] = useState(() => {
+    const path = location.pathname;
+    if (path.includes('/assignments')) return 'assignments';
+    if (path.includes('/job-listings')) return 'jobListings';
+    return 'dashboard';
+  });
   const [isPostJobsOpen, setIsPostJobsOpen] = useState(false);
   const [isJobListingsOpen, setIsJobListingsOpen] = useState(false);
 
@@ -53,24 +59,7 @@ const Sidebar = ({ isExpanded, onToggle }) => {
       id: 'autoListings',
       label: 'Auto Listings',
       icon: <MdAutorenew />,
-      hasDropdown: true,
-      submenu: [
-        {
-          id: 'automatedListings',
-          label: 'Automated Listings',
-          path: '/automated-listings'
-        },
-        {
-          id: 'notAutomatedListings',
-          label: 'Not Automated Listings',
-          path: '/not-automated-listings'
-        },
-        {
-          id: 'expiredListings',
-          label: 'Expired Listings',
-          path: '/expired-listings'
-        }
-      ]
+      path: '/auto-listings'
     },
     {
       id: 'activeListings',
@@ -90,7 +79,8 @@ const Sidebar = ({ isExpanded, onToggle }) => {
     {
       id: 'postJobs',
       label: 'Jobs & Internships',
-      icon: <FiBriefcase />
+      icon: <FiBriefcase />,
+      hasDropdown: true
     },
     {
       id: 'jobListings',
@@ -112,46 +102,69 @@ const Sidebar = ({ isExpanded, onToggle }) => {
     }
   ];
 
-  const handlePostJobsClick = (e) => {
+  const handleToggleClick = (e) => {
     e.stopPropagation();
-    if (!isExpanded) {
-      onToggle();
-    }
-    setIsPostJobsOpen(!isPostJobsOpen);
+    onToggle();
   };
 
-  const handleJobListingsClick = (e) => {
+  const handleItemClick = (e, itemId, path, hasDropdown) => {
     e.stopPropagation();
-    if (!isExpanded) {
-      onToggle();
-    }
-    setIsJobListingsOpen(!isJobListingsOpen);
-  };
-
-  const handleItemClick = (itemId, path) => {
     setActiveItem(itemId);
-    if (path) {
-      navigate(path);
-      if (isExpanded) {
+    
+    if (hasDropdown) {
+      if (!isExpanded) {
         onToggle();
       }
+      
+      if (itemId === 'postJobs') {
+        setIsPostJobsOpen(true);
+        setIsJobListingsOpen(false);
+      } else if (itemId === 'jobListings') {
+        setIsJobListingsOpen(true);
+        setIsPostJobsOpen(false);
+      }
+    } else if (path) {
+      navigate(path);
     }
   };
 
-  const handleSubmenuItemClick = (itemId, path) => {
-    setActiveItem(itemId);
-    if (path) {
-      navigate(path);
-    }
-    onToggle(); // Collapse sidebar after selection
-    setIsPostJobsOpen(false);
-    setIsJobListingsOpen(false);
+  const renderMenuItem = (item) => {
+    const isDropdown = item.hasDropdown && isExpanded;
+    
+    return (
+      <div 
+        key={item.id}
+        className={`nav-item ${activeItem === item.id ? 'active' : ''}`}
+        onClick={(e) => handleItemClick(e, item.id, item.path, isDropdown)}
+        role="button"
+        tabIndex={0}
+      >
+        <div className="item-content">
+          <span className="item-icon">{item.icon}</span>
+          <span className="item-label">
+            {item.label}
+          </span>
+        </div>
+        {isDropdown && (
+          <FiChevronDown 
+            className={`dropdown-icon ${
+              (item.id === 'postJobs' && isPostJobsOpen) ||
+              (item.id === 'jobListings' && isJobListingsOpen)
+                ? 'rotated'
+                : ''
+            }`}
+          />
+        )}
+      </div>
+    );
   };
 
   return (
     <aside 
       ref={sidebarRef} 
       className={`sidebar ${isExpanded ? 'expanded' : 'collapsed'}`}
+      role="navigation"
+      aria-label="Main navigation"
     >
       {/* Brand Header */}
       <div className="sidebar-header">
@@ -160,19 +173,13 @@ const Sidebar = ({ isExpanded, onToggle }) => {
           onClick={() => navigate('/')}
           role="button"
           tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              navigate('/');
-            }
-          }}
-          style={{ outline: 'none' }}
         >
           <span className="brand-icon">SM</span>
           {isExpanded && <span className="brand-text ml2">Swissmote</span>}
         </div>
         <button 
           className="toggle-button"
-          onClick={onToggle}
+          onClick={handleToggleClick}
           aria-label={isExpanded ? 'Collapse sidebar' : 'Expand sidebar'}
         >
           {isExpanded ? <FiChevronLeft /> : <FiChevronRight />}
@@ -181,150 +188,57 @@ const Sidebar = ({ isExpanded, onToggle }) => {
 
       {/* Navigation Items */}
       <nav className="sidebar-nav">
-        {/* Jobs & Internships Dropdown */}
-        <div 
-          className={`nav-item ${activeItem === 'postJobs' ? 'active' : ''} ${!isExpanded ? 'collapsed-item' : 'expanded-item'}`}
-          onClick={handlePostJobsClick}
-        >
-          <span className="item-icon"><FiBriefcase /></span>
-          <span className={`item-label ${!isExpanded ? 'collapsed-label' : ''}`}>
-            Jobs & Internships
-          </span>
-          {isExpanded && (
-            <FiChevronDown className={`dropdown-icon ${isPostJobsOpen ? 'rotated' : ''}`} />
-          )}
-        </div>
-
-        {/* Jobs & Internships Submenu */}
-        {isExpanded && isPostJobsOpen && (
-          <div className="submenu">
-            {postJobsSubmenu.map((item) => (
-              <div 
-                key={item.id}
-                className={`nav-item submenu-item ${activeItem === item.id ? 'active' : ''}`}
-                onClick={() => handleSubmenuItemClick(item.id, item.path)}
-              >
-                <span className="item-icon">{item.icon}</span>
-                <span className="item-label">{item.label}</span>
+        {menuItems.map((item) => (
+          <React.Fragment key={item.id}>
+            {renderMenuItem(item)}
+            {isExpanded && item.id === 'postJobs' && isPostJobsOpen && (
+              <div className="submenu">
+                {postJobsSubmenu.map((subItem) => renderMenuItem(subItem))}
               </div>
-            ))}
-          </div>
-        )}
-
-        {/* Job Listings Dropdown */}
-        <div 
-          className={`nav-item ${activeItem === 'jobListings' ? 'active' : ''} ${!isExpanded ? 'collapsed-item' : 'expanded-item'}`}
-          onClick={handleJobListingsClick}
-        >
-          <span className="item-icon"><FiFileText /></span>
-          <span className={`item-label ${!isExpanded ? 'collapsed-label' : ''}`}>
-            Job & Internship Listings
-          </span>
-          {isExpanded && (
-            <FiChevronDown className={`dropdown-icon ${isJobListingsOpen ? 'rotated' : ''}`} />
-          )}
-        </div>
-
-        {/* Job Listings Submenu */}
-        {isExpanded && isJobListingsOpen && (
-          <div className="submenu">
-            {/* Auto Listings with its nested submenu */}
-            <div>
-              <div 
-                className={`nav-item submenu-item ${activeItem === 'autoListings' ? 'active' : ''}`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setActiveItem(activeItem === 'autoListings' ? '' : 'autoListings');
-                }}
-              >
-                <span className="item-icon"><MdAutorenew /></span>
-                <span className="item-label">Auto Listings</span>
-                <FiChevronDown className={`dropdown-icon ${activeItem === 'autoListings' ? 'rotated' : ''}`} />
+            )}
+            {isExpanded && item.id === 'jobListings' && isJobListingsOpen && (
+              <div className="submenu">
+                {jobListingsSubmenu.map((subItem) => renderMenuItem(subItem))}
               </div>
-              
-              {/* Nested submenu for Auto Listings */}
-              {activeItem === 'autoListings' && (
-                <div className="nested-submenu">
-                  {jobListingsSubmenu[0].submenu.map((subItem) => (
-                    <div 
-                      key={subItem.id}
-                      className={`nested-submenu-item ${activeItem === subItem.id ? 'active' : ''}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleSubmenuItemClick(subItem.id, subItem.path);
-                      }}
-                    >
-                      <span className="item-label">{subItem.label}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Other Job Listings menu items */}
-            {jobListingsSubmenu.slice(1).map((item) => (
-              <div 
-                key={item.id}
-                className={`nav-item submenu-item ${activeItem === item.id ? 'active' : ''}`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleSubmenuItemClick(item.id, item.path);
-                }}
-              >
-                <span className="item-icon">{item.icon}</span>
-                <span className="item-label">{item.label}</span>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Render remaining menu items */}
-        {menuItems.slice(2).map((item) => (
-          <div 
-            key={item.id}
-            className={`nav-item ${activeItem === item.id ? 'active' : ''} ${!isExpanded ? 'collapsed-item' : 'expanded-item'}`}
-            onClick={() => handleItemClick(item.id, item.path)}
-          >
-            <span className="item-icon">{item.icon}</span>
-            <span className={`item-label ${!isExpanded ? 'collapsed-label' : ''}`}>
-              {item.label}
-            </span>
-          </div>
+            )}
+          </React.Fragment>
         ))}
       </nav>
 
       {/* Footer/Logout */}
       <div className="sidebar-footer">
-        {/* Commented out Feedback menu */}
-        {/*
         <div 
-          className={`logout-button ${!isExpanded ? 'collapsed-item' : ''}`}
-          onClick={() => {
+          className="logout-button"
+          onClick={(e) => {
+            e.stopPropagation();
             navigate('/feedback');
-            onToggle();
           }}
+          role="button"
+          tabIndex={0}
         >
           <FiMessageSquare />
-          <span className={`${!isExpanded ? 'collapsed-label' : ''}`}>
-            Feed back
-          </span>
+          <span>Feedback</span>
         </div>
-        */}
         <div 
-          className={`logout-button ${!isExpanded ? 'collapsed-item' : ''}`}
-          onClick={() => {
+          className="logout-button"
+          onClick={(e) => {
+            e.stopPropagation();
             console.log('Logout clicked');
-            onToggle();
           }}
+          role="button"
+          tabIndex={0}
         >
           <FiLogOut />
-          <span className={`${!isExpanded ? 'collapsed-label' : ''}`}>
-            Logout
-          </span>
+          <span>Logout</span>
         </div>
       </div>
     </aside>
   );
+};
+
+Sidebar.propTypes = {
+  isExpanded: PropTypes.bool.isRequired,
+  onToggle: PropTypes.func.isRequired
 };
 
 export default Sidebar;

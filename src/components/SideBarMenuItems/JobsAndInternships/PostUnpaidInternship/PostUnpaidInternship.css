@@ -1,28 +1,235 @@
-/* Extend the existing PostJobs.css styles */
-.post-internship-container {
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgba(26, 54, 93, 0.1), 0 2px 4px -1px rgba(26, 54, 93, 0.06);
-  max-width: 1200px;
-  margin: 2rem auto;
+@import '../PostJobs/PostJobs.css';
+
+.post-container {
   padding: 2rem;
+  color: #fff;
+  background-color: #1a1f2e;
+  min-height: 100vh;
 }
 
-.important-note {
-  background-color: #ebf8ff;  /* Light blue background */
-  border: 1px solid #1a365d;  /* Dark blue border */
-  border-radius: 8px;
-  padding: 1.5rem;
+/* Header Section */
+.header {
+  margin-bottom: 3rem;
 }
 
-.important-note h3 {
-  color: #1a365d;  /* Dark blue */
-  margin-top: 0;
+.header-content {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 2.5rem;
 }
 
-.important-note p {
-  color: #2d3748;  /* Dark gray */
-  line-height: 1.5;
+.header-icon {
+  width: 3.5rem;
+  height: 3.5rem;
+  background-color: #2a2f3e;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  margin-right: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.header-icon svg {
+  width: 1.75rem;
+  height: 1.75rem;
+  color: #60a5fa;
+}
+
+.header-text h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.header-text p {
+  margin: 0.5rem 0 0;
+  color: #8b8fa3;
+  font-size: 1.125rem;
+}
+
+/* Progress Bar */
+.progress-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  padding: 0 1rem;
+}
+
+.progress-bar::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #3a3f4e;
+  z-index: 1;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+  cursor: pointer;
+}
+
+.step-number {
+  width: 2rem;
+  height: 2rem;
+  background-color: #2a2f3e;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  margin-bottom: 0.5rem;
+  border: 2px solid #3a3f4e;
+}
+
+.step.active .step-number {
+  background-color: #60a5fa;
+  border-color: #60a5fa;
+}
+
+.step-text {
+  color: #8b8fa3;
+  font-size: 0.875rem;
+}
+
+.step.active .step-text {
+  color: #60a5fa;
+}
+
+/* Form Section */
+.form-section {
+  background-color: #2a2f3e;
+  padding: 2rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  color: #60a5fa;
+  font-size: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.field-group {
+  margin-bottom: 1.5rem;
+}
+
+.field-label {
+  display: flex;
+  align-items: center;
+  color: #fff;
+  margin-bottom: 0.5rem;
+}
+
+.field-icon {
+  color: #60a5fa;
+  margin-right: 0.5rem;
+  font-size: 1.25rem;
+}
+
+.required {
+  color: #ef4444;
+  margin-left: 0.25rem;
+}
+
+.form-input,
+.form-select {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #1a1f2e;
+  border: 1px solid #3a3f4e;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.form-input.disabled {
+  background-color: #1a1f2e;
+  color: #8b8fa3;
+  cursor: not-allowed;
+}
+
+.field-hint {
+  color: #8b8fa3;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.btn-primary,
+.btn-secondary {
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background-color: #60a5fa;
+  color: #fff;
+  border: none;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: #fff;
+  border: 1px solid #3a3f4e;
+}
+
+/* Disabled input for organization */
+.modern-input.disabled {
+  background-color: #1a1f2e;
+  color: #8b8fa3;
+  cursor: not-allowed;
+  border: 1px solid #3a3f4e;
 }
 
 /* Inherit all other styles from PostJobs.css */
+
+/* Important Note styles */
+.important-note {
+  background-color: rgba(96, 165, 250, 0.1); /* Light blue with low opacity */
+  border: 1px solid #60a5fa; /* Light blue border */
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.important-note h3 {
+  color: #60a5fa; /* Light blue text */
+  font-size: 1.125rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.note-icon {
+  color: #60a5fa;
+  margin-right: 0.5rem;
+  font-size: 1.25rem;
+}
+
+.important-note p {
+  color: #8b8fa3; /* Light gray text */
+  margin: 0;
+  line-height: 1.5;
+  font-size: 0.875rem;
+}

@@ -104,3 +104,63 @@ CSS3:
 - Ensure proper test coverage
 @docs https://react.dev/blog/2022/03/29/react-v18
 @docs https://tachyons.io/docs/
+
+### BACKEND Implementation Rules
+
+1. # LAYOUT AND DESIGN PRESERVATION
+   - No modifications to existing frontend code
+   - Strictly focus on backend and API implementation
+
+2. # ENDPOINT SCOPE
+   - ONLY implement endpoints explicitly provided
+   - No creation of additional endpoints without specific request
+   - Strictly adhere to given specification
+
+3. # API IMPLEMENTATION APPROACH
+   - Step-by-step implementation
+   - Provide comprehensive API endpoint documentation first
+   - Implement backend code following the documented explanation
+
+4. # CODE QUALITY AND BEST PRACTICES
+   - Implement robust error handling
+   - Use consistent naming conventions
+   - Follow SOLID principles
+   - Implement input validation
+   - Create comprehensive logging
+   - Ensure security best practices
+
+5. # PERFORMANCE CONSIDERATIONS
+   - Optimize database queries
+   - Implement caching strategies
+   - Design scalable architecture
+   - Minimize response times
+   - Use efficient data serialization
+
+6. # TESTING AND RELIABILITY
+   - Develop comprehensive unit and integration tests
+   - Implement error tracking
+   - Create meaningful error messages
+   - Ensure graceful degradation
+   - Implement retry mechanisms for service calls
+
+7. # SECURITY IMPLEMENTATION
+   - Implement authentication and authorization
+   - Use secure password hashing
+   - Protect against common vulnerabilities
+   - Implement rate limiting
+   - Use environment-based configuration
+
+8. # DOCUMENTATION AND MAINTAINABILITY
+   - Maintain clear API documentation
+   - Comment complex logic
+   - Create consistent response structures
+   - Document endpoint behaviors and error cases
+
+9. # DEVELOPMENT WORKFLOW
+   - Maintain code integrity
+   - Prevent frontend code loss
+   - Careful, methodical backend integration
+
+10. # CONVERSATION TRACKING
+    - Treat this conversation as a critical reference
+    - Maintain context across implementation stages

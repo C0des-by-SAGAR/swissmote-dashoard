@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
 import { 
   FiBriefcase, 
-  FiUsers, 
-  FiClock,
-  FiMonitor,
-  FiAward,
-  FiCode
+  FiUsers
 } from 'react-icons/fi';
 import { BiBuilding, BiRupee } from 'react-icons/bi';
 import './PostJobs.css';
@@ -41,27 +37,39 @@ const PostJobs = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (currentStep === 3) {
-      try {
-        await jobService.createJob(formData);
-        toast.success('Job posted successfully!');
-        setFormData({
-          jobTitle: '',
-          requiredSkills: '',
-          positions: '',
-          minExperience: '',
-          minSalary: '',
-          maxSalary: '',
-          workType: 'Virtual',
-          employment: 'Full-Time',
-          organization: ''
-        });
-        setCurrentStep(1);
-      } catch (error) {
-        toast.error(error.message || 'Error posting job');
-      }
-    } else {
+    
+    if (currentStep !== 3) {
       setCurrentStep(prev => prev + 1);
+      return;
+    }
+
+    try {
+      const loadingToast = toast.loading('Posting job...');
+      
+      await jobService.postJob(formData);
+      
+      toast.update(loadingToast, {
+        render: 'Job posted successfully!',
+        type: 'success',
+        isLoading: false,
+        autoClose: 3000
+      });
+
+      setFormData({
+        jobTitle: '',
+        requiredSkills: '',
+        positions: '',
+        minExperience: '',
+        minSalary: '',
+        maxSalary: '',
+        workType: 'Virtual',
+        employment: 'Full-Time',
+        organization: ''
+      });
+      
+      setCurrentStep(1);
+    } catch (error) {
+      toast.error(error.message || 'Failed to post job. Please try again.');
     }
   };
 
@@ -70,15 +78,11 @@ const PostJobs = () => {
   };
 
   const renderBasicInfo = () => (
-    <div className="form-section-card mb4">
-      <div className="section-header">
-        <h2 className="f3 fw6 mb3">Basic Information</h2>
-        <div className="section-divider"></div>
-      </div>
+    <div className="form-section">
+      <h2 className="section-title">Basic Information</h2>
       
-      <div className="field-group mb4">
+      <div className="field-group">
         <label className="field-label">
-          <FiBriefcase className="field-icon" />
           Job Title<span className="required">*</span>
         </label>
         <input
@@ -87,14 +91,13 @@ const PostJobs = () => {
           value={formData.jobTitle}
           onChange={handleInputChange}
           placeholder="e.g., Senior Software Engineer"
-          className="modern-input"
+          className="form-input"
           required
         />
       </div>
 
-      <div className="field-group mb4">
+      <div className="field-group">
         <label className="field-label">
-          <FiCode className="field-icon" />
           Required Skills<span className="required">*</span>
         </label>
         <input
@@ -103,39 +106,33 @@ const PostJobs = () => {
           value={formData.requiredSkills}
           onChange={handleInputChange}
           placeholder="e.g., React, Node.js, TypeScript"
-          className="modern-input"
+          className="form-input"
           required
         />
         <small className="field-hint">Separate skills with commas</small>
       </div>
 
-      <div className="flex flex-wrap">
-        <div className="w-50-l w-100 pr3-l mb3">
-          <label className="field-label">
-            <FiMonitor className="field-icon" />
-            Work Type
-          </label>
+      <div className="flex-row">
+        <div className="field-group half-width">
+          <label className="field-label">Work Type</label>
           <select
             name="workType"
             value={formData.workType}
             onChange={handleInputChange}
-            className="modern-select"
+            className="form-select"
           >
             <option value="Virtual">Virtual</option>
-            <option value="Hybrid">On-Site</option>
+            <option value="On-Site">On-Site</option>
           </select>
         </div>
 
-        <div className="w-50-l w-100 mb3">
-          <label className="field-label">
-            <FiClock className="field-icon" />
-            Employment
-          </label>
+        <div className="field-group half-width">
+          <label className="field-label">Employment</label>
           <select
             name="employment"
             value={formData.employment}
             onChange={handleInputChange}
-            className="modern-select"
+            className="form-select"
           >
             <option value="Full-Time">Full-Time</option>
             <option value="Part-Time">Part-Time</option>
@@ -153,10 +150,10 @@ const PostJobs = () => {
       </div>
       
       <div className="flex flex-wrap">
-        <div className="w-third-l w-100 pr3-l mb4">
+        <div className="w-50-l w-100 pr3-l mb4">
           <label className="field-label">
             <FiUsers className="field-icon" />
-            Positions
+            Positions<span className="required">*</span>
           </label>
           <input
             type="number"
@@ -166,12 +163,13 @@ const PostJobs = () => {
             placeholder="e.g., 5"
             className="modern-input"
             min="1"
+            required
           />
         </div>
 
-        <div className="w-third-l w-100 pr3-l mb4">
+        <div className="w-50-l w-100 mb4">
           <label className="field-label">
-            <FiAward className="field-icon" />
+            <FiBriefcase className="field-icon" />
             Min. Experience
           </label>
           <input
@@ -186,7 +184,7 @@ const PostJobs = () => {
       </div>
 
       <div className="flex flex-wrap">
-        <div className="w-third-l w-100 pr3-l mb4">
+        <div className="w-50-l w-100 pr3-l mb4">
           <label className="field-label">
             <BiRupee className="field-icon" />
             Min. Salary<span className="required">*</span>
@@ -202,7 +200,7 @@ const PostJobs = () => {
           />
         </div>
 
-        <div className="w-third-l w-100 mb4">
+        <div className="w-50-l w-100 mb4">
           <label className="field-label">
             <BiRupee className="field-icon" />
             Max. Salary
@@ -246,18 +244,18 @@ const PostJobs = () => {
       </div>
       
       <div className="review-content">
-        <div className="review-section mb4">
+        <div className="review-section">
           <h3 className="f4 fw6 mb3">Basic Information</h3>
-          <div className="review-item mb2">
+          <div className="review-item">
             <span className="fw6">Job Title:</span> {formData.jobTitle}
           </div>
-          <div className="review-item mb2">
+          <div className="review-item">
             <span className="fw6">Required Skills:</span> {formData.requiredSkills}
           </div>
-          <div className="review-item mb2">
+          <div className="review-item">
             <span className="fw6">Work Type:</span> {formData.workType}
           </div>
-          <div className="review-item mb2">
+          <div className="review-item">
             <span className="fw6">Employment:</span> {formData.employment}
           </div>
         </div>
@@ -268,13 +266,13 @@ const PostJobs = () => {
             <span className="fw6">Positions:</span> {formData.positions}
           </div>
           <div className="review-item mb2">
-            <span className="fw6">Experience Required:</span> {formData.minExperience} Years
+            <span className="fw6">Min. Experience:</span> {formData.minExperience} Years
           </div>
           <div className="review-item mb2">
             <span className="fw6">Salary Range:</span> ₹{formData.minSalary} - ₹{formData.maxSalary}
           </div>
           <div className="review-item mb2">
-            <span className="fw6">Organization:</span> {organizationMap[formData.organization] || formData.organization}
+            <span className="fw6">Organization:</span> {organizationMap[formData.organization]}
           </div>
         </div>
       </div>
@@ -282,34 +280,35 @@ const PostJobs = () => {
   );
 
   return (
-    <div className="post-job-container">
-      <div className="header-section mb4">
-        <div className="flex items-center mb3">
-          <div className="header-icon-wrapper mr3">
-            <FiBriefcase className="header-icon" />
+    <div className="post-container">
+      <div className="header">
+        <div className="header-content">
+          <div className="header-icon">
+            <FiBriefcase />
           </div>
-          <div>
-            <h1 className="f2 fw6 navy mb0">Post Job</h1>
-            <p className="f4 gray mt2 mb0">Create a professional job posting to attract the best talent.</p>
+          <div className="header-text">
+            <h1>Post Job</h1>
+            <p>Create a job posting to attract talented individuals for your organization.</p>
           </div>
         </div>
-        <div className="progress-bar mt4">
+
+        <div className="progress-bar">
           <div 
-            className={`progress-step ${currentStep === 1 ? 'active' : ''}`}
+            className={`step ${currentStep === 1 ? 'active' : ''}`}
             onClick={() => handleStepClick(1)}
           >
             <span className="step-number">1</span>
             <span className="step-text">Basic Info</span>
           </div>
           <div 
-            className={`progress-step ${currentStep === 2 ? 'active' : ''}`}
+            className={`step ${currentStep === 2 ? 'active' : ''}`}
             onClick={() => handleStepClick(2)}
           >
             <span className="step-number">2</span>
             <span className="step-text">Job Details</span>
           </div>
           <div 
-            className={`progress-step ${currentStep === 3 ? 'active' : ''}`}
+            className={`step ${currentStep === 3 ? 'active' : ''}`}
             onClick={() => handleStepClick(3)}
           >
             <span className="step-number">3</span>
@@ -323,19 +322,19 @@ const PostJobs = () => {
         {currentStep === 2 && renderJobDetails()}
         {currentStep === 3 && renderReview()}
 
-        <div className="form-actions flex justify-end mt4">
+        <div className="form-actions">
           {currentStep > 1 && (
             <button
               type="button"
               onClick={() => setCurrentStep(prev => prev - 1)}
-              className="reset-button mr3"
+              className="btn-secondary"
             >
               Previous
             </button>
           )}
           <button
             type="submit"
-            className="submit-button"
+            className="btn-primary"
           >
             {currentStep === 3 ? 'Post Job' : 'Next'}
           </button>

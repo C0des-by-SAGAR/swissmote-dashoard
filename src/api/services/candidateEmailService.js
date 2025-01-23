@@ -1,28 +1,42 @@
-import { axiosInstance } from '../config/axiosConfig';
-import { handleApiError } from '../utils/errorHandler';
+import axios from 'axios';
+import { authService } from './authService';
 
-/**
- * Service for candidate email operations
- */
 export const candidateEmailService = {
-  /**
-   * Get candidate email
-   * @param {Object} params Request parameters
-   * @param {number} params.applicant_id - The applicant ID
-   * @param {string} params.org - Organization (pv or sa)
-   * @returns {Promise<string>} Email response
-   */
-  getCandidateEmail: async (params) => {
+  getCandidateEmail: async (applicantId, organization) => {
     try {
-      const response = await axiosInstance.get('/candidate_email', {
-        params: {
-          applicant_id: params.applicant_id,
-          org: params.org
+      const response = await axios.get(
+        `https://api.swissmote.com/candidate_email`,
+        {
+          params: {
+            applicant_id: applicantId,
+            org: organization
+          },
+          headers: authService.getAuthHeaders()
         }
-      });
+      );
+
+      if (response.status === 404) {
+        throw new Error('Email not found');
+      }
+
+      if (response.status === 422) {
+        throw new Error('Invalid applicant ID or organization');
+      }
+
       return response.data;
     } catch (error) {
-      throw handleApiError(error);
+      if (error.response?.status === 404) {
+        throw new Error('Email not found for this candidate');
+      }
+      if (error.response?.status === 422) {
+        throw new Error('Invalid applicant ID or organization');
+      }
+      throw new Error(error.response?.data?.message || 'Failed to fetch candidate email');
     }
+  },
+
+  // Helper method to validate organization
+  isValidOrg: (org) => {
+    return ['pv', 'sa'].includes(org.toLowerCase());
   }
 }; 
