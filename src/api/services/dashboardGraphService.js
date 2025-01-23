@@ -6,28 +6,47 @@ export const dashboardGraphService = {
   getDashboardGraphData: async () => {
     try {
       // Fetch all required data in parallel
-      const [activeListings, closedListings] = await Promise.all([
+      const [
+        activeListings, 
+        closedListings,
+        saJobListings,
+        saInternListings,
+        pvJobListings,
+        pvInternListings
+      ] = await Promise.all([
         activeListingService.getActiveListings(),
-        closedListingService.getClosedListings()
+        closedListingService.getClosedListings(),
+        autoListingsService.getSAJobListings(),
+        autoListingsService.getSAInternshipListings(),
+        autoListingsService.getPVJobListings(),
+        autoListingsService.getPVInternshipListings()
       ]);
 
-      // Calculate Follow-up Status
+      // Combine all auto listings
+      const autoListings = [
+        ...saJobListings,
+        ...saInternListings,
+        ...pvJobListings,
+        ...pvInternListings
+      ];
+
+      // Calculate Follow-up Status from auto listings
       const followUpData = [
         {
           name: 'Day 2 Sent',
-          value: activeListings.filter(listing => listing.followup2?.sent).length
+          value: autoListings.filter(listing => listing.followup2?.sent).length
         },
         {
           name: 'Day 2 Pending',
-          value: activeListings.filter(listing => !listing.followup2?.sent).length
+          value: autoListings.filter(listing => !listing.followup2?.sent).length
         },
         {
           name: 'Day 4 Sent',
-          value: activeListings.filter(listing => listing.followup4?.sent).length
+          value: autoListings.filter(listing => listing.followup4?.sent).length
         },
         {
           name: 'Day 4 Pending',
-          value: activeListings.filter(listing => !listing.followup4?.sent).length
+          value: autoListings.filter(listing => !listing.followup4?.sent).length
         }
       ];
 

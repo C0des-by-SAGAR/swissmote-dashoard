@@ -40,8 +40,8 @@ const Header = ({
             aria-label="Select account"
           >
             <option value="All">All Accounts</option>
-            <option value="Persist Ventures">Persist Ventures</option>
-            <option value="Systemic Altruism">Systemic Altruism</option>
+            <option value="pv">Persist Ventures</option>
+            <option value="sa">Systemic Altruism</option>
           </select>
         </div>
 
