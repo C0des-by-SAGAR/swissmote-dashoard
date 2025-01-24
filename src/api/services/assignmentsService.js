@@ -34,6 +34,6 @@ export const assignmentsService = {
   // Helper method for pagination
   getAssignmentsPage: async (listingId, page = 1, itemsPerPage = 10) => {
     const offset = (page - 1) * itemsPerPage;
-    return assignmentsService.getAssignments(listingId, 'db', itemsPerPage, offset);
+    return assignmentsService.getAssignments(listingId, 'itn', itemsPerPage, offset);
   }
 }; 
