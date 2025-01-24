@@ -6,7 +6,7 @@ export const questionsService = {
   getQuestions: async (listingId, offset = 0, limit = 1) => {
     try {
       const response = await axios.get(
-        `https://api.swissmote.com/getQuestions?listing=${listingId}&offset=${offset}&limit=${limit}`,
+        `https://api.swissmote.com/getQuestions?listing=${listingId}&offset=0&limit=1`,
         {
           headers: authService.getAuthHeaders()
         }
