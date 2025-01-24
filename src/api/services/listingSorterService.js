@@ -20,26 +20,40 @@ export const listingSorterService = {
           const expiryDate = new Date(listing.expiry_date);
           const processedListing = {
             ...listing,
-            // Format data for AutomatedListings component
-            listingName: listing.title || 'Untitled',
-            organization: listing.company || 'Unknown',
-            projectName: listing.project || '',
-            date: new Date(listing.created_at).toLocaleDateString(),
-            postedOver: listing.posted_days || '0 days',
-            conversionRate: listing.conversion_rate || 0,
-            assignmentsReceived: listing.assignments_received || 0,
-            assignmentsSent: listing.assignments_sent || 0,
-            newApplicants: listing.new_applicants || 0,
-            totalApplications: listing.total_applications || 0,
+            // Match the data structure shown in the screenshot
+            listingName: listing.listing_name || 'Untitled',
+            listingNumber: listing.listing_number || '',
+            organisation: listing.organisation || 'Unknown',
+            postedOver: `${listing.posted_over || 0} days`,
+            conversionRate: `${listing.conversion_rate || 0}%`,
+            assignments: {
+              received: listing.assignments_received || '0/0',
+              sent: listing.assignments_sent || '0/0'
+            },
+            applications: {
+              new: listing.new_applications || 0,
+              total: listing.total_applications || 0
+            },
             assignmentLinks: listing.assignment_links || [],
             reviewLinks: listing.review_links || [],
-            introMessage: listing.intro_message || '',
-            assignmentMessage: listing.assignment_message || '',
-            day2Followup: listing.followup_2?.message || '',
-            day2Status: listing.followup_2?.sent ? 'Completed' : 'Pending',
-            day4Followup: listing.followup_4?.message || '',
-            day4Status: listing.followup_4?.sent ? 'Completed' : 'Pending',
-            expiryDate: expiryDate.toLocaleDateString(),
+            messages: {
+              intro: listing.intro_message || '',
+              assignment: listing.assignment_message || '',
+              followup: {
+                day2: {
+                  message: listing.day_2_followup || '',
+                  status: listing.day_2_status || 'Pending'
+                },
+                day4: {
+                  message: listing.day_4_followup || '',
+                  status: listing.day_4_status || 'Pending'
+                }
+              }
+            },
+            dates: {
+              expiry: expiryDate.toLocaleDateString(),
+              created: new Date(listing.created_at).toLocaleDateString()
+            },
             createdBy: listing.created_by || 'Unknown',
             automatedBy: listing.automated_by || 'Unknown',
             isExpired: expiryDate < currentDate
@@ -59,11 +73,10 @@ export const listingSorterService = {
           const expiryDate = new Date(listing.expiry_date);
           const processedListing = {
             ...listing,
-            // Format data for NotAutomatedListings component
-            listingName: listing.title || 'Untitled',
-            listingNumber: listing.id || '',
-            organisation: listing.company || 'Unknown',
-            employmentType: listing.type || 'Unknown',
+            listingName: listing.listing_name || 'Untitled',
+            listingNumber: listing.listing_number || '',
+            organisation: listing.organisation || 'Unknown',
+            employmentType: listing.employment_type || 'Unknown',
             expiryDate: expiryDate.toLocaleDateString(),
             createdBy: listing.created_by || 'Unknown',
             isExpired: expiryDate < currentDate
