@@ -672,7 +672,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.75);
+  background-color: rgba(0, 0, 0, 0.85);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -680,24 +680,22 @@
 }
 
 .modal-content {
-  background: #1e2837;
-  border-radius: 12px;
+  background: #1a1a1a;
   width: 100%;
-  max-width: 500px;
-  padding: 24px;
+  max-width: 600px;
+  padding: 32px;
   position: relative;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 32px;
 }
 
 .modal-header h2 {
-  font-size: 24px;
+  font-size: 32px;
   color: #ffffff;
   margin: 0;
   font-weight: 600;
@@ -706,173 +704,77 @@
 .close-button {
   background: none;
   border: none;
-  color: #94a3b8;
+  color: #ffffff;
   cursor: pointer;
   padding: 8px;
-  border-radius: 6px;
-  transition: all 0.2s;
+  font-size: 24px;
 }
 
-.close-button:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-}
-
-.modal-body {
-  margin-bottom: 24px;
-}
-
-.announcement-input {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  background: rgba(0, 0, 0, 0.2);
-  color: #ffffff;
+.input-label {
+  display: block;
   font-size: 16px;
-  resize: vertical;
-  min-height: 120px;
-  font-family: inherit;
+  color: #94a3b8;
+  margin-bottom: 12px;
+}
+
+.modal-input {
+  width: 100%;
+  padding: 16px;
+  background: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  margin-bottom: 32px;
   box-sizing: border-box;
 }
 
-.announcement-input:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-}
-
-.announcement-input::placeholder {
+.modal-input::placeholder {
   color: #94a3b8;
 }
 
 .modal-footer {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
+  gap: 16px;
+  margin-top: 32px;
 }
 
 .cancel-button,
 .submit-button {
-  padding: 10px 20px;
+  padding: 12px 24px;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
+  border: none;
 }
 
 .cancel-button {
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
+  background: #27272a;
   color: #ffffff;
 }
 
 .submit-button {
   background: #3b82f6;
-  border: none;
-  color: white;
+  color: #ffffff;
 }
 
 .cancel-button:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: #3f3f46;
 }
 
 .submit-button:hover {
   background: #2563eb;
 }
 
-/* Add disabled state styles */
-.submit-button:disabled {
-  background: #64748b;
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
-.input-label {
-  display: block;
-  font-size: 16px;
-  font-weight: 500;
-  color: #374151;
-  margin-bottom: 8px;
-}
-
-.review-input {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  font-size: 16px;
-  margin-bottom: 24px;
-  box-sizing: border-box;
-}
-
-.review-input:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
-}
-
-.review-input::placeholder {
-  color: #9ca3af;
-}
-
-.input-group {
-  margin-bottom: 24px;
-}
-
-.input-group:last-child {
-  margin-bottom: 0;
-}
-
-.followup-input {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  font-size: 16px;
-  resize: vertical;
-  min-height: 100px;
-  font-family: inherit;
-  box-sizing: border-box;
-}
-
-.followup-input:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
-}
-
-.update-message {
-  background: #3b82f6;
-}
-
-.update-message:hover {
-  background: #2563eb;
-}
-
-.card-actions {
-  display: flex;
-  gap: 8px;
-  padding: 16px;
-  flex-wrap: wrap;
-}
-
-.action-button {
-  padding: 8px 16px;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  background-color: #3b82f6;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  flex: 1;
-  min-width: fit-content;
-}
-
-.action-button:hover {
-  background-color: #3b82f6;
-}
-
-.action-button:active {
-  background-color: #3b82f6;
+/* Add a divider line after the header */
+.modal-header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 80px; /* Adjust based on your header height */
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
 }
