@@ -29,16 +29,31 @@ const AutoListings = () => {
   const fetchListings = async () => {
     try {
       setIsLoading(true);
-      console.log('Fetching with filters:', filters);
       const response = await autoListingsService.getAutoListings(
         filters.emp_type,
         filters.account
       );
-      console.log('API Response:', response);
+
+      // Process listings and categorize them
+      const currentDate = new Date();
+      const processedListings = {
+        automated: response.automated.map(listing => ({
+          ...listing,
+          isExpired: new Date(listing.expiry_date) < currentDate
+        })),
+        notAutomated: response.not_automated.map(listing => ({
+          ...listing,
+          isExpired: new Date(listing.expiry_date) < currentDate
+        }))
+      };
+
       setListings({
-        automated: response.filter(listing => listing.isAutomated),
-        notAutomated: response.filter(listing => !listing.isAutomated),
-        expired: response.filter(listing => new Date(listing.expiryDate) < new Date())
+        automated: processedListings.automated.filter(listing => !listing.isExpired),
+        notAutomated: processedListings.notAutomated.filter(listing => !listing.isExpired),
+        expired: [
+          ...processedListings.automated.filter(listing => listing.isExpired),
+          ...processedListings.notAutomated.filter(listing => listing.isExpired)
+        ]
       });
     } catch (error) {
       console.error('Fetch error:', error);

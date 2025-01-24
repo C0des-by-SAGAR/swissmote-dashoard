@@ -10,11 +10,29 @@ const Header = ({
   isLoading 
 }) => {
   const handleEmploymentTypeChange = (e) => {
-    onFilterChange({ employmentType: e.target.value });
+    const value = e.target.value.toLowerCase();
+    onFilterChange({ 
+      employmentType: value,
+      emp_type: value
+    });
+    // Trigger fetch when employment type changes
+    onFetchListings();
   };
 
   const handleAccountChange = (e) => {
-    onFilterChange({ account: e.target.value });
+    const displayValue = e.target.value;
+    const apiValue = displayValue === 'Persist Ventures' ? 'pv' : 'sa';
+    onFilterChange({ 
+      account: apiValue,
+      accountDisplay: displayValue
+    });
+    // Trigger fetch when account changes
+    onFetchListings();
+  };
+
+  // Search only affects client-side filtering
+  const handleSearchChange = (e) => {
+    onFilterChange({ searchTerm: e.target.value });
   };
 
   return (
@@ -32,17 +50,15 @@ const Header = ({
             onChange={handleEmploymentTypeChange}
             className="select-input"
           >
-            <option value="job">Job</option>
             <option value="internship">Internship</option>
+            <option value="job">Job</option>
           </select>
         </div>
         
         <div className="filter-group">
           <label className="filter-label">Account</label>
           <select
-            value={filters.account === 'pv' ? 'Persist Ventures' : 
-                  filters.account === 'sa' ? 'Systemic Altruism' : 
-                  filters.account}
+            value={filters.accountDisplay}
             onChange={handleAccountChange}
             className="select-input"
           >
@@ -64,7 +80,7 @@ const Header = ({
           <input 
             type="text" 
             value={filters.searchTerm} 
-            onChange={e => onFilterChange({ searchTerm: e.target.value })} 
+            onChange={handleSearchChange}
             placeholder="Type to Start Search..." 
             className="search-input"
           />
