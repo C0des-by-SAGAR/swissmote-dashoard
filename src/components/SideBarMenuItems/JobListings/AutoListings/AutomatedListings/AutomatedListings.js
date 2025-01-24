@@ -359,6 +359,8 @@ const AutomatedListings = ({ listings }) => {
               >
                 Make Announcement
               </button>
+            </div>
+            <div className='card-actions'> 
               <button 
                 className="action-button"
                 onClick={(e) => handleAddReview(listing, e)}
