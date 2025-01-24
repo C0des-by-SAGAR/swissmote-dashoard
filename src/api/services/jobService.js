@@ -25,36 +25,29 @@ export const jobService = {
         min_salary: minSalary,
         max_salary: maxSalary,
         account: formData.organization,
-        post_on_linkedin: false,
-        description: formData.jobTitle.trim(),
-        job_employment_type: "job" // Adding required field
+        post_on_linkedin: false
       };
 
-      // Log the exact payload being sent for debugging
-      console.log('Sending payload:', JSON.stringify(payload));
-
-      const response = await axios({
-        method: 'POST',
-        url: 'https://api.swissmote.com/postJob',
-        params: { dev: true },
-        data: payload,
-        headers: {
-          ...authService.getAuthHeaders(),
-          'Content-Type': 'application/json'
+      const response = await axios.post(
+        'https://api.swissmote.com/postJob?dev=true',
+        payload,
+        {
+          headers: {
+            ...authService.getAuthHeaders(),
+            'Content-Type': 'application/json'
+          }
         }
-      });
+      );
       
       return response.data;
     } catch (error) {
-      // Enhanced error logging
       console.error('Job posting error:', {
         error: error.response?.data || error,
         status: error.response?.status,
         payload: error.config?.data
       });
       
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to post job';
-      throw new Error(errorMessage);
+      throw new Error(error.response?.data?.message || 'Failed to post job');
     }
   },
   // Other job-related API methods can be added here

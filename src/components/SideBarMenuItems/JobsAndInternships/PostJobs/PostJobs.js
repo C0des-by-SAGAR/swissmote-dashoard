@@ -9,8 +9,8 @@ import { toast } from 'react-toastify';
 import { jobService } from '../../../../api/services/jobService';
 
 const organizationMap = {
-  'org1': 'Persist Ventures',
-  'org2': 'Systemic Altruism'
+  'org1': 'pv',
+  'org2': 'sa'
 };
 
 const PostJobs = () => {
@@ -22,7 +22,7 @@ const PostJobs = () => {
     minExperience: '',
     minSalary: '',
     maxSalary: '',
-    workType: 'Virtual',
+    workType: 'virtual',
     employment: 'Full-Time',
     organization: ''
   });
@@ -43,10 +43,22 @@ const PostJobs = () => {
       return;
     }
 
+    if (!formData.jobTitle || !formData.requiredSkills || !formData.positions || 
+        !formData.minSalary || !formData.organization) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
     try {
       const loadingToast = toast.loading('Posting job...');
       
-      await jobService.postJob(formData);
+      const formattedData = {
+        ...formData,
+        workType: formData.workType.toLowerCase(),
+        organization: organizationMap[formData.organization]
+      };
+      
+      await jobService.postJob(formattedData);
       
       toast.update(loadingToast, {
         render: 'Job posted successfully!',
@@ -62,7 +74,7 @@ const PostJobs = () => {
         minExperience: '',
         minSalary: '',
         maxSalary: '',
-        workType: 'Virtual',
+        workType: 'virtual',
         employment: 'Full-Time',
         organization: ''
       });
@@ -121,8 +133,8 @@ const PostJobs = () => {
             onChange={handleInputChange}
             className="form-select"
           >
-            <option value="Virtual">Virtual</option>
-            <option value="On-Site">On-Site</option>
+            <option value="virtual">Virtual</option>
+            <option value="on-site">On-Site</option>
           </select>
         </div>
 
