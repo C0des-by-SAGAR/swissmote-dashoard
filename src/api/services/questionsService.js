@@ -5,13 +5,8 @@ export const questionsService = {
   getQuestions: async (listingId, offset = 0, limit = 10) => {
     try {
       const response = await axios.get(
-        `https://api.swissmote.com/get_questions`,
+        `https://api.swissmote.com/getQuestions?listing_id=${listingId}&offset=${offset}&limit=${limit}`,
         {
-          params: {
-            listing_id: listingId,
-            offset,
-            limit
-          },
           headers: authService.getAuthHeaders()
         }
       );
