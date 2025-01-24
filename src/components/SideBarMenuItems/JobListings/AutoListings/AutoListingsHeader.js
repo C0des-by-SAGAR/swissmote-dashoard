@@ -9,6 +9,16 @@ const Header = ({
   onFetchListings,
   isLoading 
 }) => {
+  const handleEmploymentTypeChange = (e) => {
+    console.log('Employment type changed:', e.target.value); // Debug log
+    onFilterChange({ employmentType: e.target.value });
+  };
+
+  const handleAccountChange = (e) => {
+    console.log('Account changed:', e.target.value); // Debug log
+    onFilterChange({ account: e.target.value });
+  };
+
   return (
     <div className="header-container">
       <div className="header-top mb4">
@@ -21,7 +31,7 @@ const Header = ({
           <label className="filter-label">Employment Type</label>
           <select 
             value={filters.employmentType}
-            onChange={e => onFilterChange({ employmentType: e.target.value })}
+            onChange={handleEmploymentTypeChange}
             className="select-input"
             aria-label="Select employment type"
           >
@@ -34,7 +44,7 @@ const Header = ({
           <label className="filter-label">Account</label>
           <select
             value={filters.account}
-            onChange={e => onFilterChange({ account: e.target.value })}
+            onChange={handleAccountChange}
             className="select-input"
             aria-label="Select account"
           >

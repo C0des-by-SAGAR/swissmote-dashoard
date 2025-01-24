@@ -21,20 +21,27 @@ const AutoListings = () => {
     expired: []
   });
   const [filters, setFilters] = useState({
-    employmentType: 'All',
-    account: 'All',
+    employmentType: 'job',
+    account: 'pv',
     searchTerm: ''
   });
 
   const fetchListings = async () => {
     try {
       setIsLoading(true);
-      const sortedListings = await listingSorterService.getAllSortedListings(
+      console.log('Fetching with filters:', filters);
+      const response = await autoListingsService.getAutoListings(
         filters.employmentType,
         filters.account
       );
-      setListings(sortedListings);
+      console.log('API Response:', response);
+      setListings({
+        automated: response.filter(listing => listing.isAutomated),
+        notAutomated: response.filter(listing => !listing.isAutomated),
+        expired: response.filter(listing => new Date(listing.expiryDate) < new Date())
+      });
     } catch (error) {
+      console.error('Fetch error:', error);
       toast.error('Failed to fetch listings');
     } finally {
       setIsLoading(false);
@@ -50,6 +57,7 @@ const AutoListings = () => {
   };
 
   const handleFilterChange = (newFilters) => {
+    console.log('Filter change:', newFilters);
     setFilters(prev => ({ ...prev, ...newFilters }));
   };
 

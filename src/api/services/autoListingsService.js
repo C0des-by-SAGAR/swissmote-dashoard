@@ -5,19 +5,20 @@ export const autoListingsService = {
   getAutoListings: async (empType, account) => {
     try {
       // Convert employment type to match API expectations based on dropdown values
-      const employmentType = empType?.toLowerCase() === 'job' ? 'job' : 
-                           empType?.toLowerCase() === 'internship' ? 'internship' : '';
-      
-      // Convert account type to match API expectations based on dropdown values
-      const accountType = account?.toLowerCase() === 'pv' ? 'pv' :
-                         account?.toLowerCase() === 'sa' ? 'sa' : '';
+      const employmentType = empType?.toLowerCase() || '';
+      const accountType = account?.toLowerCase() || '';
 
-      // Use query string format instead of params object
+      const headers = authService.getAuthHeaders();
+
       const response = await axios.post(
-        `https://api.swissmote.com/get_auto_listings?emp_type=${employmentType}&account=${accountType}`,
+        `https://api.swissmote.com/get_auto_listings`,
         {
+          params: {
+            emp_type: employmentType,
+            account: accountType
+          },
           headers: {
-            ...authService.getAuthHeaders(),
+            ...headers,
             'Content-Type': 'application/json',
             'Accept': 'application/json'
           }
@@ -30,9 +31,9 @@ export const autoListingsService = {
 
       return response.data.automated || [];
     } catch (error) {
-      if (error.response?.status === 405) {
-        console.error('Method not allowed error:', error);
-        throw new Error('Invalid API method. Please check the API documentation.');
+      console.error('API Error:', error);
+      if (error.response?.status === 401) {
+        throw new Error('Unauthorized. Please check your authentication.');
       }
       throw new Error(error.response?.data?.message || 'Failed to fetch auto listings');
     }
