@@ -75,18 +75,37 @@ const Dashboard = () => {
   };
 
   const renderChart = (data) => {
+    // Add console.log to debug the data
+    console.log('Chart Data:', data);
+    
     // Ensure data exists and has length
-    if (!data || data.length === 0) return null;
+    if (!data || data.length === 0) {
+      console.log('No data available');
+      return null;
+    }
 
     switch (chartType) {
       case 'Bar':
         return (
-          <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+          <BarChart 
+            data={data} 
+            margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+            width={500}  // Add explicit width
+            height={300} // Add explicit height
+          >
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.1)" />
-            <XAxis dataKey="name" stroke="#e2e8f0" />
-            <YAxis stroke="#e2e8f0" domain={[0, 'auto']} allowDecimals={false} />
+            <XAxis 
+              dataKey="name" 
+              stroke="#e2e8f0"
+              tick={{ fill: '#e2e8f0' }}  // Make ticks visible
+            />
+            <YAxis 
+              stroke="#e2e8f0"
+              domain={[0, dataMax => Math.max(4, dataMax)]}  // Set minimum domain to 4
+              tick={{ fill: '#e2e8f0' }}  // Make ticks visible
+            />
             <Tooltip content={<CustomTooltip />} />
-            <Bar dataKey="value" minPointSize={1}>
+            <Bar dataKey="value" minPointSize={5}>  // Increase minPointSize
               {data.map((entry, index) => (
                 <Cell 
                   key={`cell-${index}`} 
@@ -160,13 +179,15 @@ const Dashboard = () => {
         <div className="chart-header">
           <h2 className="chart-title">Follow-up Status</h2>
         </div>
-        <ResponsiveContainer width="100%" height={300}>
-          {graphData.followUpData && graphData.followUpData.length > 0 ? (
-            renderChart(graphData.followUpData)
-          ) : (
-            <div className="no-data-message">No follow-up data available</div>
-          )}
-        </ResponsiveContainer>
+        <div style={{ width: '100%', height: 300 }}>  {/* Add wrapper div with explicit dimensions */}
+          <ResponsiveContainer>
+            {graphData.followUpData && graphData.followUpData.length > 0 ? (
+              renderChart(graphData.followUpData)
+            ) : (
+              <div className="no-data-message">No follow-up data available</div>
+            )}
+          </ResponsiveContainer>
+        </div>
         <div className="follow-up-summary">
           <h3>Day 2 Follow-ups</h3>
           <div className="status-list">
