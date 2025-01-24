@@ -45,6 +45,17 @@ const PostInternship = () => {
       return;
     }
 
+    // Validate required fields
+    if (!formData.internshipTitle || 
+        !formData.requiredSkills || 
+        !formData.positions || 
+        !formData.duration || 
+        !formData.stipend || 
+        !formData.organization) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
     try {
       const loadingToast = toast.loading('Posting internship...');
       
@@ -57,6 +68,7 @@ const PostInternship = () => {
         autoClose: 3000
       });
 
+      // Reset form
       setFormData({
         internshipTitle: '',
         requiredSkills: '',
