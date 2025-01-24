@@ -34,7 +34,7 @@ const AutomatedListings = ({ listings }) => {
     setCurrentPage(pageNumber);
   };
 
-  // Reset to first page when filters change
+  // Reset to first page when listings change
   React.useEffect(() => {
     setCurrentPage(1);
   }, [listings]);
@@ -233,144 +233,127 @@ const AutomatedListings = ({ listings }) => {
     <div className="automated-listings-container">
       <div className="listings-grid">
         {currentCards.map((listing, index) => (
-          <div 
-            key={index} 
-            className="listing-card"
-            onClick={() => handleCardClick(listing)}
-            style={{ cursor: 'pointer' }}
-          >
-            {/* Updated Header Section */}
+          <div key={index} className="listing-card">
             <div className="card-header">
               <div className="header-content">
                 <h2 className="listing-title">{listing.listingName}</h2>
-                <div className="organization-info">
-                  <span className="organization">{listing.organization}</span>
-                  <span className="separator">•</span>
-                  <span className="project">{listing.projectName}</span>
-                  <span className="separator">•</span>
-                  <span className="date">{listing.date}</span>
+                <p className="listing-number">#{listing.listingNumber}</p>
+              </div>
+              <div className="organization-info">
+                <span className="organization">{listing.organisation}</span>
+              </div>
+            </div>
+
+            <div className="card-body">
+              <div className="metrics-grid">
+                <div className="metric-item">
+                  <label>Posted Over</label>
+                  <span>{listing.postedOver}</span>
+                </div>
+                <div className="metric-item">
+                  <label>Conversion Rate</label>
+                  <span>{listing.conversionRate}</span>
                 </div>
               </div>
-            </div>
 
-            {/* Stats Sections */}
-            <div className="stats-grid">
-              <div className="stat-item">
-                <label className="stat-label">Posted Over</label>
-                <span className="stat-value">{listing.postedOver}</span>
-              </div>
-              <div className="stat-item">
-                <label className="stat-label">Conversion Rate</label>
-                <span className="stat-value highlight">{listing.conversionRate}%</span>
-              </div>
-            </div>
-
-            <div className="stats-grid">
-              <div className="stat-item">
-                <label className="stat-label">Assignments</label>
-                <span className="stat-value">
-                  <span className="primary-value">{listing.assignmentsReceived}</span>
-                  <span className="separator">/</span>
-                  <span className="secondary-value">{listing.assignmentsSent}</span>
-                </span>
-              </div>
-              <div className="stat-item">
-                <label className="stat-label">Applications</label>
-                <span className="stat-value">
-                  <span className="primary-value">{listing.newApplicants}</span>
-                  <span className="separator">/</span>
-                  <span className="secondary-value">{listing.totalApplications}</span>
-                </span>
-              </div>
-            </div>
-
-            <div className="stats-grid">
-              <div className="stat-item">
-                <label className="stat-label">Assignment Links</label>
-                <span className="stat-value">{listing.assignmentLinks.join(', ')}</span>
-              </div>
-              <div className="stat-item">
-                <label className="stat-label">Review Links</label>
-                <span className="stat-value">{listing.reviewLinks}</span>
-              </div>
-            </div>
-
-            <div className="stats-grid">
-              <div className="stat-item">
-                <label className="stat-label">Intro Message</label>
-                <span className="stat-value">{listing.introMessage}</span>
-              </div>
-              <div className="stat-item">
-                <label className="stat-label">Assignment Message</label>
-                <span className="stat-value">{listing.assignmentMessage}</span>
-              </div>
-            </div>
-
-            <div className="stats-grid">
-              <div className="stat-item">
-                <label className="stat-label">Day 2 Followup</label>
-                <div className="followup-content">
-                  <span className="stat-value">{listing.day2Followup}</span>
-                  <span className={getStatusBadgeClass(listing.day2Status)}>
-                    {listing.day2Status}
-                  </span>
+              <div className="assignments-section">
+                <div className="assignments-grid">
+                  <div className="assignment-item">
+                    <label>Assignments</label>
+                    <div className="assignment-stats">
+                      <span>Received: {listing.assignments?.received}</span>
+                      <span>Sent: {listing.assignments?.sent}</span>
+                    </div>
+                  </div>
+                  <div className="assignment-item">
+                    <label>Applications</label>
+                    <div className="application-stats">
+                      <span>New: {listing.applications?.new}</span>
+                      <span>Total: {listing.applications?.total}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="stat-item">
-                <label className="stat-label">Day 4 Followup</label>
-                <div className="followup-content">
-                  <span className="stat-value">{listing.day4Followup}</span>
-                  <span className={getStatusBadgeClass(listing.day4Status)}>
-                    {listing.day4Status}
-                  </span>
+
+              <div className="links-section">
+                <div className="links-grid">
+                  <div className="link-item">
+                    <label>Assignment Links</label>
+                    <div className="link-list">
+                      {listing.assignmentLinks?.map((link, i) => (
+                        <a key={i} href={link} target="_blank" rel="noopener noreferrer">
+                          Link {i + 1}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="link-item">
+                    <label>Review Links</label>
+                    <div className="link-list">
+                      {listing.reviewLinks?.map((link, i) => (
+                        <a key={i} href={link} target="_blank" rel="noopener noreferrer">
+                          Link {i + 1}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="stats-grid">
-              <div className="stat-item">
-                <label className="stat-label">Expiry Date</label>
-                <span className="stat-value">{listing.expiryDate}</span>
+              <div className="messages-section">
+                <div className="message-item">
+                  <label>Intro Message</label>
+                  <p>{listing.messages?.intro}</p>
+                </div>
+                <div className="message-item">
+                  <label>Assignment Message</label>
+                  <p>{listing.messages?.assignment}</p>
+                </div>
+                <div className="followup-grid">
+                  <div className="followup-item">
+                    <label>Day 2 Followup</label>
+                    <span className={`status ${listing.messages?.followup?.day2?.status?.toLowerCase()}`}>
+                      {listing.messages?.followup?.day2?.status}
+                    </span>
+                  </div>
+                  <div className="followup-item">
+                    <label>Day 4 Followup</label>
+                    <span className={`status ${listing.messages?.followup?.day4?.status?.toLowerCase()}`}>
+                      {listing.messages?.followup?.day4?.status}
+                    </span>
+                  </div>
+                </div>
               </div>
-              <div className="stat-item">
-                <label className="stat-label">Created By</label>
-                <span className="stat-value">{listing.createdBy}</span>
+
+              <div className="dates-section">
+                <div className="date-item">
+                  <label>Expiry Date</label>
+                  <span>{listing.dates?.expiry}</span>
+                </div>
+                <div className="date-item">
+                  <label>Created By</label>
+                  <span>{listing.createdBy}</span>
+                </div>
+              </div>
+
+              <div className="automated-by">
+                <label>Automated By</label>
+                <span>{listing.automatedBy}</span>
               </div>
             </div>
 
-            <div className="creator-section">
-              <label className="creator-label">Automated By</label>
-              <span className="creator-value">{listing.automatedBy}</span>
-            </div>
-
-            {/* Remove the Action Menu section and replace with direct buttons */}
-            <div className="action-buttons">
-              <button 
-                className="action-button"
-                onClick={(e) => handlePostAssignment(listing, e)}
-              >
-                Post Assignment
+            <div className="card-actions">
+              <button className="action-button" onClick={() => handleActionClick(index)}>
+                Actions
               </button>
-              <button 
-                className="action-button"
-                onClick={(e) => handleMakeAnnouncement(listing, e)}
-              >
-                Make Announcement
-              </button>
-            </div>
-            <div className='action-buttons'>
-              <button 
-                className="action-button"
-                onClick={(e) => handleAddReview(listing, e)}
-              >
-                Add Review
-              </button>
-              <button 
-                className="action-button"
-                onClick={(e) => handleEditFollowUp(listing, e)}
-              >
-                Edit Follow-Up Message
-              </button>
+              {activeMenu === index && (
+                <div className="action-menu">
+                  <button onClick={(e) => handlePostAssignment(listing, e)}>Post Assignment</button>
+                  <button onClick={(e) => handleMakeAnnouncement(listing, e)}>Make Announcement</button>
+                  <button onClick={(e) => handleAddReview(listing, e)}>Add Review</button>
+                  <button onClick={(e) => handleEditFollowUp(listing, e)}>Edit Follow-Up Message</button>
+                </div>
+              )}
             </div>
           </div>
         ))}
@@ -565,7 +548,7 @@ const AutomatedListings = ({ listings }) => {
       )}
 
       {listings.length > cardsPerPage && (
-        <div className="pagination mt-6">
+        <div className="pagination">
           <button 
             className="pagination-button"
             onClick={() => handlePageChange(currentPage - 1)}
