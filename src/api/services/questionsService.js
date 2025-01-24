@@ -5,8 +5,8 @@ import { activeListingService } from './activeListingService';
 export const questionsService = {
   getQuestions: async (listingId, offset = 0, limit = 1) => {
     try {
-      const response = await axios.post(
-        `https://api.swissmote.com/getQuestions?listing=${listingId}&offset=0&limit=1`,
+      const response = await axios.get(
+        `https://api.swissmote.com/getQuestions?listing=${listingId}&offset=${offset}&limit=${limit}`,
         {
           headers: authService.getAuthHeaders()
         }
