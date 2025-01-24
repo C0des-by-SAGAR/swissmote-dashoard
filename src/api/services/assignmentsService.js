@@ -6,41 +6,27 @@ export const assignmentsService = {
     try {
       const headers = await authService.getAuthHeaders();
       
-      // Ensure listingId is properly formatted
+      // Ensure listingId is a valid integer
       const listing = parseInt(listingId, 10);
 
-      const response = await axios({
-        method: 'POST',
-        url: 'https://api.swissmote.com/get_assignments',
-        headers: {
-          ...headers,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        data: {
-          listing,           // Just the number, no additional formatting
-          source: "itn",     // Explicitly set as string
-          row_data: rowData, // Pagination
+      // Make the API call
+      const response = await axios.post(
+        'https://api.swissmote.com/get_assignments',
+        {
+          listing, // Ensure only the number is sent
+          source,  // Default to 'itn'
+          row_data: rowData,
           offset_data: offsetData
-        }
-      });
+        },
+        { headers }
+      );
 
-      // Add debug logging
-      console.log('API Response:', {
-        status: response.status,
-        data: response.data,
-        headers: response.headers
-      });
+      // Log the response for debugging
+      console.log('API Response:', response.data);
 
-      // Check if response is an error message
-      if (response.data?.detail) {
-        throw new Error(response.data.detail);
-      }
-
-      // Ensure response.data is an array
-      const assignments = Array.isArray(response.data) ? response.data : [];
-
-      return assignments.map(assignment => ({
+      // Validate and return the assignments
+      const assignments = response.data?.assignments || []; // Adjust key if the API response differs
+      return assignments.map((assignment) => ({
         id: assignment.id,
         candidateName: assignment.candidate_name,
         company: assignment.company,
@@ -51,40 +37,30 @@ export const assignmentsService = {
         relocation: assignment.relocation,
         attachments: assignment.attachments || [],
         listingNumber: assignment.listing_number,
-        candidateId: assignment.candidate_id
+        candidateId: assignment.candidate_id,
       }));
-
     } catch (error) {
-      // Enhanced error logging
-      console.error('Assignment fetch error:', {
-        error: error,
+      // Log detailed error for debugging
+      console.error('Error fetching assignments:', {
+        error: error.message,
         response: error.response?.data,
-        status: error.response?.status,
-        message: error.message,
-        requestData: {
-          listing: listingId,
-          source: source,
-          row_data: rowData,
-          offset_data: offsetData
-        }
+        requestData: { listingId, source, rowData, offsetData },
       });
 
+      // Handle specific error scenarios
       if (error.response?.status === 400) {
-        throw new Error(error.response.data?.detail || 'Invalid request parameters');
-      }
-      if (error.response?.status === 401) {
+        throw new Error('Invalid request. Please check the listing ID and parameters.');
+      } else if (error.response?.status === 401) {
         throw new Error('Authentication failed. Please log in again.');
+      } else if (error.response?.status === 403) {
+        throw new Error('Access denied. You do not have permission to view these assignments.');
       }
-      if (error.response?.status === 403) {
-        throw new Error('You do not have permission to view these assignments.');
-      }
-      throw new Error(error.message || 'Failed to fetch assignments');
+      throw new Error('An unexpected error occurred while fetching assignments.');
     }
   },
 
-  // Helper method for pagination
   getAssignmentsPage: async (listingId, page = 1, itemsPerPage = 10) => {
     const offset = (page - 1) * itemsPerPage;
     return assignmentsService.getAssignments(listingId, 'itn', itemsPerPage, offset);
   }
-}; 
+};
