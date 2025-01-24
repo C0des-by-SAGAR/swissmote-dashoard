@@ -335,26 +335,22 @@ const Assignments = () => {
       setIsLoading(true);
       const loadingToast = toast.loading('Fetching assignments...');
       
-      // Always use 'itn' as source
-      const assignments = await assignmentsService.getAssignments(listingId, 'itn');
+      const { assignments, total } = await assignmentsService.getAssignments(listingId, 'itn');
       
-      // Map the response to the expected structure
+      // Update the assignments list and the count
       setAssignmentsList(prev => ({
         ...prev,
-        [listingId]: assignments.map(assignment => ({
-          id: assignment.id,
-          candidateName: assignment.candidate_name,
-          company: assignment.company,
-          status: assignment.status,
-          location: assignment.location,
-          experience: assignment.experience,
-          receivedDate: assignment.received_date,
-          relocation: assignment.relocation,
-          attachments: assignment.attachments || [],
-          listingNumber: assignment.listing_number,
-          candidateId: assignment.candidate_id
-        }))
+        [listingId]: assignments
       }));
+
+      // Update the active listings with the correct assignment count
+      setActiveListings(prevListings => 
+        prevListings.map(listing => 
+          listing.id === listingId 
+            ? { ...listing, assignmentCount: total }
+            : listing
+        )
+      );
 
       toast.update(loadingToast, {
         render: 'Assignments fetched successfully!',
@@ -393,20 +389,31 @@ const Assignments = () => {
     listing.id.includes(searchTerm)
   );
 
-  useEffect(() => {
-    fetchActiveListings();
-  }, []);
-
   const fetchActiveListings = async () => {
     try {
       setIsLoading(true);
       const listings = await activeListingService.getActiveListings();
-      setActiveListings(listings.map(listing => ({
-        id: listing.id,
-        name: listing.projectName,
-        role: listing.listingName,
-        assignmentCount: 0 // This would typically come from a separate API
-      })));
+      
+      // Fetch assignment counts for each listing
+      const listingsWithCounts = await Promise.all(
+        listings.map(async (listing) => {
+          try {
+            const { total } = await assignmentsService.getAssignments(listing.id, 'itn', 1, 0);
+            return {
+              ...listing,
+              assignmentCount: total || 0
+            };
+          } catch (error) {
+            console.error(`Error fetching assignments for listing ${listing.id}:`, error);
+            return {
+              ...listing,
+              assignmentCount: 0
+            };
+          }
+        })
+      );
+
+      setActiveListings(listingsWithCounts);
     } catch (error) {
       toast.error(error.message || 'Failed to fetch active listings');
       setActiveListings([]);
