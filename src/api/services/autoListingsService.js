@@ -5,26 +5,35 @@ export const autoListingsService = {
   getAutoListings: async (empType, account) => {
     try {
       // Convert employment type to match API expectations based on dropdown values
-      const employmentType = empType === 'job' ? 'job' : 
-                           empType === 'internship' ? 'internship' : '';
+      const employmentType = empType?.toLowerCase() === 'job' ? 'job' : 
+                           empType?.toLowerCase() === 'internship' ? 'internship' : '';
       
       // Convert account type to match API expectations based on dropdown values
-      const accountType = account === 'pv' ? 'pv' :
-                         account === 'sa' ? 'sa' : '';
+      const accountType = account?.toLowerCase() === 'pv' ? 'pv' :
+                         account?.toLowerCase() === 'sa' ? 'sa' : '';
 
+      // Use query string format instead of params object
       const response = await axios.get(
-        `https://api.swissmote.com/get_auto_listings`,
+        `https://api.swissmote.com/get_auto_listings?emp_type=${employmentType}&account=${accountType}`,
         {
-          params: {
-            emp_type: employmentType,
-            account: accountType
-          },
-          headers: authService.getAuthHeaders()
+          headers: {
+            ...authService.getAuthHeaders(),
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
         }
       );
 
+      if (!response.data) {
+        throw new Error('No data received from server');
+      }
+
       return response.data.automated || [];
     } catch (error) {
+      if (error.response?.status === 405) {
+        console.error('Method not allowed error:', error);
+        throw new Error('Invalid API method. Please check the API documentation.');
+      }
       throw new Error(error.response?.data?.message || 'Failed to fetch auto listings');
     }
   },
