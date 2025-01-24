@@ -10,135 +10,81 @@ import { expiredListingsData } from './ExpiredListings/expiredListingsData';
 import './AutoListings.css';
 import { autoListingsService } from '../../../../api/services/autoListingsService';
 import { toast } from 'react-toastify';
+import { listingSorterService } from '../../../../api/services/listingSorterService';
 
 const AutoListings = () => {
   const [activeTab, setActiveTab] = useState('automated');
+  const [isLoading, setIsLoading] = useState(false);
+  const [listings, setListings] = useState({
+    automated: [],
+    notAutomated: [],
+    expired: []
+  });
   const [filters, setFilters] = useState({
     employmentType: 'All',
     account: 'All',
     searchTerm: ''
   });
-  const [filteredAutomatedListings, setFilteredAutomatedListings] = useState(automatedListingsData);
-  const [filteredNotAutomatedListings, setFilteredNotAutomatedListings] = useState(notAutomatedListingsData);
-  const [filteredExpiredListings, setFilteredExpiredListings] = useState(expiredListingsData);
-  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    const filterListings = () => {
-      // Filter automated listings
-      let filteredAuto = automatedListingsData;
-      let filteredNotAuto = notAutomatedListingsData;
-
-      // Filter by employment type
-      if (filters.employmentType !== 'All') {
-        filteredAuto = filteredAuto.filter(listing => 
-          listing.employmentType === filters.employmentType
-        );
-        filteredNotAuto = filteredNotAuto.filter(listing => 
-          listing.employmentType.toLowerCase() === filters.employmentType.toLowerCase()
-        );
-      }
-
-      // Filter by account
-      if (filters.account !== 'All') {
-        filteredAuto = filteredAuto.filter(listing => 
-          listing.organization === filters.account
-        );
-        filteredNotAuto = filteredNotAuto.filter(listing => 
-          listing.organisation === filters.account
-        );
-      }
-
-      // Filter by search term
-      if (filters.searchTerm) {
-        const searchLower = filters.searchTerm.toLowerCase();
-        filteredAuto = filteredAuto.filter(listing =>
-          listing.listingName.toLowerCase().includes(searchLower) ||
-          listing.projectName.toLowerCase().includes(searchLower) ||
-          listing.organization.toLowerCase().includes(searchLower)
-        );
-        filteredNotAuto = filteredNotAuto.filter(listing =>
-          listing.listingName.toLowerCase().includes(searchLower) ||
-          listing.organisation.toLowerCase().includes(searchLower)
-        );
-      }
-
-      setFilteredAutomatedListings(filteredAuto);
-      setFilteredNotAutomatedListings(filteredNotAuto);
-    };
-
-    filterListings();
-  }, [filters]);
-
-  const handleFilterChange = (newFilters) => {
-    setFilters(prev => ({ ...prev, ...newFilters }));
-  };
-
-  const fetchListings = async (empType, account) => {
+  const fetchListings = async () => {
     try {
       setIsLoading(true);
-      const data = await autoListingsService.getAutoListings(
-        empType.toLowerCase(), 
-        account === 'Persist Ventures' ? 'pv' : 'sa'
+      const sortedListings = await listingSorterService.getAllSortedListings(
+        filters.employmentType,
+        filters.account
       );
-
-      // Transform the API response to match our component's data structure
-      const transformedListings = data.map(listing => ({
-        listingName: listing.listing_name,
-        listingNumber: listing.listing_number,
-        expiryDate: listing.expiry_date,
-        projectName: listing.projectname,
-        organization: listing.posted_over.includes('Persist') ? 'Persist Ventures' : 'Systemic Altruism',
-        employmentType: empType,
-        metrics: listing.metrics,
-        conversionRate: listing.conversion_rate,
-        assignmentLink: listing.assignment_link?.[0] || '',
-        reviewLink: listing.review_link || [],
-        platformData: listing.platform_data,
-        messages: listing.messages
-      }));
-
-      setFilteredAutomatedListings(transformedListings);
-      
-      toast.success('Listings fetched successfully!');
+      setListings(sortedListings);
     } catch (error) {
-      toast.error(error.message || 'Failed to fetch listings');
-      setFilteredAutomatedListings([]);
+      toast.error('Failed to fetch listings');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleFetchListings = async () => {
-    const empType = filters.employmentType === 'All' ? 'Job' : filters.employmentType;
-    const account = filters.account === 'All' ? 'Persist Ventures' : filters.account;
-    await fetchListings(empType, account);
+  useEffect(() => {
+    fetchListings();
+  }, [filters.employmentType, filters.account]);
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
   };
 
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'automated':
-        return <AutomatedListings listings={filteredAutomatedListings} />;
-      case 'not-automated':
-        return <NotAutomatedListings listings={filteredNotAutomatedListings} />;
-      case 'expired':
-        return <ExpiredListings listings={filteredExpiredListings} />;
-      default:
-        return <AutomatedListings listings={filteredAutomatedListings} />;
-    }
+  const handleFilterChange = (newFilters) => {
+    setFilters(prev => ({ ...prev, ...newFilters }));
+  };
+
+  const filteredListings = {
+    automated: listings.automated.filter(listing =>
+      listing.listingName.toLowerCase().includes(filters.searchTerm.toLowerCase())
+    ),
+    notAutomated: listings.notAutomated.filter(listing =>
+      listing.listingName.toLowerCase().includes(filters.searchTerm.toLowerCase())
+    ),
+    expired: listings.expired.filter(listing =>
+      listing.listingName.toLowerCase().includes(filters.searchTerm.toLowerCase())
+    )
   };
 
   return (
     <div className="auto-listings-container">
-      <Header 
-        activeTab={activeTab} 
-        onTabChange={setActiveTab}
+      <Header
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
         filters={filters}
         onFilterChange={handleFilterChange}
-        onFetchListings={handleFetchListings}
+        onFetchListings={fetchListings}
         isLoading={isLoading}
       />
-      {renderTabContent()}
+
+      {activeTab === 'automated' && (
+        <AutomatedListings listings={filteredListings.automated} />
+      )}
+      {activeTab === 'not-automated' && (
+        <NotAutomatedListings listings={filteredListings.notAutomated} />
+      )}
+      {activeTab === 'expired' && (
+        <ExpiredListings listings={filteredListings.expired} />
+      )}
     </div>
   );
 };
