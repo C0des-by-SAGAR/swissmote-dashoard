@@ -6,25 +6,31 @@ export const dashboardStatsService = {
   getDashboardStats: async () => {
     try {
       // Fetch all required data in parallel
-      const [activeListings, closedListings, saJobListings, saInternListings, pvJobListings, pvInternListings] = 
-        await Promise.all([
-          activeListingService.getActiveListings(),
-          closedListingService.getClosedListings(),
-          autoListingsService.getSAJobListings(),
-          autoListingsService.getSAInternshipListings(),
-          autoListingsService.getPVJobListings(),
-          autoListingsService.getPVInternshipListings()
-        ]);
+      const [
+        activeListings, 
+        closedListings, 
+        saJobData,
+        saInternData,
+        pvJobData,
+        pvInternData
+      ] = await Promise.all([
+        activeListingService.getActiveListings(),
+        closedListingService.getClosedListings(),
+        autoListingsService.getSAJobListings(),
+        autoListingsService.getSAInternshipListings(),
+        autoListingsService.getPVJobListings(),
+        autoListingsService.getPVInternshipListings()
+      ]);
 
       // Calculate total jobs (active + closed)
       const totalJobs = activeListings.length + closedListings.length;
 
-      // Calculate automated listings (all auto listings combined)
+      // Calculate automated listings (combine all automated listings)
       const automatedListings = [
-        ...saJobListings,
-        ...saInternListings,
-        ...pvJobListings,
-        ...pvInternListings
+        ...(saJobData.automated || []),
+        ...(saInternData.automated || []),
+        ...(pvJobData.automated || []),
+        ...(pvInternData.automated || [])
       ].length;
 
       // Calculate not automated listings (total - automated)
@@ -43,6 +49,7 @@ export const dashboardStatsService = {
         expiredListings
       };
     } catch (error) {
+      console.error('Stats Error:', error);
       throw new Error('Failed to fetch dashboard statistics');
     }
   }

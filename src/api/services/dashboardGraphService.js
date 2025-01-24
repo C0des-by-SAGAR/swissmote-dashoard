@@ -9,10 +9,10 @@ export const dashboardGraphService = {
       const [
         activeListings, 
         closedListings,
-        saJobListings,
-        saInternListings,
-        pvJobListings,
-        pvInternListings
+        saJobData,
+        saInternData,
+        pvJobData,
+        pvInternData
       ] = await Promise.all([
         activeListingService.getActiveListings(),
         closedListingService.getClosedListings(),
@@ -22,31 +22,35 @@ export const dashboardGraphService = {
         autoListingsService.getPVInternshipListings()
       ]);
 
-      // Combine all auto listings
+      // Combine all automated listings
       const autoListings = [
-        ...saJobListings,
-        ...saInternListings,
-        ...pvJobListings,
-        ...pvInternListings
+        ...(saJobData.automated || []),
+        ...(saInternData.automated || []),
+        ...(pvJobData.automated || []),
+        ...(pvInternData.automated || [])
       ];
 
       // Calculate Follow-up Status from auto listings
       const followUpData = [
         {
           name: 'Day 2 Sent',
-          value: autoListings.filter(listing => listing.followup2?.sent).length
+          value: autoListings.filter(listing => 
+            listing.messages?.followup?.day2?.status === 'Completed').length
         },
         {
           name: 'Day 2 Pending',
-          value: autoListings.filter(listing => !listing.followup2?.sent).length
+          value: autoListings.filter(listing => 
+            listing.messages?.followup?.day2?.status === 'Pending').length
         },
         {
           name: 'Day 4 Sent',
-          value: autoListings.filter(listing => listing.followup4?.sent).length
+          value: autoListings.filter(listing => 
+            listing.messages?.followup?.day4?.status === 'Completed').length
         },
         {
           name: 'Day 4 Pending',
-          value: autoListings.filter(listing => !listing.followup4?.sent).length
+          value: autoListings.filter(listing => 
+            listing.messages?.followup?.day4?.status === 'Pending').length
         }
       ];
 
@@ -55,19 +59,31 @@ export const dashboardGraphService = {
       const conversionData = [
         {
           name: '0-25%',
-          value: allListings.filter(listing => listing.conversionRate <= 25).length
+          value: allListings.filter(listing => {
+            const rate = parseFloat(listing.conversionRate?.replace('%', '') || '0');
+            return rate <= 25;
+          }).length
         },
         {
           name: '26-50%',
-          value: allListings.filter(listing => listing.conversionRate > 25 && listing.conversionRate <= 50).length
+          value: allListings.filter(listing => {
+            const rate = parseFloat(listing.conversionRate?.replace('%', '') || '0');
+            return rate > 25 && rate <= 50;
+          }).length
         },
         {
           name: '51-75%',
-          value: allListings.filter(listing => listing.conversionRate > 50 && listing.conversionRate <= 75).length
+          value: allListings.filter(listing => {
+            const rate = parseFloat(listing.conversionRate?.replace('%', '') || '0');
+            return rate > 50 && rate <= 75;
+          }).length
         },
         {
           name: '76-100%',
-          value: allListings.filter(listing => listing.conversionRate > 75).length
+          value: allListings.filter(listing => {
+            const rate = parseFloat(listing.conversionRate?.replace('%', '') || '0');
+            return rate > 75;
+          }).length
         }
       ];
 
@@ -75,11 +91,13 @@ export const dashboardGraphService = {
       const reviewData = [
         {
           name: 'Reviews Added',
-          value: allListings.filter(listing => listing.assignmentLink && listing.assignmentLink.length > 0).length
+          value: allListings.filter(listing => 
+            listing.reviewLinks && listing.reviewLinks.length > 0).length
         },
         {
           name: 'Reviews Pending',
-          value: allListings.filter(listing => !listing.assignmentLink || listing.assignmentLink.length === 0).length
+          value: allListings.filter(listing => 
+            !listing.reviewLinks || listing.reviewLinks.length === 0).length
         }
       ];
 
@@ -114,6 +132,7 @@ export const dashboardGraphService = {
         summaryData
       };
     } catch (error) {
+      console.error('Graph Data Error:', error);
       throw new Error('Failed to fetch dashboard graph data');
     }
   }
