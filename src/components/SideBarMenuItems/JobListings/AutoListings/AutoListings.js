@@ -21,7 +21,7 @@ const AutoListings = () => {
     expired: []
   });
   const [filters, setFilters] = useState({
-    employmentType: 'job',
+    emp_type: 'job',
     account: 'pv',
     searchTerm: ''
   });
@@ -31,7 +31,7 @@ const AutoListings = () => {
       setIsLoading(true);
       console.log('Fetching with filters:', filters);
       const response = await autoListingsService.getAutoListings(
-        filters.employmentType,
+        filters.emp_type,
         filters.account
       );
       console.log('API Response:', response);
@@ -50,7 +50,7 @@ const AutoListings = () => {
 
   useEffect(() => {
     fetchListings();
-  }, [filters.employmentType, filters.account]);
+  }, [filters.emp_type, filters.account]);
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
@@ -58,7 +58,15 @@ const AutoListings = () => {
 
   const handleFilterChange = (newFilters) => {
     console.log('Filter change:', newFilters);
-    setFilters(prev => ({ ...prev, ...newFilters }));
+    const updatedFilters = {
+      ...newFilters,
+      emp_type: newFilters.employmentType,
+      account: newFilters.account?.toLowerCase() === 'persist ventures' ? 'pv' : 
+              newFilters.account?.toLowerCase() === 'systemic altruism' ? 'sa' : 
+              newFilters.account
+    };
+    delete updatedFilters.employmentType;
+    setFilters(prev => ({ ...prev, ...updatedFilters }));
   };
 
   const filteredListings = {
@@ -78,7 +86,11 @@ const AutoListings = () => {
       <Header
         activeTab={activeTab}
         onTabChange={handleTabChange}
-        filters={filters}
+        filters={{
+          employmentType: filters.emp_type,
+          account: filters.account,
+          searchTerm: filters.searchTerm
+        }}
         onFilterChange={handleFilterChange}
         onFetchListings={fetchListings}
         isLoading={isLoading}
