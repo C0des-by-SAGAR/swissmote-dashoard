@@ -5,10 +5,10 @@ export const questionsService = {
   getQuestions: async (listingId, offset = 0, limit = 10) => {
     try {
       const response = await axios.get(
-        `https://api.swissmote.com/getQuestions`,
+        `https://api.swissmote.com/get_questions`,
         {
           params: {
-            listing: listingId,
+            listing_id: listingId,
             offset,
             limit
           },
@@ -25,6 +25,15 @@ export const questionsService = {
         data: response.data
       };
     } catch (error) {
+      if (error.response?.status === 404) {
+        return {
+          success: true,
+          data: {
+            questions: [],
+            total: 0
+          }
+        };
+      }
       throw new Error(error.response?.data?.message || 'Failed to fetch questions');
     }
   }
