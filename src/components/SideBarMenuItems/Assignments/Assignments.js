@@ -386,62 +386,57 @@ const Assignments = () => {
     setSelectedListing(null);
   };
 
-  // Filter listings based on search term
-  const filteredListings = activeListings.filter(listing =>
-    searchTerm.trim() === '' ||
-    listing.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    listing.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    listing.id.includes(searchTerm)
-  );
-
   const fetchActiveListings = async () => {
     try {
       setIsLoading(true);
-      const loadingToast = toast.loading('Fetching listings...');
-      
       const listings = await activeListingService.getActiveListings();
       
-      // Set the listings first without waiting for assignment counts
-      setActiveListings(listings.map(listing => ({
-        ...listing,
+      if (!Array.isArray(listings)) {
+        throw new Error('Invalid listings response');
+      }
+
+      // Map initial listings with basic info
+      const initialListings = listings.map(listing => ({
+        id: listing.id,
+        name: listing.name || `Listing #${listing.id}`,
+        role: listing.role || 'Role not specified',
         assignmentCount: 0
-      })));
+      }));
 
-      toast.update(loadingToast, {
-        render: 'Listings fetched successfully!',
-        type: 'success',
-        isLoading: false,
-        autoClose: 3000
-      });
+      setActiveListings(initialListings);
 
-      // Then fetch assignment counts in the background
-      const listingsWithCounts = await Promise.all(
-        listings.map(async (listing) => {
-          try {
-            const { total } = await assignmentsService.getAssignments(listing.id, 'itn', 1, 0);
-            return {
-              ...listing,
-              assignmentCount: total || 0
-            };
-          } catch (error) {
-            console.error(`Error fetching assignments for listing ${listing.id}:`, error);
-            return {
-              ...listing,
-              assignmentCount: 0
-            };
-          }
-        })
-      );
-
-      setActiveListings(listingsWithCounts);
+      // Fetch assignment counts separately
+      for (const listing of initialListings) {
+        try {
+          const { total } = await assignmentsService.getAssignments(listing.id, 'itn', 1, 0);
+          
+          setActiveListings(prev => 
+            prev.map(item => 
+              item.id === listing.id 
+                ? { ...item, assignmentCount: total }
+                : item
+            )
+          );
+        } catch (error) {
+          console.error(`Error fetching assignments for listing ${listing.id}:`, error);
+        }
+      }
     } catch (error) {
       console.error('Error fetching listings:', error);
-      toast.error(error.message || 'Failed to fetch active listings');
+      toast.error('Failed to fetch listings');
       setActiveListings([]);
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Filter listings based on search term
+  const filteredListings = activeListings.filter(listing =>
+    !searchTerm.trim() ||
+    (listing.name && listing.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (listing.role && listing.role.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (listing.id && listing.id.toString().includes(searchTerm))
+  );
 
   return (
     <div className="assignments-container">
@@ -488,7 +483,7 @@ const Assignments = () => {
       <div className="scrollable-content">
         {isLoading ? (
           <div className="loading-state white-60 tc pa4">
-            Loading...
+            <span>Loading listings...</span>
           </div>
         ) : selectedListing ? (
           <AssignmentCards 
@@ -512,13 +507,19 @@ const Assignments = () => {
                     <div className="flex justify-between items-start mb3">
                       <div>
                         <div className="flex items-baseline mb2">
-                          <h3 className="f4 fw6 white mv0">{listing.name}</h3>
-                          <span className="listing-id ml2 f7 moon-gray">#{listing.id}</span>
+                          <h3 className="f4 fw6 white mv0">
+                            {listing.name || `Listing #${listing.id}`}
+                          </h3>
+                          <span className="listing-id ml2 f7 moon-gray">
+                            #{listing.id}
+                          </span>
                         </div>
-                        <p className="f6 gray mv0">{listing.role}</p>
+                        <p className="f6 gray mv0">
+                          {listing.role || 'Role not specified'}
+                        </p>
                       </div>
                       <div className="assignment-count f6 white-80 bg-dark-blue br2 pa2">
-                        {listing.assignmentCount} Assignments
+                        {listing.assignmentCount || 0} Assignments
                       </div>
                     </div>
                     <div className="flex justify-between items-center mt3">
@@ -528,7 +529,7 @@ const Assignments = () => {
                       >
                         View Details
                       </button>
-                      {listing.assignmentCount > 0 && (
+                      {(listing.assignmentCount > 0) && (
                         <button 
                           className="action-btn light-green-btn white ml2"
                           onClick={() => handleReviewAssignments(listing)}
