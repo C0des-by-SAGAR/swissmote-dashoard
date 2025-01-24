@@ -24,10 +24,10 @@ export const dashboardGraphService = {
 
       // Combine all automated listings
       const autoListings = [
-        ...(saJobData.automated || []),
-        ...(saInternData.automated || []),
-        ...(pvJobData.automated || []),
-        ...(pvInternData.automated || [])
+        ...(saJobData?.automated || []),
+        ...(saInternData?.automated || []),
+        ...(pvJobData?.automated || []),
+        ...(pvInternData?.automated || [])
       ];
 
       // Calculate Follow-up Status from auto listings
@@ -35,22 +35,30 @@ export const dashboardGraphService = {
         {
           name: 'Day 2 Sent',
           value: autoListings.filter(listing => 
-            listing.messages?.followup?.day2?.status === 'Completed').length
+            listing?.day_2_status === 'Completed' || 
+            listing?.messages?.followup?.day2?.status === 'Completed'
+          ).length || 0
         },
         {
           name: 'Day 2 Pending',
           value: autoListings.filter(listing => 
-            listing.messages?.followup?.day2?.status === 'Pending').length
+            listing?.day_2_status === 'Pending' || 
+            listing?.messages?.followup?.day2?.status === 'Pending'
+          ).length || 0
         },
         {
           name: 'Day 4 Sent',
           value: autoListings.filter(listing => 
-            listing.messages?.followup?.day4?.status === 'Completed').length
+            listing?.day_4_status === 'Completed' || 
+            listing?.messages?.followup?.day4?.status === 'Completed'
+          ).length || 0
         },
         {
           name: 'Day 4 Pending',
           value: autoListings.filter(listing => 
-            listing.messages?.followup?.day4?.status === 'Pending').length
+            listing?.day_4_status === 'Pending' || 
+            listing?.messages?.followup?.day4?.status === 'Pending'
+          ).length || 0
         }
       ];
 
