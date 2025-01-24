@@ -335,8 +335,10 @@ const Assignments = () => {
       setIsLoading(true);
       const loadingToast = toast.loading('Fetching assignments...');
       
-      const assignments = await assignmentsService.getAssignments(listingId);
+      // Always use 'itn' as source
+      const assignments = await assignmentsService.getAssignments(listingId, 'itn');
       
+      // Map the response to the expected structure
       setAssignmentsList(prev => ({
         ...prev,
         [listingId]: assignments.map(assignment => ({
@@ -361,6 +363,7 @@ const Assignments = () => {
         autoClose: 3000
       });
     } catch (error) {
+      console.error('Assignment fetch error:', error);
       toast.error(error.message || 'Failed to fetch assignments');
       setAssignmentsList(prev => ({
         ...prev,

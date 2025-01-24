@@ -10,13 +10,10 @@ const Header = ({
   isLoading 
 }) => {
   const handleEmploymentTypeChange = (e) => {
-    console.log('Employment type changed:', e.target.value);
     onFilterChange({ employmentType: e.target.value });
   };
 
   const handleAccountChange = (e) => {
-    console.log('Account changed:', e.target.value);
-    // Pass the display value, parent component will convert it
     onFilterChange({ account: e.target.value });
   };
 
@@ -34,7 +31,6 @@ const Header = ({
             value={filters.employmentType}
             onChange={handleEmploymentTypeChange}
             className="select-input"
-            aria-label="Select employment type"
           >
             <option value="job">Job</option>
             <option value="internship">Internship</option>
@@ -49,7 +45,6 @@ const Header = ({
                   filters.account}
             onChange={handleAccountChange}
             className="select-input"
-            aria-label="Select account"
           >
             <option value="Persist Ventures">Persist Ventures</option>
             <option value="Systemic Altruism">Systemic Altruism</option>
