@@ -4,16 +4,26 @@ import { authService } from './authService';
 export const jobService = {
   postJob: async (formData) => {
     try {
+      // Convert salary strings to numbers and remove any non-numeric characters
+      const minSalary = parseInt(formData.minSalary.replace(/[^0-9]/g, '')) || 0;
+      const maxSalary = parseInt(formData.maxSalary.replace(/[^0-9]/g, '')) || 0;
+
+      // Ensure skills are properly formatted as an array
+      const skills = formData.requiredSkills
+        .split(',')
+        .map(skill => skill.trim())
+        .filter(skill => skill.length > 0);
+
       const payload = {
-        username: "username", // You might want to get this from user context/auth
-        job_title: formData.jobTitle,
+        username: "username",
+        job_title: formData.jobTitle.trim(),
         min_experience: parseInt(formData.minExperience) || 0,
-        skills: formData.requiredSkills.split(',').map(skill => skill.trim()),
+        skills: skills,
         job_type: formData.workType.toLowerCase(),
         job_part_full: formData.employment === 'Full-Time' ? 'full' : 'part',
-        min_position: parseInt(formData.positions),
-        min_salary: parseInt(formData.minSalary.replace(/[^0-9]/g, '')),
-        max_salary: parseInt(formData.maxSalary.replace(/[^0-9]/g, '')),
+        num_position: parseInt(formData.positions) || 1,
+        min_salary: minSalary,
+        max_salary: maxSalary,
         account: formData.organization,
         post_on_linkedin: false
       };
@@ -21,11 +31,21 @@ export const jobService = {
       const response = await axios.post(
         'https://api.swissmote.com/postJob?dev=true',
         payload,
-        { headers: authService.getAuthHeaders() }
+        { 
+          headers: {
+            ...authService.getAuthHeaders(),
+            'Content-Type': 'application/json'
+          }
+        }
       );
       return response.data;
     } catch (error) {
-      throw new Error(error.response?.data?.message || 'Failed to post job');
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to post job';
+      console.error('Job posting error:', {
+        error: error.response?.data || error,
+        payload: error.config?.data
+      });
+      throw new Error(errorMessage);
     }
   },
   // Other job-related API methods can be added here
