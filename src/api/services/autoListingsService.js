@@ -4,26 +4,30 @@ import { authService } from './authService';
 export const autoListingsService = {
   getAutoListings: async (empType, account) => {
     try {
-      // Convert employment type to match API expectations based on dropdown values
-      const employmentType = empType?.toLowerCase() || '';
-      const accountType = account?.toLowerCase() || '';
+      // Get fresh auth headers
+      const headers = await authService.getAuthHeaders();
+      
+      // Convert employment type to match API expectations
+      const employmentType = empType?.toLowerCase() === 'job' ? 'job' : 
+                           empType?.toLowerCase() === 'internship' ? 'internship' : '';
+      
+      // Convert account type to match API expectations
+      const accountType = account?.toLowerCase() === 'pv' ? 'pv' :
+                         account?.toLowerCase() === 'sa' ? 'sa' : '';
 
-      const headers = authService.getAuthHeaders();
-
-      const response = await axios.post(
-        `https://api.swissmote.com/get_auto_listings`,
-        {
-          params: {
-            emp_type: employmentType,
-            account: accountType
-          },
-          headers: {
-            ...headers,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          }
+      const response = await axios({
+        method: 'POST', // Changed to POST based on API error
+        url: 'https://api.swissmote.com/get_auto_listings',
+        headers: {
+          ...headers,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        data: {  // Send as POST data instead of query params
+          emp_type: employmentType,
+          account: accountType
         }
-      );
+      });
 
       if (!response.data) {
         throw new Error('No data received from server');
@@ -31,10 +35,22 @@ export const autoListingsService = {
 
       return response.data.automated || [];
     } catch (error) {
-      console.error('API Error:', error);
+      console.error('Full error:', error);
+      
       if (error.response?.status === 401) {
-        throw new Error('Unauthorized. Please check your authentication.');
+        // Handle authentication error
+        console.error('Authentication error:', error.response?.data);
+        
+        // Attempt to refresh token if available
+        try {
+          await authService.refreshToken();
+          // Retry the request once after refreshing token
+          return autoListingsService.getAutoListings(empType, account);
+        } catch (refreshError) {
+          throw new Error('Authentication failed. Please log in again.');
+        }
       }
+      
       throw new Error(error.response?.data?.message || 'Failed to fetch auto listings');
     }
   },
