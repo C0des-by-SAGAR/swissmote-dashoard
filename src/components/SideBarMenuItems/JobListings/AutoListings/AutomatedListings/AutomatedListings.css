@@ -672,7 +672,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.75);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -680,13 +680,13 @@
 }
 
 .modal-content {
-  background: #ffffff;
-  border-radius: 8px;
+  background: #1e2837;
+  border-radius: 12px;
   width: 100%;
   max-width: 500px;
   padding: 24px;
   position: relative;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .modal-header {
@@ -698,88 +698,37 @@
 
 .modal-header h2 {
   font-size: 24px;
-  color: #1a1a1a;
+  color: #ffffff;
   margin: 0;
+  font-weight: 600;
 }
 
 .close-button {
   background: none;
   border: none;
-  font-size: 24px;
-  color: #666;
+  color: #94a3b8;
   cursor: pointer;
-  padding: 4px;
-}
-
-.assignment-input {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #e2e8f0;
+  padding: 8px;
   border-radius: 6px;
-  font-size: 16px;
-  margin-bottom: 24px;
-  box-sizing: border-box;
-}
-
-.assignment-input:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
-}
-
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-}
-
-.cancel-button,
-.submit-button {
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
   transition: all 0.2s;
 }
 
-.cancel-button {
-  background: #f3f4f6;
-  border: none;
-  color: #4b5563;
-}
-
-.submit-button {
-  background: #3b82f6;
-  border: none;
-  color: white;
-}
-
-.cancel-button:hover {
-  background: #e5e7eb;
-}
-
-.submit-button:hover {
-  background: #2563eb;
+.close-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
 }
 
 .modal-body {
   margin-bottom: 24px;
 }
 
-.input-label {
-  display: block;
-  font-size: 16px;
-  font-weight: 500;
-  color: #374151;
-  margin-bottom: 8px;
-}
-
 .announcement-input {
   width: 100%;
   padding: 12px;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  color: #ffffff;
   font-size: 16px;
   resize: vertical;
   min-height: 120px;
@@ -790,11 +739,62 @@
 .announcement-input:focus {
   outline: none;
   border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 
 .announcement-input::placeholder {
-  color: #9ca3af;
+  color: #94a3b8;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.cancel-button,
+.submit-button {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancel-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #ffffff;
+}
+
+.submit-button {
+  background: #3b82f6;
+  border: none;
+  color: white;
+}
+
+.cancel-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.submit-button:hover {
+  background: #2563eb;
+}
+
+/* Add disabled state styles */
+.submit-button:disabled {
+  background: #64748b;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.input-label {
+  display: block;
+  font-size: 16px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 8px;
 }
 
 .review-input {
