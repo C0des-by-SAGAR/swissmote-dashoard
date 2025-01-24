@@ -6,27 +6,41 @@ export const assignmentsService = {
     try {
       const headers = await authService.getAuthHeaders();
       
+      // Ensure listingId is properly formatted
+      const listing = parseInt(listingId, 10);
+
       const response = await axios({
         method: 'POST',
         url: 'https://api.swissmote.com/get_assignments',
         headers: {
           ...headers,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
         data: {
-          listing: listingId,
-          source: source,      // Keep this as 'itn'
-          row_data: rowData,
+          listing,           // Just the number, no additional formatting
+          source: "itn",     // Explicitly set as string
+          row_data: rowData, // Pagination
           offset_data: offsetData
         }
       });
 
-      if (response.data?.detail === "listing is not automated yet, please automate it first") {
-        throw new Error('Listing must be automated before viewing assignments');
+      // Add debug logging
+      console.log('API Response:', {
+        status: response.status,
+        data: response.data,
+        headers: response.headers
+      });
+
+      // Check if response is an error message
+      if (response.data?.detail) {
+        throw new Error(response.data.detail);
       }
 
-      // Transform the response data to match the component's expected structure
-      return response.data.map(assignment => ({
+      // Ensure response.data is an array
+      const assignments = Array.isArray(response.data) ? response.data : [];
+
+      return assignments.map(assignment => ({
         id: assignment.id,
         candidateName: assignment.candidate_name,
         company: assignment.company,
@@ -41,14 +55,28 @@ export const assignmentsService = {
       }));
 
     } catch (error) {
+      // Enhanced error logging
       console.error('Assignment fetch error:', {
         error: error,
         response: error.response?.data,
         status: error.response?.status,
-        message: error.message
+        message: error.message,
+        requestData: {
+          listing: listingId,
+          source: source,
+          row_data: rowData,
+          offset_data: offsetData
+        }
       });
+
       if (error.response?.status === 400) {
-        throw new Error(error.response.data?.detail || 'Failed to fetch assignments');
+        throw new Error(error.response.data?.detail || 'Invalid request parameters');
+      }
+      if (error.response?.status === 401) {
+        throw new Error('Authentication failed. Please log in again.');
+      }
+      if (error.response?.status === 403) {
+        throw new Error('You do not have permission to view these assignments.');
       }
       throw new Error(error.message || 'Failed to fetch assignments');
     }
