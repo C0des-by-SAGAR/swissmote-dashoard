@@ -4,11 +4,13 @@ import { authService } from './authService';
 export const autoListingsService = {
   getAutoListings: async (empType, account) => {
     try {
-      // Convert employment type to match API expectations
-      const employmentType = empType === 'All' ? '' : empType.toLowerCase();
+      // Convert employment type to match API expectations based on dropdown values
+      const employmentType = empType === 'job' ? 'job' : 
+                           empType === 'internship' ? 'internship' : '';
       
-      // Convert account type to match API expectations
-      const accountType = account === 'All' ? '' : account.toLowerCase();
+      // Convert account type to match API expectations based on dropdown values
+      const accountType = account === 'pv' ? 'pv' :
+                         account === 'sa' ? 'sa' : '';
 
       const response = await axios.get(
         `https://api.swissmote.com/get_auto_listings`,

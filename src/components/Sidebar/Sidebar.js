@@ -207,7 +207,7 @@ const Sidebar = ({ isExpanded, onToggle }) => {
 
       {/* Footer/Logout */}
       <div className="sidebar-footer">
-        <div 
+        {/* <div 
           className="logout-button"
           onClick={(e) => {
             e.stopPropagation();
@@ -218,7 +218,7 @@ const Sidebar = ({ isExpanded, onToggle }) => {
         >
           <FiMessageSquare />
           <span>Feedback</span>
-        </div>
+        </div> */}
         <div 
           className="logout-button"
           onClick={(e) => {
