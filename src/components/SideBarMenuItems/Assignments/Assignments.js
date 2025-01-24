@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { activeListings } from './mockData';
 import './Assignments.css';
 import { assignmentsService } from '../../../api/services/assignmentsService';
 import { toast } from 'react-toastify';

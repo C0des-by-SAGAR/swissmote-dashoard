@@ -39,7 +39,6 @@ const Header = ({
             className="select-input"
             aria-label="Select account"
           >
-            <option value="All">All Accounts</option>
             <option value="pv">Persist Ventures</option>
             <option value="sa">Systemic Altruism</option>
           </select>

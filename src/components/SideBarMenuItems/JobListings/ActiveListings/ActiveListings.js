@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { activeListingService } from '../../../../api/services/activeListingService';
 import { toast } from 'react-toastify';
-import { activeListingsData } from './activelistingsdata';
 
 const sortOptions = [
   { value: 'default', label: 'Sort By' },
