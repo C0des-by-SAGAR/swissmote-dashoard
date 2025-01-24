@@ -2,7 +2,7 @@ import axios from 'axios';
 import { authService } from './authService';
 
 export const assignmentsService = {
-  getAssignments: async (listingId, source = 'db', rowData = 10, offsetData = 0) => {
+  getAssignments: async (listingId, source = 'itn', rowData = 10, offsetData = 0) => {
     try {
       const payload = {
         listing: listingId,

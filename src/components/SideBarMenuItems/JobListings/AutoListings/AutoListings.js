@@ -59,14 +59,14 @@ const AutoListings = () => {
   const handleFilterChange = (newFilters) => {
     console.log('Filter change:', newFilters);
     const updatedFilters = {
-      ...newFilters,
-      emp_type: newFilters.employmentType,
-      account: newFilters.account?.toLowerCase() === 'persist ventures' ? 'pv' : 
-              newFilters.account?.toLowerCase() === 'systemic altruism' ? 'sa' : 
-              newFilters.account
+      ...filters,
+      emp_type: newFilters.employmentType || filters.emp_type,
+      account: newFilters.account === 'Persist Ventures' ? 'pv' : 
+              newFilters.account === 'Systemic Altruism' ? 'sa' : 
+              filters.account,
+      searchTerm: newFilters.searchTerm || filters.searchTerm
     };
-    delete updatedFilters.employmentType;
-    setFilters(prev => ({ ...prev, ...updatedFilters }));
+    setFilters(updatedFilters);
   };
 
   const filteredListings = {
@@ -88,7 +88,9 @@ const AutoListings = () => {
         onTabChange={handleTabChange}
         filters={{
           employmentType: filters.emp_type,
-          account: filters.account,
+          account: filters.account === 'pv' ? 'Persist Ventures' : 
+                  filters.account === 'sa' ? 'Systemic Altruism' : 
+                  filters.account,
           searchTerm: filters.searchTerm
         }}
         onFilterChange={handleFilterChange}

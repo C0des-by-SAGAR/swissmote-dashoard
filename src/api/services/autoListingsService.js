@@ -4,55 +4,25 @@ import { authService } from './authService';
 export const autoListingsService = {
   getAutoListings: async (empType, account) => {
     try {
-      // Get fresh auth headers
       const headers = await authService.getAuthHeaders();
       
-      // Convert employment type to match API expectations
-      const employmentType = empType?.toLowerCase() === 'job' ? 'job' : 
-                           empType?.toLowerCase() === 'internship' ? 'internship' : '';
-      
-      // Convert account type to match API expectations
-      const accountType = account?.toLowerCase() === 'persist ventures' ? 'pv' :
-                         account?.toLowerCase() === 'systemic altruism' ? 'sa' : 
-                         account?.toLowerCase(); // fallback to direct value if already abbreviated
-
+      // No need for complex conversions, just use the values directly
       const response = await axios({
         method: 'POST',
         url: 'https://api.swissmote.com/get_auto_listings',
         headers: {
           ...headers,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          'Content-Type': 'application/json'
         },
-        data: JSON.stringify({  // Explicitly stringify the data
-          emp_type: employmentType || 'job',  // Default to 'job' if empty
-          account: accountType || 'pv'        // Default to 'pv' if empty
-        })
+        data: {
+          emp_type: empType,    // API expects 'job' or 'internship' directly
+          account: account      // API expects 'pv' or 'sa' directly
+        }
       });
 
-      if (!response.data) {
-        throw new Error('No data received from server');
-      }
-
-      return response.data.automated || [];
+      return response.data?.automated || [];
     } catch (error) {
-      console.error('Full error:', error);
-      
-      if (error.response?.status === 422) {
-        console.error('Request validation error:', error.response?.data);
-        throw new Error('Invalid request format. Please check your input values.');
-      }
-      
-      if (error.response?.status === 401) {
-        console.error('Authentication error:', error.response?.data);
-        try {
-          await authService.refreshToken();
-          return autoListingsService.getAutoListings(empType, account);
-        } catch (refreshError) {
-          throw new Error('Authentication failed. Please log in again.');
-        }
-      }
-      
+      console.error('API Error:', error.response?.data);
       throw new Error(error.response?.data?.message || 'Failed to fetch auto listings');
     }
   },
