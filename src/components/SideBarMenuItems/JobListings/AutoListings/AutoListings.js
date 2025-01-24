@@ -4,13 +4,9 @@ import Header from './AutoListingsHeader';
 import AutomatedListings from './AutomatedListings/AutomatedListings';
 import NotAutomatedListings from './NotAutomatedListings/NotAutomatedListings';
 import ExpiredListings from './ExpiredListings/ExpiredListings';
-import { automatedListingsData } from './AutomatedListings/automatedListingsData';
-import { notAutomatedListingsData } from './NotAutomatedListings/notAutomatedListingsData';
-import { expiredListingsData } from './ExpiredListings/expiredListingsData';
 import './AutoListings.css';
-import { autoListingsService } from '../../../../api/services/autoListingsService';
-import { toast } from 'react-toastify';
 import { listingSorterService } from '../../../../api/services/listingSorterService';
+import { toast } from 'react-toastify';
 
 const AutoListings = () => {
   const [activeTab, setActiveTab] = useState('automated');
@@ -29,32 +25,12 @@ const AutoListings = () => {
   const fetchListings = async () => {
     try {
       setIsLoading(true);
-      const response = await autoListingsService.getAutoListings(
+      const sortedListings = await listingSorterService.getAllSortedListings(
         filters.emp_type,
         filters.account
       );
 
-      // Process listings and categorize them
-      const currentDate = new Date();
-      const processedListings = {
-        automated: response.automated.map(listing => ({
-          ...listing,
-          isExpired: new Date(listing.expiry_date) < currentDate
-        })),
-        notAutomated: response.not_automated.map(listing => ({
-          ...listing,
-          isExpired: new Date(listing.expiry_date) < currentDate
-        }))
-      };
-
-      setListings({
-        automated: processedListings.automated.filter(listing => !listing.isExpired),
-        notAutomated: processedListings.notAutomated.filter(listing => !listing.isExpired),
-        expired: [
-          ...processedListings.automated.filter(listing => listing.isExpired),
-          ...processedListings.notAutomated.filter(listing => listing.isExpired)
-        ]
-      });
+      setListings(sortedListings);
     } catch (error) {
       console.error('Fetch error:', error);
       toast.error('Failed to fetch listings');
@@ -72,28 +48,30 @@ const AutoListings = () => {
   };
 
   const handleFilterChange = (newFilters) => {
-    console.log('Filter change:', newFilters);
     const updatedFilters = {
       ...filters,
       emp_type: newFilters.employmentType || filters.emp_type,
-      account: newFilters.account === 'Persist Ventures' ? 'pv' : 
-              newFilters.account === 'Systemic Altruism' ? 'sa' : 
-              filters.account,
-      searchTerm: newFilters.searchTerm || filters.searchTerm
+      account: newFilters.account || filters.account,
+      searchTerm: newFilters.searchTerm ?? filters.searchTerm // Use nullish coalescing
     };
     setFilters(updatedFilters);
   };
 
+  // Safe filtering function
+  const safeFilter = (list, searchTerm) => {
+    if (!Array.isArray(list)) return [];
+    if (!searchTerm) return list;
+    
+    return list.filter(listing => {
+      const listingName = listing?.listingName || listing?.title || '';
+      return listingName.toLowerCase().includes(searchTerm.toLowerCase());
+    });
+  };
+
   const filteredListings = {
-    automated: listings.automated.filter(listing =>
-      listing.listingName.toLowerCase().includes(filters.searchTerm.toLowerCase())
-    ),
-    notAutomated: listings.notAutomated.filter(listing =>
-      listing.listingName.toLowerCase().includes(filters.searchTerm.toLowerCase())
-    ),
-    expired: listings.expired.filter(listing =>
-      listing.listingName.toLowerCase().includes(filters.searchTerm.toLowerCase())
-    )
+    automated: safeFilter(listings.automated, filters.searchTerm),
+    notAutomated: safeFilter(listings.notAutomated, filters.searchTerm),
+    expired: safeFilter(listings.expired, filters.searchTerm)
   };
 
   return (
@@ -114,13 +92,19 @@ const AutoListings = () => {
       />
 
       {activeTab === 'automated' && (
-        <AutomatedListings listings={filteredListings.automated} />
+        <AutomatedListings 
+          listings={filteredListings.automated || []} 
+        />
       )}
       {activeTab === 'not-automated' && (
-        <NotAutomatedListings listings={filteredListings.notAutomated} />
+        <NotAutomatedListings 
+          listings={filteredListings.notAutomated || []} 
+        />
       )}
       {activeTab === 'expired' && (
-        <ExpiredListings listings={filteredListings.expired} />
+        <ExpiredListings 
+          listings={filteredListings.expired || []} 
+        />
       )}
     </div>
   );
