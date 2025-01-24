@@ -35,52 +35,61 @@ const PostUnpaidInternship = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Enhanced validation with detailed checks
-    const validationErrors = [];
-    
-    if (!formData.internshipTitle?.trim()) validationErrors.push('Internship Title');
-    if (!formData.requiredSkills?.trim()) validationErrors.push('Required Skills');
-    if (!formData.positions) validationErrors.push('Positions');
-    if (!formData.duration) validationErrors.push('Duration');
-
-    if (validationErrors.length > 0) {
-      toast.error(`Please fill in the following required fields: ${validationErrors.join(', ')}`);
-      return;
-    }
-
-    if (currentStep !== 3) {
+    // Only validate required fields for current step
+    if (currentStep === 1) {
+      if (!formData.internshipTitle?.trim() || !formData.requiredSkills?.trim()) {
+        toast.error('Please fill in all required fields for Basic Information');
+        return;
+      }
       setCurrentStep(prev => prev + 1);
       return;
     }
 
-    try {
-      const loadingToast = toast.loading('Posting unpaid internship...');
-      console.log('Submitting form data:', formData); // Debug log
-      
-      await unpaidArmyService.postUnpaidInternship(formData);
-      
-      toast.update(loadingToast, {
-        render: 'Unpaid internship posted successfully!',
-        type: 'success',
-        isLoading: false,
-        autoClose: 3000
-      });
+    // Original validation for final submission
+    if (currentStep === 3) {
+      const validationErrors = [];
+      if (!formData.internshipTitle?.trim()) validationErrors.push('Internship Title');
+      if (!formData.requiredSkills?.trim()) validationErrors.push('Required Skills');
+      if (!formData.positions) validationErrors.push('Positions');
+      if (!formData.duration) validationErrors.push('Duration');
 
-      // Reset form
-      setFormData({
-        internshipTitle: '',
-        requiredSkills: '',
-        positions: '',
-        duration: '',
-        workType: 'Virtual',
-        employment: 'Part-Time',
-        organization: 'Systemic Altruism'
-      });
-      
-      setCurrentStep(1);
-    } catch (error) {
-      console.error('Submission error:', error); // Debug log
-      toast.error(error.message || 'Failed to post unpaid internship. Please try again.');
+      if (validationErrors.length > 0) {
+        toast.error(`Please fill in the following required fields: ${validationErrors.join(', ')}`);
+        return;
+      }
+
+      // Rest of the submission logic
+      try {
+        const loadingToast = toast.loading('Posting unpaid internship...');
+        console.log('Submitting form data:', formData); // Debug log
+        
+        await unpaidArmyService.postUnpaidInternship(formData);
+        
+        toast.update(loadingToast, {
+          render: 'Unpaid internship posted successfully!',
+          type: 'success',
+          isLoading: false,
+          autoClose: 3000
+        });
+
+        // Reset form
+        setFormData({
+          internshipTitle: '',
+          requiredSkills: '',
+          positions: '',
+          duration: '',
+          workType: 'Virtual',
+          employment: 'Part-Time',
+          organization: 'Systemic Altruism'
+        });
+        
+        setCurrentStep(1);
+      } catch (error) {
+        console.error('Submission error:', error); // Debug log
+        toast.error(error.message || 'Failed to post unpaid internship. Please try again.');
+      }
+    } else {
+      setCurrentStep(prev => prev + 1);
     }
   };
 
