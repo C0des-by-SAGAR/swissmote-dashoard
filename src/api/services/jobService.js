@@ -26,7 +26,8 @@ export const jobService = {
         max_salary: maxSalary,
         account: formData.organization,
         post_on_linkedin: false,
-        description: formData.jobTitle.trim() // Adding description as it might be required
+        description: formData.jobTitle.trim(),
+        job_employment_type: "job" // Adding required field
       };
 
       // Log the exact payload being sent for debugging
@@ -39,8 +40,7 @@ export const jobService = {
         data: payload,
         headers: {
           ...authService.getAuthHeaders(),
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          'Content-Type': 'application/json'
         }
       });
       
@@ -50,7 +50,7 @@ export const jobService = {
       console.error('Job posting error:', {
         error: error.response?.data || error,
         status: error.response?.status,
-        payload: JSON.parse(error.config?.data || '{}')
+        payload: error.config?.data
       });
       
       const errorMessage = error.response?.data?.message || error.message || 'Failed to post job';
