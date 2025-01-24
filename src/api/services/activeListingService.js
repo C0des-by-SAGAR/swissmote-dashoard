@@ -15,7 +15,7 @@ export const activeListingService = {
       return response.data.map(listing => ({
         id: listing['Listing No'],
         listingName: listing.listing_name,
-        projectName: listing['Project Name'],
+        projectName: listing['Project Name'], 
         organisation: listing.Organisation,
         process: listing.Process,
         designation: listing.Designation,
@@ -38,4 +38,4 @@ export const activeListingService = {
       throw new Error(error.response?.data?.message || 'Failed to fetch active listings');
     }
   }
-}; 
+};
