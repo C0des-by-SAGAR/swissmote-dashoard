@@ -35,9 +35,16 @@ const PostUnpaidInternship = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Validate required fields before submission
-    if (!formData.internshipTitle || !formData.requiredSkills || !formData.positions || !formData.duration) {
-      toast.error('Please fill in all required fields');
+    // Enhanced validation with detailed checks
+    const validationErrors = [];
+    
+    if (!formData.internshipTitle?.trim()) validationErrors.push('Internship Title');
+    if (!formData.requiredSkills?.trim()) validationErrors.push('Required Skills');
+    if (!formData.positions) validationErrors.push('Positions');
+    if (!formData.duration) validationErrors.push('Duration');
+
+    if (validationErrors.length > 0) {
+      toast.error(`Please fill in the following required fields: ${validationErrors.join(', ')}`);
       return;
     }
 
@@ -48,6 +55,7 @@ const PostUnpaidInternship = () => {
 
     try {
       const loadingToast = toast.loading('Posting unpaid internship...');
+      console.log('Submitting form data:', formData); // Debug log
       
       await unpaidArmyService.postUnpaidInternship(formData);
       
@@ -58,6 +66,7 @@ const PostUnpaidInternship = () => {
         autoClose: 3000
       });
 
+      // Reset form
       setFormData({
         internshipTitle: '',
         requiredSkills: '',
@@ -70,6 +79,7 @@ const PostUnpaidInternship = () => {
       
       setCurrentStep(1);
     } catch (error) {
+      console.error('Submission error:', error); // Debug log
       toast.error(error.message || 'Failed to post unpaid internship. Please try again.');
     }
   };
