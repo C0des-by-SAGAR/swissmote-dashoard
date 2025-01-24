@@ -13,7 +13,7 @@ export const autoListingsService = {
                          account?.toLowerCase() === 'sa' ? 'sa' : '';
 
       // Use query string format instead of params object
-      const response = await axios.get(
+      const response = await axios.post(
         `https://api.swissmote.com/get_auto_listings?emp_type=${employmentType}&account=${accountType}`,
         {
           headers: {
