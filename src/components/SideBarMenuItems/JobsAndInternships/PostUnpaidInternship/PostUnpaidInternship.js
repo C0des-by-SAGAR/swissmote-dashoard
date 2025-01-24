@@ -35,6 +35,12 @@ const PostUnpaidInternship = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Validate required fields before submission
+    if (!formData.internshipTitle || !formData.requiredSkills || !formData.positions || !formData.duration) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
     if (currentStep !== 3) {
       setCurrentStep(prev => prev + 1);
       return;
