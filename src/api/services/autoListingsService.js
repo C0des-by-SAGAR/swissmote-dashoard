@@ -12,21 +12,22 @@ export const autoListingsService = {
                            empType?.toLowerCase() === 'internship' ? 'internship' : '';
       
       // Convert account type to match API expectations
-      const accountType = account?.toLowerCase() === 'pv' ? 'pv' :
-                         account?.toLowerCase() === 'sa' ? 'sa' : '';
+      const accountType = account?.toLowerCase() === 'persist ventures' ? 'pv' :
+                         account?.toLowerCase() === 'systemic altruism' ? 'sa' : 
+                         account?.toLowerCase(); // fallback to direct value if already abbreviated
 
       const response = await axios({
-        method: 'POST', // Changed to POST based on API error
+        method: 'POST',
         url: 'https://api.swissmote.com/get_auto_listings',
         headers: {
           ...headers,
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        data: {  // Send as POST data instead of query params
-          emp_type: employmentType,
-          account: accountType
-        }
+        data: JSON.stringify({  // Explicitly stringify the data
+          emp_type: employmentType || 'job',  // Default to 'job' if empty
+          account: accountType || 'pv'        // Default to 'pv' if empty
+        })
       });
 
       if (!response.data) {
@@ -37,14 +38,15 @@ export const autoListingsService = {
     } catch (error) {
       console.error('Full error:', error);
       
+      if (error.response?.status === 422) {
+        console.error('Request validation error:', error.response?.data);
+        throw new Error('Invalid request format. Please check your input values.');
+      }
+      
       if (error.response?.status === 401) {
-        // Handle authentication error
         console.error('Authentication error:', error.response?.data);
-        
-        // Attempt to refresh token if available
         try {
           await authService.refreshToken();
-          // Retry the request once after refreshing token
           return autoListingsService.getAutoListings(empType, account);
         } catch (refreshError) {
           throw new Error('Authentication failed. Please log in again.');
