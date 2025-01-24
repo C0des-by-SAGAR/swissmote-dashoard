@@ -11,7 +11,18 @@ export const activeListingService = {
             ...authService.getAuthHeaders(),
             'Content-Type': 'application/json',
             'Accept': 'application/json'
-          }
+          },
+          transformResponse: [(data) => {
+            try {
+              // Remove any control characters before parsing JSON
+              const cleanData = data.replace(/[\x00-\x1F\x7F-\x9F]/g, '');
+              return JSON.parse(cleanData);
+            } catch (e) {
+              console.error('JSON Parse Error:', e);
+              console.log('Raw response:', data);
+              return null;
+            }
+          }]
         }
       );
 
@@ -41,19 +52,21 @@ export const activeListingService = {
         internshalaLink: listing.Internshala || '',
         leaderLink: listing['Leader link'] || '',
         candidateLink: listing['Candidate link'] || '',
-        assignmentLink: listing['Assignment link'] ? JSON.parse(listing['Assignment link']) : []
+        assignmentLink: listing['Assignment link'] ? 
+          (typeof listing['Assignment link'] === 'string' ? 
+            JSON.parse(listing['Assignment link'].replace(/[\x00-\x1F\x7F-\x9F]/g, '')) : 
+            listing['Assignment link']
+          ) : []
       }));
     } catch (error) {
-      // Enhanced error handling
+      // Enhanced error handling with logging
+      console.error('Full error:', error);
       if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
+        console.log('Response data:', error.response.data);
         throw new Error(`Server error: ${error.response.status} - ${error.response.data?.message || 'Unknown error'}`);
       } else if (error.request) {
-        // The request was made but no response was received
         throw new Error('No response received from server. Please check your connection.');
       } else {
-        // Something happened in setting up the request that triggered an Error
         throw new Error(`Error setting up request: ${error.message}`);
       }
     }
