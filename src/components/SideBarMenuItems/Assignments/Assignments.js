@@ -330,6 +330,11 @@ const Assignments = () => {
   const [replyingTo, setReplyingTo] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
+  // Add useEffect to fetch listings when component mounts
+  useEffect(() => {
+    fetchActiveListings();
+  }, []); // Empty dependency array means this runs once when component mounts
+
   const fetchAssignments = async (listingId) => {
     try {
       setIsLoading(true);
@@ -392,9 +397,24 @@ const Assignments = () => {
   const fetchActiveListings = async () => {
     try {
       setIsLoading(true);
+      const loadingToast = toast.loading('Fetching listings...');
+      
       const listings = await activeListingService.getActiveListings();
       
-      // Fetch assignment counts for each listing
+      // Set the listings first without waiting for assignment counts
+      setActiveListings(listings.map(listing => ({
+        ...listing,
+        assignmentCount: 0
+      })));
+
+      toast.update(loadingToast, {
+        render: 'Listings fetched successfully!',
+        type: 'success',
+        isLoading: false,
+        autoClose: 3000
+      });
+
+      // Then fetch assignment counts in the background
       const listingsWithCounts = await Promise.all(
         listings.map(async (listing) => {
           try {
@@ -415,6 +435,7 @@ const Assignments = () => {
 
       setActiveListings(listingsWithCounts);
     } catch (error) {
+      console.error('Error fetching listings:', error);
       toast.error(error.message || 'Failed to fetch active listings');
       setActiveListings([]);
     } finally {
@@ -465,7 +486,11 @@ const Assignments = () => {
       </header>
 
       <div className="scrollable-content">
-        {selectedListing ? (
+        {isLoading ? (
+          <div className="loading-state white-60 tc pa4">
+            Loading...
+          </div>
+        ) : selectedListing ? (
           <AssignmentCards 
             assignments={assignmentsList[selectedListing.id] || []}
             projectName={selectedListing.name}
@@ -478,41 +503,47 @@ const Assignments = () => {
           <>
             <h2 className="f3 fw5 white mv3 ml4">Active Listings</h2>
             <div className="active-listings-grid">
-              {filteredListings.map(listing => (
-                <div 
-                  key={listing.id}
-                  className="listing-card pa3 mb3 br2"
-                >
-                  <div className="flex justify-between items-start mb3">
-                    <div>
-                      <div className="flex items-baseline mb2">
-                        <h3 className="f4 fw6 white mv0">{listing.name}</h3>
-                        <span className="listing-id ml2 f7 moon-gray">#{listing.id}</span>
+              {filteredListings.length > 0 ? (
+                filteredListings.map(listing => (
+                  <div 
+                    key={listing.id}
+                    className="listing-card pa3 mb3 br2"
+                  >
+                    <div className="flex justify-between items-start mb3">
+                      <div>
+                        <div className="flex items-baseline mb2">
+                          <h3 className="f4 fw6 white mv0">{listing.name}</h3>
+                          <span className="listing-id ml2 f7 moon-gray">#{listing.id}</span>
+                        </div>
+                        <p className="f6 gray mv0">{listing.role}</p>
                       </div>
-                      <p className="f6 gray mv0">{listing.role}</p>
+                      <div className="assignment-count f6 white-80 bg-dark-blue br2 pa2">
+                        {listing.assignmentCount} Assignments
+                      </div>
                     </div>
-                    <div className="assignment-count f6 white-80 bg-dark-blue br2 pa2">
-                      {listing.assignmentCount} Assignments
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center mt3">
-                    <button className="action-btn light-blue-btn white">
-                      View Details
-                    </button>
-                    {listing.assignmentCount > 0 && (
+                    <div className="flex justify-between items-center mt3">
                       <button 
-                        className="action-btn light-green-btn white ml2"
+                        className="action-btn light-blue-btn white"
                         onClick={() => handleReviewAssignments(listing)}
                       >
-                        Review Assignments
+                        View Details
                       </button>
-                    )}
+                      {listing.assignmentCount > 0 && (
+                        <button 
+                          className="action-btn light-green-btn white ml2"
+                          onClick={() => handleReviewAssignments(listing)}
+                        >
+                          Review Assignments
+                        </button>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
-              {filteredListings.length === 0 && (
+                ))
+              ) : (
                 <div className="no-listings white-60 tc pa4">
-                  No listings found matching "{searchTerm}"
+                  {searchTerm 
+                    ? `No listings found matching "${searchTerm}"`
+                    : 'No active listings found'}
                 </div>
               )}
             </div>
