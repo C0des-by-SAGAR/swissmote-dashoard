@@ -26,8 +26,8 @@ const Header = ({
             aria-label="Select employment type"
           >
             <option value="All">All Types</option>
-            <option value="Job">Job</option>
-            <option value="Internship">Internship</option>
+            <option value="job">Job</option>
+            <option value="internship">Internship</option>
           </select>
         </div>
         
