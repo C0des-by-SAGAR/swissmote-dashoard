@@ -28,20 +28,25 @@ export const assignmentsService = {
       // Transform the response data to match the component's expected structure
       return response.data.map(assignment => ({
         id: assignment.id,
-        candidate_name: assignment.candidate_name,
+        candidateName: assignment.candidate_name,
         company: assignment.company,
         status: assignment.status,
         location: assignment.location,
         experience: assignment.experience,
-        received_date: assignment.received_date,
+        receivedDate: assignment.received_date,
         relocation: assignment.relocation,
         attachments: assignment.attachments || [],
-        listing_number: assignment.listing_number,
-        candidate_id: assignment.candidate_id
+        listingNumber: assignment.listing_number,
+        candidateId: assignment.candidate_id
       }));
 
     } catch (error) {
-      console.error('Assignment fetch error:', error.response?.data || error);
+      console.error('Assignment fetch error:', {
+        error: error,
+        response: error.response?.data,
+        status: error.response?.status,
+        message: error.message
+      });
       if (error.response?.status === 400) {
         throw new Error(error.response.data?.detail || 'Failed to fetch assignments');
       }
