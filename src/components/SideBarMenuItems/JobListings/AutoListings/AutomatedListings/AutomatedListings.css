@@ -591,6 +591,7 @@
   word-break: break-word;
   line-height: 1.2;
   box-sizing: border-box;
+  margin: 1rem;
 }
 
 .action-button:hover {
