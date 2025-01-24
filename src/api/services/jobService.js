@@ -4,16 +4,17 @@ import { authService } from './authService';
 export const jobService = {
   postJob: async (formData) => {
     try {
-      // Convert salary strings to numbers and remove any non-numeric characters
-      const minSalary = parseInt(formData.minSalary.replace(/[^0-9]/g, '')) || 0;
-      const maxSalary = parseInt(formData.maxSalary.replace(/[^0-9]/g, '')) || 0;
+      // Convert salary strings to numbers (remove non-numeric characters)
+      const minSalary = parseInt(formData.minSalary.replace(/[^0-9]/g, ''));
+      const maxSalary = parseInt(formData.maxSalary.replace(/[^0-9]/g, ''));
 
-      // Ensure skills are properly formatted as an array of strings
+      // Format skills array
       const skills = formData.requiredSkills
         .split(',')
         .map(skill => skill.trim())
-        .filter(skill => skill.length > 0);
+        .filter(Boolean);
 
+      // Construct payload exactly matching API requirements
       const payload = {
         username: "username",
         job_title: formData.jobTitle.trim(),
@@ -21,32 +22,31 @@ export const jobService = {
         skills: skills,
         job_type: formData.workType.toLowerCase(),
         job_part_full: formData.employment === 'Full-Time' ? 'full' : 'part',
-        num_position: parseInt(formData.positions) || 1,
+        num_position: parseInt(formData.positions),
         min_salary: minSalary,
         max_salary: maxSalary,
-        account: formData.organization,
+        account: formData.organization, // Already mapped in PostJobs component
         post_on_linkedin: false
       };
 
-      const response = await axios.post(
-        'https://api.swissmote.com/postJob?dev=true',
-        payload,
-        {
-          headers: {
-            ...authService.getAuthHeaders(),
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-      
+      const response = await axios({
+        method: 'POST',
+        url: 'https://api.swissmote.com/postJob',
+        params: { dev: true },
+        headers: {
+          ...authService.getAuthHeaders(),
+          'Content-Type': 'application/json'
+        },
+        data: payload
+      });
+
       return response.data;
     } catch (error) {
       console.error('Job posting error:', {
-        error: error.response?.data || error,
         status: error.response?.status,
+        data: error.response?.data,
         payload: error.config?.data
       });
-      
       throw new Error(error.response?.data?.message || 'Failed to post job');
     }
   },

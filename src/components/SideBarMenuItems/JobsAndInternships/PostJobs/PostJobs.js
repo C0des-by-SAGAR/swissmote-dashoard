@@ -44,7 +44,7 @@ const PostJobs = () => {
     }
 
     if (!formData.jobTitle || !formData.requiredSkills || !formData.positions || 
-        !formData.minSalary || !formData.organization) {
+        !formData.minSalary || !formData.maxSalary || !formData.organization) {
       toast.error('Please fill in all required fields');
       return;
     }
@@ -53,8 +53,14 @@ const PostJobs = () => {
       const loadingToast = toast.loading('Posting job...');
       
       const formattedData = {
-        ...formData,
+        jobTitle: formData.jobTitle.trim(),
+        minExperience: formData.minExperience.trim(),
+        requiredSkills: formData.requiredSkills.trim(),
         workType: formData.workType.toLowerCase(),
+        employment: formData.employment === 'Full-Time' ? 'full' : 'part',
+        positions: formData.positions,
+        minSalary: formData.minSalary.replace(/[^0-9]/g, ''),
+        maxSalary: formData.maxSalary.replace(/[^0-9]/g, ''),
         organization: organizationMap[formData.organization]
       };
       
