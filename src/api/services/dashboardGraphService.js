@@ -22,45 +22,59 @@ export const dashboardGraphService = {
         autoListingsService.getPVInternshipListings()
       ]);
 
-      // Combine all automated listings
+      // Combine all automated listings and ensure proper data structure
       const autoListings = [
         ...(saJobData?.automated || []),
         ...(saInternData?.automated || []),
         ...(pvJobData?.automated || []),
         ...(pvInternData?.automated || [])
-      ];
+      ].map(listing => ({
+        ...listing,
+        messages: listing.messages || {},
+        followup: listing.followup || listing.messages?.followup || {}
+      }));
+
+      console.log('Auto Listings:', autoListings); // Debug log
 
       // Calculate Follow-up Status from auto listings
       const followUpData = [
         {
           name: 'Day 2 Sent',
           value: autoListings.filter(listing => 
-            listing?.day_2_status === 'Completed' || 
-            listing?.messages?.followup?.day2?.status === 'Completed'
-          ).length || 0
+            listing.followup?.day2?.status === 'Completed' ||
+            listing.day2_status === 'Completed' ||
+            listing.messages?.followup?.day2?.status === 'Completed'
+          ).length
         },
         {
           name: 'Day 2 Pending',
           value: autoListings.filter(listing => 
-            listing?.day_2_status === 'Pending' || 
-            listing?.messages?.followup?.day2?.status === 'Pending'
-          ).length || 0
+            listing.followup?.day2?.status === 'Pending' ||
+            listing.day2_status === 'Pending' ||
+            listing.messages?.followup?.day2?.status === 'Pending' ||
+            (!listing.followup?.day2?.status && !listing.day2_status && !listing.messages?.followup?.day2?.status)
+          ).length
         },
         {
           name: 'Day 4 Sent',
           value: autoListings.filter(listing => 
-            listing?.day_4_status === 'Completed' || 
-            listing?.messages?.followup?.day4?.status === 'Completed'
-          ).length || 0
+            listing.followup?.day4?.status === 'Completed' ||
+            listing.day4_status === 'Completed' ||
+            listing.messages?.followup?.day4?.status === 'Completed'
+          ).length
         },
         {
           name: 'Day 4 Pending',
           value: autoListings.filter(listing => 
-            listing?.day_4_status === 'Pending' || 
-            listing?.messages?.followup?.day4?.status === 'Pending'
-          ).length || 0
+            listing.followup?.day4?.status === 'Pending' ||
+            listing.day4_status === 'Pending' ||
+            listing.messages?.followup?.day4?.status === 'Pending' ||
+            (!listing.followup?.day4?.status && !listing.day4_status && !listing.messages?.followup?.day4?.status)
+          ).length
         }
       ];
+
+      console.log('Follow-up Data:', followUpData); // Debug log
 
       // Calculate Conversion Rate Distribution
       const allListings = [...activeListings, ...closedListings];
