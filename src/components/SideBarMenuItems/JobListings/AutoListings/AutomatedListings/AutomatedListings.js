@@ -235,96 +235,136 @@ const AutomatedListings = ({ listings }) => {
         {currentCards.map((listing, index) => (
           <div 
             key={index} 
-            className="listing-card bg-dark-blue pa3 br3 mb3 relative"
+            className="listing-card" 
             onClick={() => handleCardClick(listing)}
           >
-            {/* Listing Content */}
-            <div className="listing-content">
-              <div className="mb2">
-                <h3 className="listing-title ma0 mb2">{listing.listingName}</h3>
-                <p className="listing-date ma0 mb2">Date: {listing.date}</p>
+            <div className="card-header">
+              <div className="header-content">
+                <h2 className="listing-title">{listing.listingName}</h2>
+                <p className="listing-number">#{listing.listingNumber}</p>
               </div>
-
-              <div className="listing-details">
-                <div className="detail-item">
-                  <span className="label">Assignment Links</span>
-                  <span className="value">{listing.assignmentLinks || 'N/A'}</span>
-                </div>
-                <div className="detail-item">
-                  <span className="label">Review Links</span>
-                  <span className="value">{listing.reviewLinks || 'N/A'}</span>
-                </div>
-                <div className="detail-item">
-                  <span className="label">Intro Message</span>
-                  <span className="value">{listing.introMessage || 'N/A'}</span>
-                </div>
-                <div className="detail-item">
-                  <span className="label">Assignment Message</span>
-                  <span className="value">{listing.assignmentMessage || 'N/A'}</span>
-                </div>
-
-                {/* Follow-up Status */}
-                <div className="detail-item">
-                  <span className="label">Day 2 Followup</span>
-                  <span className={getStatusBadgeClass(listing.day2Status || 'Pending')}>
-                    {listing.day2Status || 'Pending'}
-                  </span>
-                </div>
-                <div className="detail-item">
-                  <span className="label">Day 4 Followup</span>
-                  <span className={getStatusBadgeClass(listing.day4Status || 'Pending')}>
-                    {listing.day4Status || 'Pending'}
-                  </span>
-                </div>
-
-                {/* Dates and Users */}
-                <div className="detail-item">
-                  <span className="label">Expiry Date</span>
-                  <span className="value">{listing.expiryDate}</span>
-                </div>
-                <div className="detail-item">
-                  <span className="label">Created By</span>
-                  <span className="value">{listing.createdBy || 'Unknown'}</span>
-                </div>
-                <div className="detail-item">
-                  <span className="label">Automated By</span>
-                  <span className="value">{listing.automatedBy || 'Unknown'}</span>
-                </div>
+              <div className="organization-info">
+                <span className="organization">{listing.organisation}</span>
               </div>
             </div>
 
-            {/* Actions Button and Menu */}
-            <div className="actions-container relative" onClick={e => e.stopPropagation()}>
+            <div className="card-body">
+              <div className="metrics-grid">
+                <div className="metric-item">
+                  <label>Posted Over</label>
+                  <span>{listing.postedOver}</span>
+                </div>
+                <div className="metric-item">
+                  <label>Conversion Rate</label>
+                  <span>{listing.conversionRate}</span>
+                </div>
+              </div>
+
+              <div className="assignments-section">
+                <div className="assignments-grid">
+                  <div className="assignment-item">
+                    <label>Assignments</label>
+                    <div className="assignment-stats">
+                      <span>Received: {listing.assignments?.received}</span>
+                      <span>Sent: {listing.assignments?.sent}</span>
+                    </div>
+                  </div>
+                  <div className="assignment-item">
+                    <label>Applications</label>
+                    <div className="application-stats">
+                      <span>New: {listing.applications?.new}</span>
+                      <span>Total: {listing.applications?.total}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="links-section">
+                <div className="links-grid">
+                  <div className="link-item">
+                    <label>Assignment Links</label>
+                    <div className="link-list">
+                      {listing.assignmentLinks?.map((link, i) => (
+                        <a key={i} href={link} target="_blank" rel="noopener noreferrer">
+                          Link {i + 1}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="link-item">
+                    <label>Review Links</label>
+                    <div className="link-list">
+                      {listing.reviewLinks?.map((link, i) => (
+                        <a key={i} href={link} target="_blank" rel="noopener noreferrer">
+                          Link {i + 1}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="messages-section">
+                <div className="message-item">
+                  <label>Intro Message</label>
+                  <p>{listing.messages?.intro}</p>
+                </div>
+                <div className="message-item">
+                  <label>Assignment Message</label>
+                  <p>{listing.messages?.assignment}</p>
+                </div>
+                <div className="followup-grid">
+                  <div className="followup-item">
+                    <label>Day 2 Followup</label>
+                    <span className={`status ${listing.messages?.followup?.day2?.status?.toLowerCase()}`}>
+                      {listing.messages?.followup?.day2?.status}
+                    </span>
+                  </div>
+                  <div className="followup-item">
+                    <label>Day 4 Followup</label>
+                    <span className={`status ${listing.messages?.followup?.day4?.status?.toLowerCase()}`}>
+                      {listing.messages?.followup?.day4?.status}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="dates-section">
+                <div className="date-item">
+                  <label>Expiry Date</label>
+                  <span>{listing.dates?.expiry}</span>
+                </div>
+                <div className="date-item">
+                  <label>Created By</label>
+                  <span>{listing.createdBy}</span>
+                </div>
+              </div>
+
+              <div className="automated-by">
+                <label>Automated By</label>
+                <span>{listing.automatedBy}</span>
+              </div>
+            </div>
+
+            <div className="card-actions">
               <button 
-                className="actions-button bg-blue white bn br2 pa2 pointer w-100"
+                className="action-button" 
                 onClick={(e) => handleActionClick(e, index)}
               >
                 Actions
               </button>
               {activeMenu === index && (
-                <div className="actions-menu absolute right-0 bg-dark-blue br2 shadow-5 z-1">
-                  <button 
-                    className="action-item white bn bg-transparent w-100 tl pa2 pointer hover-bg-blue"
-                    onClick={(e) => handlePostAssignment(listing, e)}
-                  >
+                <div className="action-menu">
+                  <button onClick={(e) => handlePostAssignment(listing, e)}>
                     Post Assignment
                   </button>
-                  <button 
-                    className="action-item white bn bg-transparent w-100 tl pa2 pointer hover-bg-blue"
-                    onClick={(e) => handleMakeAnnouncement(listing, e)}
-                  >
+                  <button onClick={(e) => handleMakeAnnouncement(listing, e)}>
                     Make Announcement
                   </button>
-                  <button 
-                    className="action-item white bn bg-transparent w-100 tl pa2 pointer hover-bg-blue"
-                    onClick={(e) => handleAddReview(listing, e)}
-                  >
+                  <button onClick={(e) => handleAddReview(listing, e)}>
                     Add Review
                   </button>
-                  <button 
-                    className="action-item white bn bg-transparent w-100 tl pa2 pointer hover-bg-blue"
-                    onClick={(e) => handleEditFollowUp(listing, e)}
-                  >
+                  <button onClick={(e) => handleEditFollowUp(listing, e)}>
                     Edit Follow-Up Message
                   </button>
                 </div>
@@ -334,7 +374,7 @@ const AutomatedListings = ({ listings }) => {
         ))}
       </div>
 
-      {/* Modals */}
+      {/* Modal */}
       {selectedListing && (
         <ListingDetailsModal
           data={selectedListing}
@@ -344,7 +384,6 @@ const AutomatedListings = ({ listings }) => {
         />
       )}
 
-      {/* Action Modals */}
       {showAssignmentModal && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -523,7 +562,6 @@ const AutomatedListings = ({ listings }) => {
         </div>
       )}
 
-      {/* Pagination */}
       {listings.length > cardsPerPage && (
         <div className="pagination">
           <button 
