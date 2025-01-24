@@ -8,7 +8,7 @@ export const jobService = {
       const minSalary = parseInt(formData.minSalary.replace(/[^0-9]/g, '')) || 0;
       const maxSalary = parseInt(formData.maxSalary.replace(/[^0-9]/g, '')) || 0;
 
-      // Ensure skills are properly formatted as an array
+      // Ensure skills are properly formatted as an array of strings
       const skills = formData.requiredSkills
         .split(',')
         .map(skill => skill.trim())
@@ -25,26 +25,35 @@ export const jobService = {
         min_salary: minSalary,
         max_salary: maxSalary,
         account: formData.organization,
-        post_on_linkedin: false
+        post_on_linkedin: false,
+        description: formData.jobTitle.trim() // Adding description as it might be required
       };
 
-      const response = await axios.post(
-        'https://api.swissmote.com/postJob?dev=true',
-        payload,
-        { 
-          headers: {
-            ...authService.getAuthHeaders(),
-            'Content-Type': 'application/json'
-          }
+      // Log the exact payload being sent for debugging
+      console.log('Sending payload:', JSON.stringify(payload));
+
+      const response = await axios({
+        method: 'POST',
+        url: 'https://api.swissmote.com/postJob',
+        params: { dev: true },
+        data: payload,
+        headers: {
+          ...authService.getAuthHeaders(),
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         }
-      );
+      });
+      
       return response.data;
     } catch (error) {
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to post job';
+      // Enhanced error logging
       console.error('Job posting error:', {
         error: error.response?.data || error,
-        payload: error.config?.data
+        status: error.response?.status,
+        payload: JSON.parse(error.config?.data || '{}')
       });
+      
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to post job';
       throw new Error(errorMessage);
     }
   },
