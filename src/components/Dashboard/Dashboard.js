@@ -75,17 +75,23 @@ const Dashboard = () => {
   };
 
   const renderChart = (data) => {
+    // Ensure data exists and has length
+    if (!data || data.length === 0) return null;
+
     switch (chartType) {
       case 'Bar':
         return (
           <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.1)" />
             <XAxis dataKey="name" stroke="#e2e8f0" />
-            <YAxis stroke="#e2e8f0" />
+            <YAxis stroke="#e2e8f0" domain={[0, 'auto']} allowDecimals={false} />
             <Tooltip content={<CustomTooltip />} />
-            <Bar dataKey="value">
+            <Bar dataKey="value" minPointSize={1}>
               {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={Object.values(neonColors)[index % Object.values(neonColors).length]} />
+                <Cell 
+                  key={`cell-${index}`} 
+                  fill={Object.values(neonColors)[index % Object.values(neonColors).length]} 
+                />
               ))}
             </Bar>
           </BarChart>
@@ -155,7 +161,11 @@ const Dashboard = () => {
           <h2 className="chart-title">Follow-up Status</h2>
         </div>
         <ResponsiveContainer width="100%" height={300}>
-          {renderChart(graphData.followUpData)}
+          {graphData.followUpData && graphData.followUpData.length > 0 ? (
+            renderChart(graphData.followUpData)
+          ) : (
+            <div className="no-data-message">No follow-up data available</div>
+          )}
         </ResponsiveContainer>
         <div className="follow-up-summary">
           <h3>Day 2 Follow-ups</h3>
