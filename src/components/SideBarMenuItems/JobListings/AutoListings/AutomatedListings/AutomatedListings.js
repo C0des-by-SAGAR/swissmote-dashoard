@@ -39,8 +39,8 @@ const AutomatedListings = ({ listings }) => {
     setCurrentPage(1);
   }, [listings]);
 
-  const handleActionClick = (index, e) => {
-    e.stopPropagation();
+  const handleActionClick = (e, index) => {
+    e.stopPropagation(); // Prevent card click
     setActiveMenu(activeMenu === index ? null : index);
   };
 
@@ -233,7 +233,11 @@ const AutomatedListings = ({ listings }) => {
     <div className="automated-listings-container">
       <div className="listings-grid">
         {currentCards.map((listing, index) => (
-          <div key={index} className="listing-card">
+          <div 
+            key={index} 
+            className="listing-card" 
+            onClick={() => handleCardClick(listing)}
+          >
             <div className="card-header">
               <div className="header-content">
                 <h2 className="listing-title">{listing.listingName}</h2>
@@ -343,15 +347,26 @@ const AutomatedListings = ({ listings }) => {
             </div>
 
             <div className="card-actions">
-              <button className="action-button" onClick={() => handleActionClick(index)}>
+              <button 
+                className="action-button" 
+                onClick={(e) => handleActionClick(e, index)}
+              >
                 Actions
               </button>
               {activeMenu === index && (
                 <div className="action-menu">
-                  <button onClick={(e) => handlePostAssignment(listing, e)}>Post Assignment</button>
-                  <button onClick={(e) => handleMakeAnnouncement(listing, e)}>Make Announcement</button>
-                  <button onClick={(e) => handleAddReview(listing, e)}>Add Review</button>
-                  <button onClick={(e) => handleEditFollowUp(listing, e)}>Edit Follow-Up Message</button>
+                  <button onClick={(e) => handlePostAssignment(listing, e)}>
+                    Post Assignment
+                  </button>
+                  <button onClick={(e) => handleMakeAnnouncement(listing, e)}>
+                    Make Announcement
+                  </button>
+                  <button onClick={(e) => handleAddReview(listing, e)}>
+                    Add Review
+                  </button>
+                  <button onClick={(e) => handleEditFollowUp(listing, e)}>
+                    Edit Follow-Up Message
+                  </button>
                 </div>
               )}
             </div>
