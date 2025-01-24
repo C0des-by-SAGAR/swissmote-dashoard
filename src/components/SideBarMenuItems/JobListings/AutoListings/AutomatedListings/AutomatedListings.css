@@ -850,3 +850,29 @@
 .update-message:hover {
   background: #2563eb;
 }
+
+.card-actions {
+  display: flex;
+  gap: 8px;
+  padding: 16px;
+  flex-wrap: wrap;
+}
+
+.action-button {
+  padding: 8px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 1;
+  min-width: fit-content;
+}
+
+.action-button:hover {
+  background-color: #f5f5f5;
+}
+
+.action-button:active {
+  background-color: #e0e0e0;
+}

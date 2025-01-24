@@ -348,27 +348,29 @@ const AutomatedListings = ({ listings }) => {
 
             <div className="card-actions">
               <button 
-                className="action-button" 
-                onClick={(e) => handleActionClick(e, index)}
+                className="action-button"
+                onClick={(e) => handlePostAssignment(listing, e)}
               >
-                Actions
+                Post Assignment
               </button>
-              {activeMenu === index && (
-                <div className="action-menu">
-                  <button onClick={(e) => handlePostAssignment(listing, e)}>
-                    Post Assignment
-                  </button>
-                  <button onClick={(e) => handleMakeAnnouncement(listing, e)}>
-                    Make Announcement
-                  </button>
-                  <button onClick={(e) => handleAddReview(listing, e)}>
-                    Add Review
-                  </button>
-                  <button onClick={(e) => handleEditFollowUp(listing, e)}>
-                    Edit Follow-Up Message
-                  </button>
-                </div>
-              )}
+              <button 
+                className="action-button"
+                onClick={(e) => handleMakeAnnouncement(listing, e)}
+              >
+                Make Announcement
+              </button>
+              <button 
+                className="action-button"
+                onClick={(e) => handleAddReview(listing, e)}
+              >
+                Add Review
+              </button>
+              <button 
+                className="action-button"
+                onClick={(e) => handleEditFollowUp(listing, e)}
+              >
+                Edit Follow-Up Message
+              </button>
             </div>
           </div>
         ))}
