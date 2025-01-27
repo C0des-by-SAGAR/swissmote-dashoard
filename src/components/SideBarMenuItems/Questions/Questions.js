@@ -168,12 +168,6 @@ const Questions = () => {
               onChange={handleSearch}
             />
           </div>
-          <button 
-            className="refresh-button"
-            onClick={handleRefresh}
-          >
-            <span>Refresh</span>
-          </button>
         </div>
       </header>
 
@@ -187,10 +181,23 @@ const Questions = () => {
                 className={`listing-item ${selectedListing === listing.id ? 'selected' : ''}`}
                 onClick={() => setSelectedListing(listing.id)}
               >
-                <span>{listing.name}</span>
-                <span className="listing-id">#{listing.id}</span>
+                <div className="listing-info">
+                  <span className="listing-name">{listing.name}</span>
+                  <span className="listing-role">Role not specified</span>
+                </div>
+                <div className="question-badge">
+                  {/* Add question count if available */}
+                  {questionsList.filter(q => q.listingId === listing.id).length} Questions
+                </div>
               </div>
             ))}
+            {activeListings.length === 0 && (
+              <div className="no-listings">
+                {searchQuery 
+                  ? `No listings found matching "${searchQuery}"`
+                  : 'No active listings found'}
+              </div>
+            )}
           </div>
         </aside>
 
@@ -202,20 +209,16 @@ const Questions = () => {
               {filteredQuestions.map((question) => (
                 <div key={question.id} className="question-card">
                   <div className="question-header">
-                    <div className="author-avatar">
-                      {question.author[0]}
+                    <div className="author-info">
+                      <div className="author-avatar">{question.author[0]}</div>
+                      <div className="question-meta">
+                        <h3>{question.author}</h3>
+                        <time>{question.date}</time>
+                      </div>
                     </div>
-                    <div className="question-meta">
-                      <h3>{question.author}</h3>
-                      <time>{question.date}</time>
-                    </div>
-                    <div className="question-id">
-                      ID: {question.id}
-                    </div>
+                    <div className="question-id">ID: {question.id}</div>
                   </div>
-                  <div className="question-content">
-                    {question.content}
-                  </div>
+                  <div className="question-content">{question.content}</div>
                   <div className="question-actions">
                     <button 
                       className="reply-button"
@@ -224,64 +227,39 @@ const Questions = () => {
                     >
                       Reply
                     </button>
-                    {replyingTo === question.id && (
-                      <form 
-                        className="reply-form"
-                        onSubmit={(e) => handleReplySubmit(question, e)}
-                      >
+                  </div>
+                  {replyingTo === question.id && (
+                    <div className="reply-field-container">
+                      <form onSubmit={(e) => handleReplySubmit(question, e)}>
                         <textarea 
                           name="reply"
-                          className="reply-input"
+                          className="reply-textarea"
                           placeholder="Write your reply..."
-                          rows="3"
                           required
                           disabled={isSubmittingReply}
                         />
-                        <div className="reply-form-actions">
-                          <button 
-                            type="submit" 
-                            className="submit-reply"
-                            disabled={isSubmittingReply}
-                          >
-                            {isSubmittingReply ? 'Sending...' : 'Submit'}
-                          </button>
+                        <div className="reply-actions">
                           <button 
                             type="button" 
-                            className="cancel-reply"
                             onClick={() => setReplyingTo(null)}
+                            className="cancel-btn"
                             disabled={isSubmittingReply}
                           >
                             Cancel
                           </button>
+                          <button 
+                            type="submit"
+                            className="submit-btn"
+                            disabled={isSubmittingReply}
+                          >
+                            {isSubmittingReply ? 'Sending...' : 'Send'}
+                          </button>
                         </div>
                       </form>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
               ))}
-
-              {pagination.totalPages > 1 && (
-                <div className="pagination-controls">
-                  <button
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="pagination-button"
-                  >
-                    Previous
-                  </button>
-                  <span className="page-info">
-                    Page {currentPage} of {pagination.totalPages}
-                  </span>
-                  <button
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === pagination.totalPages}
-                    className="pagination-button"
-                  >
-                    Next
-                  </button>
-                </div>
-              )}
-
               {filteredQuestions.length === 0 && (
                 <div className="no-questions">
                   {selectedListing ? 'No questions found for this listing' : 'Select a listing to view questions'}
