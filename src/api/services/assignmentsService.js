@@ -74,26 +74,57 @@ export const assignmentsService = {
    * @returns {Array} Formatted attachments array
    */
   _parseAttachments: (attachments) => {
-    if (!Array.isArray(attachments)) return [];
+    // If attachments is not provided or null, return empty array
+    if (!attachments) return [];
     
-    return attachments.map(attachment => {
-      // Handle string-only attachments (like messages)
-      if (typeof attachment === 'string') {
+    // Ensure attachments is an array
+    const attachmentArray = Array.isArray(attachments) ? attachments : [attachments];
+    
+    return attachmentArray.map(attachment => {
+      try {
+        // Handle string-only attachments (like messages)
+        if (typeof attachment === 'string') {
+          return {
+            type: 'message',
+            name: attachment,
+            url: null
+          };
+        }
+
+        // Handle array-type attachments [type, name, url]
+        if (Array.isArray(attachment)) {
+          const [type, name, url] = attachment;
+          return {
+            type: type || 'link',
+            name: name || url,
+            url: url
+          };
+        }
+
+        // Handle object-type attachments (fallback)
+        if (typeof attachment === 'object') {
+          return {
+            type: attachment.type || 'link',
+            name: attachment.name || attachment.url,
+            url: attachment.url
+          };
+        }
+
+        // Default fallback
         return {
-          type: 'message',
-          name: attachment,
+          type: 'unknown',
+          name: 'Unknown attachment',
+          url: null
+        };
+      } catch (error) {
+        console.warn('Error parsing attachment:', attachment, error);
+        return {
+          type: 'error',
+          name: 'Error parsing attachment',
           url: null
         };
       }
-
-      // Handle array-type attachments [type, name, url]
-      const [type, name, url] = attachment;
-      return {
-        type: type || 'link',
-        name: name || url,
-        url: url
-      };
-    }).filter(attachment => attachment.url || attachment.type === 'message');
+    }).filter(attachment => attachment && (attachment.url || attachment.type === 'message'));
   },
 
   /**
