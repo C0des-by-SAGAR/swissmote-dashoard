@@ -395,10 +395,10 @@ const Assignments = () => {
         throw new Error('Invalid listings response');
       }
 
-      // Map initial listings with basic info
+      // Update mapping to use projectName instead of hardcoded "Listing"
       const initialListings = listings.map(listing => ({
         id: listing.id,
-        name: listing.name || `Listing #${listing.id}`,
+        name: listing.projectName || `Project #${listing.id}`, // Use projectName instead of name
         role: listing.role || 'Role not specified',
         assignmentCount: 0
       }));
