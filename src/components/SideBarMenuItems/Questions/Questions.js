@@ -19,15 +19,25 @@ const Questions = () => {
     totalCount: 0
   });
   const [isSubmittingReply, setIsSubmittingReply] = useState(false);
+  const [listingCounts, setListingCounts] = useState({});
 
   useEffect(() => {
     fetchActiveListings();
   }, []);
 
-  // Fetch questions when listing is selected or page changes
+  // Add new effect to fetch all question counts on initial load
+  useEffect(() => {
+    if (activeListings.length > 0) {
+      fetchAllQuestionCounts();
+    }
+  }, [activeListings]);
+
+  // Remove the bulk questions fetching effect and modify the listing selection effect
   useEffect(() => {
     if (selectedListing) {
       fetchQuestions();
+      // Only fetch count for the selected listing
+      fetchQuestionCount(selectedListing);
     }
   }, [selectedListing, currentPage]);
 
@@ -44,6 +54,21 @@ const Questions = () => {
       setActiveListings([]);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchAllQuestionCounts = async () => {
+    try {
+      const counts = {};
+      await Promise.all(
+        activeListings.map(async (listing) => {
+          const result = await questionsService.getQuestionsCount(listing.id);
+          counts[listing.id] = result.count;
+        })
+      );
+      setListingCounts(counts);
+    } catch (error) {
+      console.error('Error fetching question counts:', error);
     }
   };
 
@@ -78,6 +103,18 @@ const Questions = () => {
       setQuestionsList([]);
     } finally {
       setIsLoadingQuestions(false);
+    }
+  };
+
+  const fetchQuestionCount = async (listingId) => {
+    try {
+      const result = await questionsService.getQuestionsCount(listingId);
+      setListingCounts(prev => ({
+        ...prev,
+        [listingId]: result.count
+      }));
+    } catch (error) {
+      console.error('Error fetching question count:', error);
     }
   };
 
@@ -151,6 +188,15 @@ const Questions = () => {
     setCurrentPage(newPage);
   };
 
+  // Add function to sort listings by question count
+  const getSortedListings = () => {
+    return [...activeListings].sort((a, b) => {
+      const countA = listingCounts[a.id] || 0;
+      const countB = listingCounts[b.id] || 0;
+      return countB - countA; // Sort in descending order
+    });
+  };
+
   return (
     <div className="questions-dashboard">
       <header className="dashboard-header">
@@ -175,7 +221,7 @@ const Questions = () => {
         <aside className="active-listings">
           <h2>Active Listings</h2>
           <div className="listings-scroll">
-            {activeListings.map((listing) => (
+            {getSortedListings().map((listing) => (
               <div 
                 key={listing.id} 
                 className={`listing-item ${selectedListing === listing.id ? 'selected' : ''}`}
@@ -185,9 +231,8 @@ const Questions = () => {
                   <span className="listing-name">{listing.name}</span>
                   <span className="listing-role">Role not specified</span>
                 </div>
-                <div className="question-badge">
-                  {/* Add question count if available */}
-                  {questionsList.filter(q => q.listingId === listing.id).length} Questions
+                <div className={`question-badge ${(listingCounts[listing.id] || 0) > 0 ? 'has-questions' : ''}`}>
+                  {listingCounts[listing.id] || 0} Questions
                 </div>
               </div>
             ))}

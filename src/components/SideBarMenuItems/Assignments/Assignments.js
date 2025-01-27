@@ -342,13 +342,18 @@ const Assignments = () => {
       
       const { assignments, total } = await assignmentsService.getAssignments(listingId);
       
+      // Ensure assignments is an array
+      if (!Array.isArray(assignments)) {
+        throw new Error('Invalid assignments data received');
+      }
+
       // Update the assignments list
       setAssignmentsList(prev => ({
         ...prev,
         [listingId]: assignments
       }));
 
-      // Update only the selected listing's assignment count
+      // Update the selected listing's assignment count
       setActiveListings(prevListings => 
         prevListings.map(listing => 
           listing.id === listingId 
@@ -366,6 +371,7 @@ const Assignments = () => {
     } catch (error) {
       console.error('Assignment fetch error:', error);
       toast.error(error.message || 'Failed to fetch assignments');
+      // Initialize empty assignments array for this listing
       setAssignmentsList(prev => ({
         ...prev,
         [listingId]: []
@@ -384,15 +390,32 @@ const Assignments = () => {
         throw new Error('Invalid listings response');
       }
 
-      // Initialize listings with 0 assignments
+      // Initialize listings with their IDs and names
       const initialListings = listings.map(listing => ({
         id: listing.id,
         name: listing.projectName || `Project #${listing.id}`,
         role: listing.role || 'Role not specified',
-        assignmentCount: 0 // Initialize with 0, will be updated when listing is selected
+        assignmentCount: 0
       }));
 
+      // Set initial listings state
       setActiveListings(initialListings);
+
+      // Fetch assignment counts for each listing
+      for (const listing of initialListings) {
+        try {
+          const { total } = await assignmentsService.getAssignments(listing.id, 1, 0);
+          setActiveListings(prev => 
+            prev.map(item => 
+              item.id === listing.id 
+                ? { ...item, assignmentCount: total }
+                : item
+            )
+          );
+        } catch (error) {
+          console.warn(`Failed to fetch count for listing ${listing.id}:`, error);
+        }
+      }
     } catch (error) {
       console.error('Error fetching listings:', error);
       toast.error('Failed to fetch listings');

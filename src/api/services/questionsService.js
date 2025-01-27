@@ -3,11 +3,16 @@ import { authService } from './authService';
 import { activeListingService } from './activeListingService';
 
 export const questionsService = {
-  getQuestions: async (listingId, offset = 0, limit = 1) => {
+  getQuestions: async (listingId, offset = 0, limit = 10) => {
     try {
       const response = await axios.get(
-        `https://api.swissmote.com/getQuestions?listing=${listingId}&offset=${offset}&limit=${limit}`,
+        `https://api.swissmote.com/getQuestions`,
         {
+          params: {
+            listing: listingId,
+            offset,
+            limit
+          },
           headers: authService.getAuthHeaders()
         }
       );
@@ -21,13 +26,16 @@ export const questionsService = {
         data: response.data
       };
     } catch (error) {
-      if (error.response?.status === 422) {
-        // Handle Unprocessable Entity error
+      if (error.response?.status === 404) {
+        // Return empty data for listings with no questions
         return {
           success: true,
           data: {
             questions: [],
-            total: 0
+            pagination: {
+              total_count: 0,
+              total_pages: 0
+            }
           }
         };
       }
@@ -59,6 +67,40 @@ export const questionsService = {
     } catch (error) {
       console.error('Error fetching all questions:', error);
       throw new Error('Failed to fetch questions for active listings');
+    }
+  },
+
+  getQuestionsCount: async (listingId) => {
+    try {
+      const response = await axios.get(
+        `https://api.swissmote.com/getQuestions`,
+        {
+          params: {
+            listing: listingId,
+            offset: 0,
+            limit: 1
+          },
+          headers: authService.getAuthHeaders()
+        }
+      );
+
+      return {
+        success: true,
+        count: response.data?.pagination?.total_count || 0
+      };
+    } catch (error) {
+      if (error.response?.status === 404) {
+        // Return 0 for listings with no questions
+        return {
+          success: true,
+          count: 0
+        };
+      }
+      console.error('Error fetching questions count:', error);
+      return {
+        success: false,
+        count: 0
+      };
     }
   }
 }; 
