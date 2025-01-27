@@ -1,65 +1,109 @@
 import axios from 'axios';
 import { authService } from './authService';
 
+const API_URL = 'https://api.swissmote.com/get_assignments';
+
 export const assignmentsService = {
-  getAssignments: async (listingId, source = 'itn', rowData = 10, offsetData = 0) => {
+  /**
+   * Fetches assignments for a given listing ID
+   * @param {number} listingId - The listing ID to fetch assignments for
+   * @param {number} rowData - Number of rows to fetch (default: 10)
+   * @param {number} offsetData - Offset for pagination (default: 0)
+   * @returns {Promise<{assignments: Array, total: number}>}
+   */
+  getAssignments: async (listingId, rowData = 10, offsetData = 0) => {
     try {
       const headers = await authService.getAuthHeaders();
       
-      // Ensure listingId is a string for the API
-      const listing = listingId.toString();
-
       const response = await axios({
-        method: 'POST',  // Changed to GET based on network tab
-        url: 'https://api.swissmote.com/get_assignments',
+        method: 'POST',
+        url: API_URL,
         headers: {
           ...headers,
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        params: {  // Using params instead of data for GET request
-          listing,
-          source: "itn",
+        data: {
+          listing: parseInt(listingId, 10), // Ensure listingId is an integer
+          source: 'itn',
           row_data: rowData,
           offset_data: offsetData
         }
       });
 
-      // Add debug logging
-      console.log('Assignment API Response:', response.data);
+      if (!response.data.success) {
+        throw new Error('Failed to fetch assignments');
+      }
 
-      const assignments = Array.isArray(response.data) ? response.data : [];
-      
+      const assignmentsData = response.data.data || {};
+      const assignments = Object.entries(assignmentsData).map(([id, data]) => ({
+        id,
+        candidateId: id,
+        candidateName: data.name || 'Unknown',
+        company: data.from || 'Not specified',
+        status: data.evaluated ? 'evaluated' : 'pending',
+        location: data.location || 'Not specified',
+        experience: data.job_expreince || 'Not specified',
+        receivedDate: data.recieved_on || new Date().toISOString(),
+        relocation: data.relocation ? 'Yes' : 'No',
+        attachments: this._parseAttachments(data.assignment || []),
+        listingNumber: listingId,
+        replied: data.replied === 1,
+        evaluated: data.evaluated,
+        futureConsideration: data.future_consideration
+      }));
+
       return {
-        assignments: assignments.map((assignment) => ({
-          id: assignment.id || '',
-          candidateName: assignment.candidate_name || 'Unknown',
-          company: assignment.company || 'Not specified',
-          status: assignment.status || 'pending',
-          location: assignment.location || 'Not specified',
-          experience: assignment.experience || 'Not specified',
-          receivedDate: assignment.received_date || new Date().toISOString(),
-          relocation: assignment.relocation || 'Not specified',
-          attachments: assignment.attachments || [],
-          listingNumber: assignment.listing_number || listing,
-          candidateId: assignment.candidate_id || '',
-        })),
-        total: assignments.length
+        assignments,
+        total: response.data.count || 0
       };
     } catch (error) {
       console.error('Assignment fetch error:', {
         error,
-        response: error.response?.data,
+        message: error.response?.data?.message || error.message,
         status: error.response?.status,
-        listingId,
-        headers: error.response?.headers
+        listingId
       });
-      return { assignments: [], total: 0 }; // Return empty result instead of throwing
+      throw new Error(error.response?.data?.message || 'Failed to fetch assignments');
     }
   },
 
+  /**
+   * Helper method to parse attachments array from API response
+   * @param {Array} attachments - Raw attachments array from API
+   * @returns {Array} Formatted attachments array
+   */
+  _parseAttachments: (attachments) => {
+    if (!Array.isArray(attachments)) return [];
+    
+    return attachments.map(attachment => {
+      // Handle string-only attachments (like messages)
+      if (typeof attachment === 'string') {
+        return {
+          type: 'message',
+          name: attachment,
+          url: null
+        };
+      }
+
+      // Handle array-type attachments [type, name, url]
+      const [type, name, url] = attachment;
+      return {
+        type: type || 'link',
+        name: name || url,
+        url: url
+      };
+    }).filter(attachment => attachment.url || attachment.type === 'message');
+  },
+
+  /**
+   * Fetches a paginated list of assignments
+   * @param {number} listingId - The listing ID to fetch assignments for
+   * @param {number} page - Page number (default: 1)
+   * @param {number} itemsPerPage - Items per page (default: 10)
+   */
   getAssignmentsPage: async (listingId, page = 1, itemsPerPage = 10) => {
     const offset = (page - 1) * itemsPerPage;
-    return assignmentsService.getAssignments(listingId, 'itn', itemsPerPage, offset);
+    return this.getAssignments(listingId, itemsPerPage, offset);
   }
 };

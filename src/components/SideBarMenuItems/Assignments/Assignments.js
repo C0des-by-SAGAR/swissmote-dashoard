@@ -340,7 +340,7 @@ const Assignments = () => {
       setIsLoading(true);
       const loadingToast = toast.loading('Fetching assignments...');
       
-      const { assignments, total } = await assignmentsService.getAssignments(listingId, 'itn');
+      const { assignments, total } = await assignmentsService.getAssignments(listingId);
       
       // Update the assignments list and the count
       setAssignmentsList(prev => ({
@@ -395,10 +395,9 @@ const Assignments = () => {
         throw new Error('Invalid listings response');
       }
 
-      // Update mapping to use projectName instead of hardcoded "Listing"
       const initialListings = listings.map(listing => ({
         id: listing.id,
-        name: listing.projectName || `Project #${listing.id}`, // Use projectName instead of name
+        name: listing.projectName || `Project #${listing.id}`,
         role: listing.role || 'Role not specified',
         assignmentCount: 0
       }));
@@ -408,7 +407,7 @@ const Assignments = () => {
       // Fetch assignment counts separately
       for (const listing of initialListings) {
         try {
-          const { total } = await assignmentsService.getAssignments(listing.id, 'itn', 1, 0);
+          const { total } = await assignmentsService.getAssignments(listing.id, 10, 0);
           
           setActiveListings(prev => 
             prev.map(item => 
