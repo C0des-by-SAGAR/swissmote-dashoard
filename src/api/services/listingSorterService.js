@@ -19,43 +19,43 @@ export const listingSorterService = {
         listings.automated.forEach(listing => {
           const expiryDate = new Date(listing.expiry_date);
           const processedListing = {
-            ...listing,
-            // Match the data structure shown in the screenshot
-            listingName: listing.listing_name || 'Untitled',
-            listingNumber: listing.listing_number || '',
-            organisation: listing.organisation || 'Unknown',
-            postedOver: `${listing.posted_over || 0} days`,
-            conversionRate: `${listing.conversion_rate || 0}%`,
+            listingName: listing.listing_name,
+            listingNumber: listing.listing_number,
+            projectName: listing.projectname,
+            date: listing.date,
+            organisation: listing.posted_over || 'Unknown',
+            postedOver: listing.posted_over || 'Unknown',
+            conversionRate: listing.conversion_rate || '0%',
             assignments: {
-              received: listing.assignments_received || '0/0',
-              sent: listing.assignments_sent || '0/0'
+              received: `${listing.metrics?.assignments_received_count || 0}/${listing.metrics?.assignments_sent_count || 0}`,
+              sent: `${listing.metrics?.assignments_sent_count || 0}/${listing.metrics?.total_applications_count || 0}`
             },
             applications: {
-              new: listing.new_applications || 0,
-              total: listing.total_applications || 0
+              new: listing.metrics?.total_new_count || 0,
+              total: listing.metrics?.total_applications_count || 0
             },
-            assignmentLinks: listing.assignment_links || [],
-            reviewLinks: listing.review_links || [],
+            assignmentLinks: listing.assignment_link || [],
+            reviewLinks: listing.review_link || [],
             messages: {
-              intro: listing.intro_message || '',
-              assignment: listing.assignment_message || '',
+              intro: listing.messages?.intro || '',
+              assignment: listing.messages?.assignment || '',
               followup: {
                 day2: {
-                  message: listing.day_2_followup || '',
-                  status: listing.day_2_status || 'Pending'
+                  message: listing.day2followup?.followup || '',
+                  status: listing.day2followup?.status === 1 ? 'Completed' : 'Pending'
                 },
                 day4: {
-                  message: listing.day_4_followup || '',
-                  status: listing.day_4_status || 'Pending'
+                  message: listing.day4followup?.followup || '',
+                  status: listing.day4followup?.status === 1 ? 'Completed' : 'Pending'
                 }
               }
             },
             dates: {
-              expiry: expiryDate.toLocaleDateString(),
-              created: new Date(listing.created_at).toLocaleDateString()
+              expiry: listing.expiry_date,
+              created: listing.date
             },
-            createdBy: listing.created_by || 'Unknown',
-            automatedBy: listing.automated_by || 'Unknown',
+            createdBy: listing.platform_data?.created_by || 'Unknown',
+            automatedBy: listing.platform_data?.automated_by || 'Unknown',
             isExpired: expiryDate < currentDate
           };
 
@@ -72,13 +72,13 @@ export const listingSorterService = {
         listings.not_automated.forEach(listing => {
           const expiryDate = new Date(listing.expiry_date);
           const processedListing = {
-            ...listing,
-            listingName: listing.listing_name || 'Untitled',
-            listingNumber: listing.listing_number || '',
-            organisation: listing.organisation || 'Unknown',
-            employmentType: listing.employment_type || 'Unknown',
-            expiryDate: expiryDate.toLocaleDateString(),
-            createdBy: listing.created_by || 'Unknown',
+            listingName: listing.listing_name,
+            listingNumber: listing.listing_number,
+            organisation: 'Not Automated',
+            employmentType: empType || 'Unknown',
+            expiryDate: listing.expiry_date,
+            createdBy: listing.platform_data?.created_by || 'Unknown',
+            automatedBy: listing.platform_data?.automated_by || 'N/A',
             isExpired: expiryDate < currentDate
           };
 

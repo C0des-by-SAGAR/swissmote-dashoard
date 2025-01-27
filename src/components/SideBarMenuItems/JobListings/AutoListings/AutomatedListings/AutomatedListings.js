@@ -7,6 +7,11 @@ import { addAssignmentService } from '../../../../../api/services/addAssignmentS
 import { reviewService } from '../../../../../api/services/reviewService';
 import { followupService } from '../../../../../api/services/followupService';
 
+const truncateText = (text, maxLength = 100) => {
+  if (!text) return '';
+  return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+};
+
 const AutomatedListings = ({ listings }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [activeMenu, setActiveMenu] = useState(null);
@@ -307,11 +312,15 @@ const AutomatedListings = ({ listings }) => {
               <div className="messages-section">
                 <div className="message-item">
                   <label>Intro Message</label>
-                  <p>{listing.messages?.intro}</p>
+                  <p className="truncated-message">
+                    {truncateText(listing.messages?.intro)}
+                  </p>
                 </div>
                 <div className="message-item">
                   <label>Assignment Message</label>
-                  <p>{listing.messages?.assignment}</p>
+                  <p className="truncated-message">
+                    {truncateText(listing.messages?.assignment)}
+                  </p>
                 </div>
                 <div className="followup-grid">
                   <div className="followup-item">

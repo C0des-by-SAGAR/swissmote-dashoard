@@ -6,6 +6,12 @@ const ListingDetailsModal = ({ data, dailyUpdates, isLoadingUpdates, onClose }) 
     return null;
   }
 
+  // Access messages from the correct path in the data structure
+  const introMessage = data.messages?.intro || 'No intro message available';
+  const assignmentMessage = data.messages?.assignment || 'No assignment message available';
+  const day2FollowupMessage = data.messages?.followup?.day2?.message || 'No day 2 followup available';
+  const day4FollowupMessage = data.messages?.followup?.day4?.message || 'No day 4 followup available';
+
   return (
     <div className="modal-overlay fixed top-0 left-0 w-100 h-100 flex items-center justify-center bg-black-60 z-999">
       <div className="modal-content bg-dark-blue white-90 br3 w-70 mw8" style={{ maxHeight: '90vh' }}>
@@ -64,14 +70,14 @@ const ListingDetailsModal = ({ data, dailyUpdates, isLoadingUpdates, onClose }) 
                 <span className="f6 blue">Intro Message</span>
               </div>
               <div className="message-content bg-black-20 pa3 br2 lh-copy white-90">
-                <pre className="message-text ma0 white-90 overflow-auto">
-                  {data.introMessage || 'No intro message available'}
+                <pre className="message-text ma0 white-90 overflow-auto" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                  {introMessage}
                 </pre>
               </div>
             </div>
 
             {/* Assignment Message */}
-            <div className="message-item">
+            <div className="message-item mb4">
               <div className="message-header flex items-center mb2">
                 <span className="green mr2">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
@@ -81,8 +87,8 @@ const ListingDetailsModal = ({ data, dailyUpdates, isLoadingUpdates, onClose }) 
                 <span className="f6 green">Assignment Message</span>
               </div>
               <div className="message-content bg-black-20 pa3 br2 lh-copy white-90">
-                <pre className="message-text ma0 white-90 overflow-auto">
-                  {data.assignmentMessage || 'No assignment message available'}
+                <pre className="message-text ma0 white-90 overflow-auto" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                  {assignmentMessage}
                 </pre>
               </div>
             </div>
@@ -103,12 +109,26 @@ const ListingDetailsModal = ({ data, dailyUpdates, isLoadingUpdates, onClose }) 
           {/* Followups */}
           <div className="mb4">
             <div className="mb3">
-              <div className="white-60 f6 mb2">Day 2 Followup</div>
-              <p className="ma0 f6 lh-copy white-80 i">{data.day2Followup || 'No day 2 followup available'}</p>
+              <div className="message-header flex items-center mb2">
+                <span className="orange mr2">Day 2 Followup</span>
+                <span className={`ml2 ${data.messages?.followup?.day2?.status === 'Completed' ? 'green' : 'red'}`}>
+                  ({data.messages?.followup?.day2?.status || 'Pending'})
+                </span>
+              </div>
+              <pre className="ma0 f6 lh-copy white-80 bg-black-20 pa3 br2" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                {day2FollowupMessage}
+              </pre>
             </div>
             <div>
-              <div className="white-60 f6 mb2">Day 4 Followup</div>
-              <p className="ma0 f6 lh-copy white-80 i">{data.day4Followup || 'No day 4 followup available'}</p>
+              <div className="message-header flex items-center mb2">
+                <span className="orange mr2">Day 4 Followup</span>
+                <span className={`ml2 ${data.messages?.followup?.day4?.status === 'Completed' ? 'green' : 'red'}`}>
+                  ({data.messages?.followup?.day4?.status || 'Pending'})
+                </span>
+              </div>
+              <pre className="ma0 f6 lh-copy white-80 bg-black-20 pa3 br2" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                {day4FollowupMessage}
+              </pre>
             </div>
           </div>
 
