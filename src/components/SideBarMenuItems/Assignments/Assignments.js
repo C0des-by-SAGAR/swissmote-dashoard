@@ -439,117 +439,82 @@ const Assignments = () => {
   );
 
   return (
-    <div className="assignments-container">
-      <header className="fixed-header pa4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <h1 className="f2 fw5 white mv0">Assignments</h1>
-            <div className="flex items-center ml4 gray f6">
-              <span className="mr3">
-                <span className="status-indicator-dot bg-green mr2"></span>
-                Evaluated
-              </span>
-              <span className="mr3">
-                <span className="status-indicator-dot bg-gold mr2"></span>
-                Pending
-              </span>
-            </div>
+    <div className="assignments-dashboard">
+      <header className="dashboard-header">
+        <div className="header-title">
+          <h1>Assignments Dashboard</h1>
+          <span className="assignment-count">{filteredListings.length} Listings</span>
+        </div>
+        <div className="header-actions">
+          <div className="search-container">
+            <input 
+              type="search"
+              placeholder={selectedListing ? "Search assignments..." : "Search listings..."}
+              className="search-input"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
-          <div className="flex items-center">
-            <select 
-              className="custom-dropdown mr3 pa2 bg-dark-gray white bn br2"
-              value={filterBy}
-              onChange={(e) => setFilterBy(e.target.value)}
-              aria-label="Filter assignments"
-            >
-              <option value="all">All Assignments</option>
-              <option value="evaluated">Evaluated</option>
-              <option value="pending">Pending</option>
-            </select>
-            <div className="search-container relative">
-              <input
-                type="search"
-                placeholder={selectedListing ? "Search assignments..." : "Search listings..."}
-                className="search-input pa2 pr4 br2 w5"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                aria-label={selectedListing ? "Search assignments" : "Search listings"}
-              />
-            </div>
-          </div>
+          <select 
+            className="filter-dropdown"
+            value={filterBy}
+            onChange={(e) => setFilterBy(e.target.value)}
+            aria-label="Filter assignments"
+          >
+            <option value="all">All Assignments</option>
+            <option value="evaluated">Evaluated</option>
+            <option value="pending">Pending</option>
+          </select>
         </div>
       </header>
 
-      <div className="scrollable-content">
-        {isLoading ? (
-          <div className="loading-state white-60 tc pa4">
-            <span>Loading listings...</span>
-          </div>
-        ) : selectedListing ? (
-          <AssignmentCards 
-            assignments={assignmentsList[selectedListing.id] || []}
-            projectName={selectedListing.name}
-            listingId={selectedListing.id}
-            onBack={handleBack}
-            filterBy={filterBy}
-            searchTerm={searchTerm}
-          />
-        ) : (
-          <>
-            <h2 className="f3 fw5 white mv3 ml4">Active Listings</h2>
-            <div className="active-listings-grid">
-              {filteredListings.length > 0 ? (
-                filteredListings.map(listing => (
-                  <div 
-                    key={listing.id}
-                    className="listing-card pa3 mb3 br2"
-                  >
-                    <div className="flex justify-between items-start mb3">
-                      <div>
-                        <div className="flex items-baseline mb2">
-                          <h3 className="f4 fw6 white mv0">
-                            {listing.name || `Listing #${listing.id}`}
-                          </h3>
-                          <span className="listing-id ml2 f7 moon-gray">
-                            #{listing.id}
-                          </span>
-                        </div>
-                        <p className="f6 gray mv0">
-                          {listing.role || 'Role not specified'}
-                        </p>
-                      </div>
-                      <div className="assignment-count f6 white-80 bg-dark-blue br2 pa2">
-                        {listing.assignmentCount || 0} Assignments
-                      </div>
-                    </div>
-                    <div className="flex justify-between items-center mt3">
-                      <button 
-                        className="action-btn light-blue-btn white"
-                        onClick={() => handleReviewAssignments(listing)}
-                      >
-                        View Details
-                      </button>
-                      {(listing.assignmentCount > 0) && (
-                        <button 
-                          className="action-btn light-green-btn white ml2"
-                          onClick={() => handleReviewAssignments(listing)}
-                        >
-                          Review Assignments
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="no-listings white-60 tc pa4">
-                  {searchTerm 
-                    ? `No listings found matching "${searchTerm}"`
-                    : 'No active listings found'}
+      <div className="dashboard-content">
+        <aside className="active-listings">
+          <h2>Active Listings</h2>
+          <div className="listings-scroll">
+            {filteredListings.map(listing => (
+              <div 
+                key={listing.id}
+                className={`listing-item ${selectedListing?.id === listing.id ? 'selected' : ''}`}
+                onClick={() => handleReviewAssignments(listing)}
+              >
+                <div className="listing-info">
+                  <span className="listing-name">{listing.name}</span>
+                  <span className="listing-role">{listing.role}</span>
                 </div>
-              )}
+                <div className="assignment-badge">
+                  {listing.assignmentCount} Assignments
+                </div>
+              </div>
+            ))}
+            {filteredListings.length === 0 && (
+              <div className="no-listings">
+                {searchTerm 
+                  ? `No listings found matching "${searchTerm}"`
+                  : 'No active listings found'}
+              </div>
+            )}
+          </div>
+        </aside>
+
+        <main className="assignments-container">
+          {isLoading ? (
+            <div className="loading-state">Loading assignments...</div>
+          ) : selectedListing ? (
+            <AssignmentCards 
+              assignments={assignmentsList[selectedListing.id] || []}
+              projectName={selectedListing.name}
+              listingId={selectedListing.id}
+              onBack={handleBack}
+              filterBy={filterBy}
+              searchTerm={searchTerm}
+            />
+          ) : (
+            <div className="no-selection">
+              Select a listing to view assignments
             </div>
-          </>
-        )}
+          )}
+        </main>
       </div>
     </div>
   );

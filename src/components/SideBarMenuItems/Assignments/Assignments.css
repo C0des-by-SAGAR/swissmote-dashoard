@@ -948,3 +948,149 @@
 .assignment-card[data-status="evaluated"] {
   border-color: #276749;
 }
+
+/* Update existing styles to match Questions layout */
+.assignments-dashboard {
+  padding: 2rem;
+  min-height: 100vh;
+  background-color: #1a202c;
+  color: #e2e8f0;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header-title h1 {
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin: 0;
+  color: white;
+}
+
+.assignment-count {
+  background-color: #2d3748;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.875rem;
+  color: #a0aec0;
+}
+
+.header-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.filter-dropdown {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  background-color: #2d3748;
+  color: white;
+  border: 1px solid #4a5568;
+  min-width: 160px;
+}
+
+.dashboard-content {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 2rem;
+}
+
+.active-listings {
+  background-color: #2d3748;
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.listings-scroll {
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+.listing-item {
+  padding: 1rem;
+  margin: 0.5rem 0;
+  background-color: #1a202c;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.listing-item:hover {
+  background-color: #2d3748;
+}
+
+.listing-item.selected {
+  background-color: #2d3748;
+  border-left: 3px solid #4299e1;
+}
+
+.listing-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.listing-name {
+  font-weight: 500;
+  color: white;
+}
+
+.listing-role {
+  font-size: 0.875rem;
+  color: #a0aec0;
+}
+
+.assignment-badge {
+  background-color: #2c5282;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+}
+
+.assignments-container {
+  background-color: #2d3748;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+}
+
+/* Update existing assignment card styles */
+.assignment-card {
+  background-color: #1a202c;
+  border: 1px solid #2d3748;
+  margin-bottom: 1rem;
+}
+
+/* Add responsive styles */
+@media screen and (max-width: 1024px) {
+  .dashboard-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .active-listings {
+    margin-bottom: 1rem;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .header-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .search-input,
+  .filter-dropdown {
+    width: 100%;
+  }
+}
