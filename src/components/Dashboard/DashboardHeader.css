@@ -105,6 +105,18 @@
   gap: 1.5rem;
 }
 
+.stats-grid.horizontal {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+}
+
+.stats-grid.horizontal .stats-card {
+  flex: 1;
+}
+
 .stats-card {
   background: rgba(30, 41, 59, 0.5);
   border-radius: 0.75rem;

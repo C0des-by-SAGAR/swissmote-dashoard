@@ -25,6 +25,7 @@ const AutomatedListings = ({ listings }) => {
   const [showFollowUpModal, setShowFollowUpModal] = useState(false);
   const [selectedListingForFollowUp, setSelectedListingForFollowUp] = useState(null);
   const [isSubmittingAssignment, setIsSubmittingAssignment] = useState(false);
+  const [isSubmittingAnnouncement, setIsSubmittingAnnouncement] = useState(false);
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [isSubmittingFollowup, setIsSubmittingFollowup] = useState(false);
   const cardsPerPage = 3;
@@ -123,24 +124,20 @@ const AutomatedListings = ({ listings }) => {
   };
 
   const handleSubmitAnnouncement = async (message) => {
-    try {
-      const loadingToast = toast.loading('Sending announcement...');
-      
-      const result = await announcementService.makeAnnouncement(
-        selectedListingForAnnouncement.listingNumber,
-        message
-      );
-      
-      toast.update(loadingToast, {
-        render: result.message || 'Announcement sent successfully!',
-        type: 'success',
-        isLoading: false,
-        autoClose: 3000
-      });
+    if (!message?.trim()) {
+      toast.error('Please enter an announcement message');
+      return;
+    }
 
+    try {
+      setIsSubmittingAnnouncement(true);
+      await announcementService.makeAnnouncement(selectedListingForAnnouncement.id, message);
+      toast.success('Announcement sent successfully');
       handleCloseAnnouncementModal();
     } catch (error) {
-      toast.error(error.message || 'Failed to send announcement');
+      toast.error('Failed to send announcement: ' + error.message);
+    } finally {
+      setIsSubmittingAnnouncement(false);
     }
   };
 
@@ -402,35 +399,22 @@ const AutomatedListings = ({ listings }) => {
           <div className="modal-content">
             <div className="modal-header">
               <h2>Add Assignment URL</h2>
-              <button 
-                className="close-button"
-                onClick={handleCloseAssignmentModal}
-                aria-label="Close"
-                disabled={isSubmittingAssignment}
-              >
-                ×
-              </button>
+              <button className="close-button" onClick={handleCloseAssignmentModal}>×</button>
             </div>
-            <input
-              type="text"
-              className="assignment-input"
-              placeholder="Enter assignment URL"
-              disabled={isSubmittingAssignment}
-            />
-            <div className="modal-footer">
-              <button 
-                className="cancel-button"
-                onClick={handleCloseAssignmentModal}
+            <div className="modal-body">
+              <input
+                type="text"
+                className="input-field"
+                placeholder="Enter assignment URL"
                 disabled={isSubmittingAssignment}
-              >
+              />
+            </div>
+            <div className="modal-footer">
+              <button className="cancel-button" onClick={handleCloseAssignmentModal}>
                 Cancel
               </button>
-              <button 
-                className="submit-button"
-                onClick={() => handleSubmitAssignment(document.querySelector('.assignment-input').value)}
-                disabled={isSubmittingAssignment}
-              >
-                {isSubmittingAssignment ? 'Posting...' : 'Submit'}
+              <button className="submit-button" onClick={() => handleSubmitAssignment(document.querySelector('.input-field').value)}>
+                Submit
               </button>
             </div>
           </div>
@@ -442,34 +426,24 @@ const AutomatedListings = ({ listings }) => {
           <div className="modal-content">
             <div className="modal-header">
               <h2>Make Announcement</h2>
-              <button 
-                className="close-button"
-                onClick={handleCloseAnnouncementModal}
-                aria-label="Close"
-              >
-                ×
+              <button className="close-button" onClick={handleCloseAnnouncementModal}>×</button>
+            </div>
+            <div className="modal-body">
+              <textarea
+                className="input-field"
+                placeholder="Enter your announcement"
+                rows={4}
+                disabled={isSubmittingAnnouncement}
+              />
+            </div>
+            <div className="modal-footer">
+              <button className="cancel-button" onClick={handleCloseAnnouncementModal}>
+                Cancel
+              </button>
+              <button className="submit-button" onClick={() => handleSubmitAnnouncement(document.querySelector('textarea').value)}>
+                Send Announcement
               </button>
             </div>
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              const message = e.target.elements.announcement.value;
-              handleSubmitAnnouncement(message);
-            }}>
-              <textarea
-                name="announcement"
-                placeholder="Enter your announcement message..."
-                className="announcement-textarea"
-                required
-              />
-              <div className="modal-footer">
-                <button type="button" onClick={handleCloseAnnouncementModal} className="cancel-button">
-                  Cancel
-                </button>
-                <button type="submit" className="submit-button">
-                  Send Announcement
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       )}
@@ -479,38 +453,22 @@ const AutomatedListings = ({ listings }) => {
           <div className="modal-content">
             <div className="modal-header">
               <h2>Add Review</h2>
-              <button 
-                className="close-button"
-                onClick={handleCloseReviewModal}
-                aria-label="Close"
-                disabled={isSubmittingReview}
-              >
-                ×
-              </button>
+              <button className="close-button" onClick={handleCloseReviewModal}>×</button>
             </div>
             <div className="modal-body">
-              <label className="input-label">Review Link</label>
               <input
                 type="text"
-                className="review-input"
-                placeholder="Enter the review link..."
+                className="input-field"
+                placeholder="Enter review URL"
                 disabled={isSubmittingReview}
               />
             </div>
             <div className="modal-footer">
-              <button 
-                className="cancel-button"
-                onClick={handleCloseReviewModal}
-                disabled={isSubmittingReview}
-              >
+              <button className="cancel-button" onClick={handleCloseReviewModal}>
                 Cancel
               </button>
-              <button 
-                className="submit-button"
-                onClick={() => handleSubmitReview(document.querySelector('.review-input').value)}
-                disabled={isSubmittingReview}
-              >
-                {isSubmittingReview ? 'Adding...' : 'Submit'}
+              <button className="submit-button" onClick={() => handleSubmitReview(document.querySelector('.input-field').value)}>
+                Submit
               </button>
             </div>
           </div>
@@ -522,20 +480,13 @@ const AutomatedListings = ({ listings }) => {
           <div className="modal-content">
             <div className="modal-header">
               <h2>Edit Follow-Up Message</h2>
-              <button 
-                className="close-button"
-                onClick={handleCloseFollowUpModal}
-                aria-label="Close"
-                disabled={isSubmittingFollowup}
-              >
-                ×
-              </button>
+              <button className="close-button" onClick={handleCloseFollowUpModal}>×</button>
             </div>
             <div className="modal-body">
               <div className="input-group">
                 <label className="input-label">Day 2 Follow-Up</label>
                 <textarea
-                  className="followup-input"
+                  className="input-field"
                   defaultValue={selectedListingForFollowUp?.day2Followup}
                   rows={4}
                   disabled={isSubmittingFollowup}
@@ -544,7 +495,7 @@ const AutomatedListings = ({ listings }) => {
               <div className="input-group">
                 <label className="input-label">Day 4 Follow-Up</label>
                 <textarea
-                  className="followup-input"
+                  className="input-field"
                   defaultValue={selectedListingForFollowUp?.day4Followup}
                   rows={4}
                   disabled={isSubmittingFollowup}
@@ -552,23 +503,18 @@ const AutomatedListings = ({ listings }) => {
               </div>
             </div>
             <div className="modal-footer">
-              <button 
-                className="cancel-button"
-                onClick={handleCloseFollowUpModal}
-                disabled={isSubmittingFollowup}
-              >
+              <button className="cancel-button" onClick={handleCloseFollowUpModal}>
                 Cancel
               </button>
               <button 
-                className="submit-button update-message"
+                className="submit-button"
                 onClick={() => {
                   const day2Input = document.querySelector('.followup-input:first-of-type');
                   const day4Input = document.querySelector('.followup-input:last-of-type');
                   handleUpdateFollowUp(day2Input.value, day4Input.value);
                 }}
-                disabled={isSubmittingFollowup}
               >
-                {isSubmittingFollowup ? 'Updating...' : 'Update Message'}
+                Update Message
               </button>
             </div>
           </div>

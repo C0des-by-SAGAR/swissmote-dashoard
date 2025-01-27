@@ -92,7 +92,7 @@ const DashboardHeader = () => {
   return (
     <div className="dashboard-header">
       <h1>Welcome to Swissmote Dashboard</h1>
-      <div className="stats-grid">
+      <div className="stats-grid horizontal">
         {statsConfig.map((stat, index) => (
           <StatsCard
             key={index}

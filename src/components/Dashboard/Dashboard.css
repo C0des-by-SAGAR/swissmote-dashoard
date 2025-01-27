@@ -29,14 +29,13 @@
 }
 
 .chart-card {
-  background: rgba(30, 41, 59, 0.5);
-  border-radius: 0.75rem;
+  min-height: 500px;
   padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  backdrop-filter: blur(8px);
-  margin-top: 0.5rem;
+  background: #1E2A3B;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* Responsive grid layout */
@@ -72,17 +71,15 @@
 }
 
 .dashboard-charts-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 1.5rem;
-  margin-top: 2rem;
+  display: none;
 }
 
 .chart-title {
-  color: #e2e8f0;
+  color: #ffffff;
   font-size: 1.25rem;
   font-weight: 600;
   margin-bottom: 1.5rem;
+  opacity: 0.9;
 }
 
 .chart-summary, .distribution-summary, .review-summary {
@@ -130,37 +127,38 @@
 }
 
 .sent-dot {
-  background-color: #4299e1;
+  background-color: #3B82F6;  /* Blue */
 }
 
 .pending-dot {
-  background-color: #ed8936;
+  background-color: #6366F1;  /* Indigo */
 }
 
 .sent {
-  color: #2b6cb0;
+  color: #3B82F6;  /* Blue */
 }
 
 .pending {
-  color: #c05621;
+  color: #6366F1;  /* Indigo */
 }
 
 /* Distribution colors update */
-.range-0-25 { color: #f687b3; }
-.range-26-50 { color: #f6ad55; }
-.range-51-75 { color: #63b3ed; }
-.range-76-100 { color: #68d391; }
+.range-0-25 { color: #3B82F6; }  /* Blue */
+.range-26-50 { color: #6366F1; } /* Indigo */
+.range-51-75 { color: #10B981; } /* Green */
+.range-76-100 { color: #8B5CF6; } /* Purple */
 
 .custom-tooltip {
-  background-color: rgba(30, 41, 59, 0.95);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  padding: 0.75rem;
-  border-radius: 0.5rem;
-  backdrop-filter: blur(8px);
+  background: rgba(30, 42, 59, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px 12px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .custom-tooltip .label {
-  color: #e2e8f0;
+  color: #ffffff;
+  font-size: 12px;
   margin: 0;
 }
 
@@ -232,11 +230,11 @@
   background-color: currentColor;
 }
 
-/* Colors for distribution ranges */
-.range-0-25::before { background-color: #f687b3; }
-.range-26-50::before { background-color: #f6ad55; }
-.range-51-75::before { background-color: #63b3ed; }
-.range-76-100::before { background-color: #68d391; }
+/* Update distribution range colors */
+.range-0-25::before { background-color: #3B82F6; }
+.range-26-50::before { background-color: #6366F1; }
+.range-51-75::before { background-color: #10B981; }
+.range-76-100::before { background-color: #8B5CF6; }
 
 @media (max-width: 768px) {
   .summary-columns {
@@ -478,4 +476,375 @@
     width: 100%;
     margin-right: 0;
   }
+}
+
+/* Add these new styles for horizontal scrolling */
+.horizontal-charts-wrapper {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(300px, 1fr));
+  gap: 1.5rem;
+  padding: 0.5rem 0;
+  margin: 1.5rem 0;
+  width: 100%;
+}
+
+/* Style the scrollbar */
+.horizontal-charts-wrapper::-webkit-scrollbar {
+  height: 6px;
+}
+
+.horizontal-charts-wrapper::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.horizontal-charts-wrapper::-webkit-scrollbar-thumb {
+  background-color: rgba(148, 163, 184, 0.3);
+  border-radius: 6px;
+}
+
+/* Update the ResponsiveContainer dimensions */
+.recharts-responsive-container {
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Update grid lines */
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: rgba(255, 255, 255, 0.05);
+}
+
+/* Update axis lines */
+.recharts-xAxis line,
+.recharts-yAxis line {
+  stroke: rgba(255, 255, 255, 0.1);
+}
+
+/* Update text colors */
+.recharts-text {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  fill: #fff;
+}
+
+/* Update legend styles */
+.recharts-legend-item-text {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Add specific styles for the line chart */
+.recharts-area-curve {
+  opacity: 0.7;
+}
+
+.recharts-area {
+  opacity: 0.6;
+}
+
+.recharts-line {
+  stroke-width: 2;
+}
+
+.recharts-line-dot {
+  stroke-width: 2;
+}
+
+.recharts-tooltip-wrapper {
+  z-index: 1000;
+}
+
+.recharts-default-tooltip {
+  background-color: #1E2A3B !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 4px;
+  padding: 8px 12px;
+}
+
+/* Add these new styles for the follow-up stats section */
+.follow-up-stats {
+  display: flex;
+  gap: 2rem;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+}
+
+.follow-up-column {
+  flex: 1;
+}
+
+.follow-up-title {
+  font-size: 1.125rem;
+  color: #ffffff;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.stats-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.stat-label {
+  font-weight: 500;
+}
+
+.stat-value {
+  font-weight: 600;
+}
+
+/* Day 2 colors */
+.sent {
+  color: #10B981; /* Green */
+}
+
+.pending {
+  color: #F59E0B; /* Yellow/Orange */
+}
+
+/* Day 4 colors */
+.sent-day4 {
+  color: #3B82F6; /* Blue */
+}
+
+.pending-day4 {
+  color: #EF4444; /* Red */
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .follow-up-stats {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .follow-up-title {
+    font-size: 1rem;
+  }
+
+  .stats-row {
+    font-size: 0.875rem;
+  }
+}
+
+/* Style for pie chart segments */
+.recharts-pie-sector {
+  transition: opacity 0.2s ease;
+}
+
+.recharts-pie-sector:hover {
+  opacity: 0.85;
+}
+
+/* Style for the connecting lines */
+.recharts-pie-label-line {
+  stroke: rgba(255, 255, 255, 0.5);
+}
+
+/* Adjust label line colors */
+.recharts-label-line {
+  stroke: rgba(255, 255, 255, 0.6);
+  stroke-width: 1px;
+}
+
+/* Pie sector styles */
+.recharts-pie-sector {
+  transition: opacity 0.2s ease;
+}
+
+.recharts-pie-sector:hover {
+  opacity: 0.85;
+}
+
+/* Label text styles */
+.recharts-text {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  fill: #fff;
+}
+
+/* Label line styles */
+.recharts-layer line {
+  stroke: rgba(255, 255, 255, 0.6);
+}
+
+/* Center the pie chart */
+.recharts-responsive-container {
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Pie sector styles */
+.recharts-pie-sector {
+  transition: opacity 0.2s ease;
+}
+
+.recharts-pie-sector:hover {
+  opacity: 0.85;
+}
+
+/* Tooltip styles */
+.custom-tooltip {
+  background: rgba(30, 42, 59, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px 12px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.custom-tooltip .label {
+  color: #ffffff;
+  font-size: 12px;
+  margin: 0;
+}
+
+/* Add responsive breakpoints */
+@media screen and (max-width: 1200px) {
+  .horizontal-charts-wrapper {
+    grid-template-columns: repeat(2, minmax(300px, 1fr));
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .horizontal-charts-wrapper {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .chart-card {
+    min-height: 400px;
+  }
+}
+
+/* Line graph label styles */
+.recharts-xAxis .recharts-cartesian-axis-tick-value {
+  font-size: 12px;
+  fill: rgba(255, 255, 255, 0.7);
+}
+
+.recharts-yAxis .recharts-cartesian-axis-tick-value {
+  font-size: 12px;
+  fill: rgba(255, 255, 255, 0.7);
+}
+
+/* Adjust x-axis label positioning */
+.recharts-xAxis .recharts-cartesian-axis-tick {
+  padding: 8px;
+}
+
+/* Style for line graph dots */
+.recharts-dot {
+  fill: #3B82F6;
+  stroke: #1E2A3B;
+  stroke-width: 2;
+}
+
+/* Style for the line itself */
+.recharts-line-curve {
+  stroke: #3B82F6;
+  stroke-width: 2;
+}
+
+/* Add padding to the chart container */
+.chart-card .recharts-wrapper {
+  padding: 1rem 0;
+  margin: 0 -1rem; /* Compensate for parent padding */
+}
+
+/* Ensure labels don't overlap */
+.recharts-cartesian-axis-tick text {
+  text-anchor: middle;
+}
+
+/* Improve axis line visibility */
+.recharts-cartesian-axis-line {
+  stroke: rgba(255, 255, 255, 0.1);
+}
+
+/* Add grid lines */
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: rgba(255, 255, 255, 0.05);
+}
+
+/* Chart title styles */
+.chart-title {
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  opacity: 0.9;
+}
+
+/* Distribution section styles */
+.distribution-title {
+  color: #94A3B8;
+  font-size: 1rem;
+  font-weight: 500;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Distribution list styles */
+.distribution-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.distribution-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #E2E8F0;
+  font-size: 0.875rem;
+}
+
+/* Review links section styles */
+.review-links {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.review-status {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.review-label {
+  color: #94A3B8;
+}
+
+.review-value {
+  color: #E2E8F0;
+  font-weight: 500;
+}
+
+/* Axis label styles */
+.recharts-xAxis .recharts-cartesian-axis-tick-value {
+  font-size: 12px;
+  fill: rgba(255, 255, 255, 0.7);
+  text-anchor: middle;
+}
+
+/* Custom class for conversion rate labels */
+.conversion-rate-label {
+  font-size: 12px;
+  fill: rgba(255, 255, 255, 0.7);
+}
+
+/* Custom class for review status labels */
+.review-status-label {
+  font-size: 12px;
+  fill: rgba(255, 255, 255, 0.7);
 }

@@ -7,123 +7,115 @@ export const dashboardGraphService = {
     try {
       // Fetch all required data in parallel
       const [
-        activeListings, 
-        closedListings,
-        saJobData,
+        saJobData, 
         saInternData,
         pvJobData,
         pvInternData
       ] = await Promise.all([
-        activeListingService.getActiveListings(),
-        closedListingService.getClosedListings(),
         autoListingsService.getSAJobListings(),
         autoListingsService.getSAInternshipListings(),
         autoListingsService.getPVJobListings(),
         autoListingsService.getPVInternshipListings()
       ]);
 
-      // Combine all automated listings and ensure proper data structure
+      // Combine all automated listings
       const autoListings = [
         ...(saJobData?.automated || []),
         ...(saInternData?.automated || []),
         ...(pvJobData?.automated || []),
         ...(pvInternData?.automated || [])
-      ].map(listing => ({
-        ...listing,
-        messages: listing.messages || {},
-        followup: listing.followup || listing.messages?.followup || {}
-      }));
+      ];
 
-      console.log('Auto Listings:', autoListings); // Debug log
-
-      // Calculate Follow-up Status from auto listings
+      // Follow-up Status calculation
       const followUpData = [
         {
           name: 'Day 2 Sent',
           value: autoListings.filter(listing => 
-            listing.followup?.day2?.status === 'Completed' ||
-            listing.day2_status === 'Completed' ||
-            listing.messages?.followup?.day2?.status === 'Completed'
+            listing.day2followup?.status === 1
           ).length
         },
         {
           name: 'Day 2 Pending',
           value: autoListings.filter(listing => 
-            listing.followup?.day2?.status === 'Pending' ||
-            listing.day2_status === 'Pending' ||
-            listing.messages?.followup?.day2?.status === 'Pending' ||
-            (!listing.followup?.day2?.status && !listing.day2_status && !listing.messages?.followup?.day2?.status)
+            listing.day2followup?.status === 0
           ).length
         },
         {
           name: 'Day 4 Sent',
           value: autoListings.filter(listing => 
-            listing.followup?.day4?.status === 'Completed' ||
-            listing.day4_status === 'Completed' ||
-            listing.messages?.followup?.day4?.status === 'Completed'
+            listing.day4followup?.status === 1
           ).length
         },
         {
           name: 'Day 4 Pending',
           value: autoListings.filter(listing => 
-            listing.followup?.day4?.status === 'Pending' ||
-            listing.day4_status === 'Pending' ||
-            listing.messages?.followup?.day4?.status === 'Pending' ||
-            (!listing.followup?.day4?.status && !listing.day4_status && !listing.messages?.followup?.day4?.status)
+            listing.day4followup?.status === 0
           ).length
         }
       ];
 
-      console.log('Follow-up Data:', followUpData); // Debug log
-
       // Calculate Conversion Rate Distribution
-      const allListings = [...activeListings, ...closedListings];
       const conversionData = [
         {
           name: '0-25%',
-          value: allListings.filter(listing => {
-            const rate = parseFloat(listing.conversionRate?.replace('%', '') || '0');
-            return rate <= 25;
+          value: autoListings.filter(listing => {
+            const received = listing.metrics?.assignments_received_count || 0;
+            const sent = listing.metrics?.assignments_sent_count || 0;
+            const rate = sent > 0 ? (received / sent) * 100 : 0;
+            return rate >= 0 && rate <= 25;
           }).length
         },
         {
           name: '26-50%',
-          value: allListings.filter(listing => {
-            const rate = parseFloat(listing.conversionRate?.replace('%', '') || '0');
+          value: autoListings.filter(listing => {
+            const received = listing.metrics?.assignments_received_count || 0;
+            const sent = listing.metrics?.assignments_sent_count || 0;
+            const rate = sent > 0 ? (received / sent) * 100 : 0;
             return rate > 25 && rate <= 50;
           }).length
         },
         {
           name: '51-75%',
-          value: allListings.filter(listing => {
-            const rate = parseFloat(listing.conversionRate?.replace('%', '') || '0');
+          value: autoListings.filter(listing => {
+            const received = listing.metrics?.assignments_received_count || 0;
+            const sent = listing.metrics?.assignments_sent_count || 0;
+            const rate = sent > 0 ? (received / sent) * 100 : 0;
             return rate > 50 && rate <= 75;
           }).length
         },
         {
           name: '76-100%',
-          value: allListings.filter(listing => {
-            const rate = parseFloat(listing.conversionRate?.replace('%', '') || '0');
-            return rate > 75;
+          value: autoListings.filter(listing => {
+            const received = listing.metrics?.assignments_received_count || 0;
+            const sent = listing.metrics?.assignments_sent_count || 0;
+            const rate = sent > 0 ? (received / sent) * 100 : 0;
+            return rate > 75 && rate <= 100;
           }).length
         }
       ];
 
-      // Calculate Review Links Status
+      // Review Links Status calculation
       const reviewData = [
         {
           name: 'Reviews Added',
-          value: allListings.filter(listing => 
-            listing.reviewLinks && listing.reviewLinks.length > 0).length
+          value: autoListings.filter(listing => 
+            Array.isArray(listing.review_link) && 
+            listing.review_link.length > 0
+          ).length
         },
         {
           name: 'Reviews Pending',
-          value: allListings.filter(listing => 
-            !listing.reviewLinks || listing.reviewLinks.length === 0).length
+          value: autoListings.filter(listing => {
+            const hasNoReviews = !listing.review_link || 
+              !Array.isArray(listing.review_link) || 
+              listing.review_link.length === 0;
+            const hasReceivedAssignments = (listing.metrics?.assignments_received_count || 0) > 0;
+            return hasNoReviews && hasReceivedAssignments;
+          }).length
         }
       ];
 
-      // Summary data for detailed stats
+      // Summary data
       const summaryData = {
         followUp: {
           day2: {
