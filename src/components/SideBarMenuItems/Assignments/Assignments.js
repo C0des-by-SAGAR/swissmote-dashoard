@@ -342,13 +342,13 @@ const Assignments = () => {
       
       const { assignments, total } = await assignmentsService.getAssignments(listingId);
       
-      // Update the assignments list and the count
+      // Update the assignments list
       setAssignmentsList(prev => ({
         ...prev,
         [listingId]: assignments
       }));
 
-      // Update the active listings with the correct assignment count
+      // Update only the selected listing's assignment count
       setActiveListings(prevListings => 
         prevListings.map(listing => 
           listing.id === listingId 
@@ -375,17 +375,6 @@ const Assignments = () => {
     }
   };
 
-  const handleReviewAssignments = async (listing) => {
-    setSelectedListing(listing);
-    if (!assignmentsList[listing.id]) {
-      await fetchAssignments(listing.id);
-    }
-  };
-
-  const handleBack = () => {
-    setSelectedListing(null);
-  };
-
   const fetchActiveListings = async () => {
     try {
       setIsLoading(true);
@@ -395,31 +384,15 @@ const Assignments = () => {
         throw new Error('Invalid listings response');
       }
 
+      // Initialize listings with 0 assignments
       const initialListings = listings.map(listing => ({
         id: listing.id,
         name: listing.projectName || `Project #${listing.id}`,
         role: listing.role || 'Role not specified',
-        assignmentCount: 0
+        assignmentCount: 0 // Initialize with 0, will be updated when listing is selected
       }));
 
       setActiveListings(initialListings);
-
-      // Fetch assignment counts separately
-      for (const listing of initialListings) {
-        try {
-          const { total } = await assignmentsService.getAssignments(listing.id, 10, 0);
-          
-          setActiveListings(prev => 
-            prev.map(item => 
-              item.id === listing.id 
-                ? { ...item, assignmentCount: total }
-                : item
-            )
-          );
-        } catch (error) {
-          console.error(`Error fetching assignments for listing ${listing.id}:`, error);
-        }
-      }
     } catch (error) {
       console.error('Error fetching listings:', error);
       toast.error('Failed to fetch listings');
@@ -427,6 +400,18 @@ const Assignments = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleReviewAssignments = async (listing) => {
+    setSelectedListing(listing);
+    // Only fetch assignments if they haven't been loaded yet
+    if (!assignmentsList[listing.id]) {
+      await fetchAssignments(listing.id);
+    }
+  };
+
+  const handleBack = () => {
+    setSelectedListing(null);
   };
 
   // Filter listings based on search term
