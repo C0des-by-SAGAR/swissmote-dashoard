@@ -32,7 +32,7 @@ export const activeListingService = {
       }
 
       // Transform the API response to match our component's data structure
-      return response.data.map(listing => ({
+      const transformedListings = response.data.map(listing => ({
         id: listing['Listing No'] || '',
         listingName: listing.listing_name || '',
         projectName: listing['Project Name'] || '', 
@@ -58,6 +58,16 @@ export const activeListingService = {
             listing['Assignment link']
           ) : []
       }));
+
+      // Filter out expired listings
+      const currentDate = new Date();
+      const filteredListings = transformedListings.filter(listing => {
+        if (!listing.expiryAt) return true; // Keep listings with no expiry date
+        const expiryDate = new Date(listing.expiryAt);
+        return !isNaN(expiryDate.getTime()) && expiryDate > currentDate;
+      });
+
+      return filteredListings;
     } catch (error) {
       // Enhanced error handling with logging
       console.error('Full error:', error);
